@@ -329,7 +329,7 @@ loadef(mword fd, char *filename)
 
     if(xnfree) {        /* Are these any free nodes to use? */
         pnode = xnfree; /* Yes, seize one */
-        xnfree = (pXFNode)pnode->xnu.ef.xnpfn;
+        xnfree = (pXFNode)(mword)pnode->xnu.xndta[1]; /* xndta[1] = free-list next */
     } else {
         MINSAVE(); /* No */
         SET_WA(sizeof(XFNode));
@@ -340,8 +340,8 @@ loadef(mword fd, char *filename)
 
     pnode->xntyp = TYPE_XNT;       /* B_XNT type word */
     pnode->xnlen = sizeof(XFNode); /* length of this block */
-    pnode->xnu.ef.xnhand = handle; /* record DLL handle */
-    pnode->xnu.ef.xnpfn = pfn;     /* record function entry address */
+    pnode->xnu.xndta[0] = (mword)(uintptr_t)handle; /* xndta[0] = DLL handle */
+    pnode->xnu.xndta[1] = (mword)(uintptr_t)pfn;    /* xndta[1] = function entry point */
     pnode->xnu.ef.xn1st = 2;       /* flag first call to function */
     pnode->xnu.ef.xnsave = 0;      /* not reload from save file */
     pnode->xnu.ef.xncbp = (void far (*)())0; /* no callback  declared */
@@ -426,7 +426,7 @@ nextef(unsigned char **bufp, int io)
                     (pnode->xnu.ef.xncbp)();
                     pnode->xnu.ef.xnsave = -1;
                 }
-            *bufp = (unsigned char *)pnode->xnu.ef.xnpfn;
+            *bufp = (unsigned char *)(uintptr_t)pnode->xnu.xndta[1]; /* xndta[1] = pfn */
             result = (void *)1; /* phony non-zero size of code */
             break;
         }
@@ -478,9 +478,9 @@ unldef(struct efblk *efb)
         }
 
     efb->efcod = 0;                /* remove pointer to XNBLK */
-    dlclose(pnode->xnu.ef.xnhand); /* close use of handle */
+    dlclose((void *)(uintptr_t)pnode->xnu.xndta[0]); /* xndta[0] = DLL handle */
 
-    pnode->xnu.ef.xnpfn = (PFN)xnfree; /* put back on free list */
+    pnode->xnu.xndta[1] = (mword)(uintptr_t)xnfree; /* put back on free list */
     xnfree = pnode;
 }
 
