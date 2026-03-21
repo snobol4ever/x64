@@ -1,0 +1,19 @@
+* test_spitbol_ipc.sno — M-X64-S4: SNOLIB + monitor_ipc_spitbol.so IPC end-to-end
+* Run: SNOLIB=<dir> MONITOR_FIFO=<fifo> ./bootsbl test_spitbol_ipc.sno
+*      (reader must already be cat-ing the FIFO)
+        LOAD('MON_OPEN(STRING)STRING',        'monitor_ipc_spitbol.so') :F(LDFAIL)
+        LOAD('MON_SEND(STRING,STRING)STRING', 'monitor_ipc_spitbol.so') :F(LDFAIL)
+        LOAD('MON_CLOSE()STRING',             'monitor_ipc_spitbol.so') :F(LDFAIL)
+        FIFO_ = HOST(4,'MONITOR_FIFO')
+        IDENT(FIFO_)                                                     :S(NOMON)
+        MON_OPEN(FIFO_)                                                  :F(OPENFAIL)
+        MON_SEND('VALUE','X = hello')
+        MON_SEND('CALL','MyFunc')
+        MON_SEND('RETURN','MyFunc = 42')
+        MON_CLOSE()
+        OUTPUT = 'PASS: M-X64-S4 SPITBOL IPC end-to-end'
+                                                                         :(END)
+NOMON   OUTPUT = 'PASS: M-X64-S4 LOAD ok (no MONITOR_FIFO set)'         :(END)
+LDFAIL  OUTPUT = 'FAIL: LOAD failed'                                     :(END)
+OPENFAIL OUTPUT = 'FAIL: MON_OPEN failed'
+END

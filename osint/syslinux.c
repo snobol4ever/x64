@@ -16,6 +16,7 @@ Copyright 2012-2017 David Shields
 #include "port.h"
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #undef brk  /* remove sproto redefinition */
 #undef sbrk /* remove sproto redefinition */
 #include <malloc.h>
@@ -173,13 +174,17 @@ callef(struct efblk *efb, union block **sp, mword nargs)
         union block *blk = sp[nargs - 1 - i];
         cargs[i].f = 0;
         switch(efb->eftar[i]) {
+        case constr: /* 1 — STRING: pass scblk* directly; fn reads typ/len/str[] */
+            cargs[i].a.i = (long)(uintptr_t)blk;
+            cargs[i].v   = LDESCR_STR;
+            break;
         case conint: /* 2 — INTEGER */
             cargs[i].a.i = blk->icb.icval;
             cargs[i].v   = LDESCR_INT;
             break;
         default:
-            /* future: string, real, noconv */
-            cargs[i].a.i = blk->icb.icval;
+            /* noconv/real/file: pass raw block ptr, tag as integer */
+            cargs[i].a.i = (long)(uintptr_t)blk;
             cargs[i].v   = LDESCR_INT;
             break;
         }
@@ -201,6 +206,20 @@ callef(struct efblk *efb, union block **sp, mword nargs)
 
     if(!load_rc)
         return (union block *)0; /* FAIL */
+
+    /* Pack return value — INTEGER or STRING */
+    if(retval.v == LDESCR_STR) {
+        /* STRING return: retval.a.i = char* data, retval.f = (char)length (<=127)
+         * or retval.v tag distinguishes; use ptscblk (512-byte scratch block). */
+        const char *rp  = (const char *)(uintptr_t)retval.a.i;
+        word        rln = (word)(unsigned char)retval.f;  /* length stored in f byte */
+        if(!rp) rln = 0;
+        if(rln > tscblk_length) rln = tscblk_length;
+        ptscblk->sctyp = TYPE_SCL;
+        ptscblk->sclen = rln;
+        if(rln > 0) memcpy(ptscblk->scstr, rp, (size_t)rln);
+        return (union block *)ptscblk;
+    }
 
     /* Pack integer return into ticblk (scratch block outside dynamic mem) */
     pticblk->ictyp = TYPE_ICL;
@@ -225,6 +244,7 @@ loadDll(char *dllName, char *fcnName, PFN *ppfnProcAddress)
 {
     void *handle;
     PFN pfn;
+    char filebuf[512];
 
 # ifdef RTLD_NOW
     handle = dlopen(dllName, RTLD_NOW);
@@ -233,7 +253,19 @@ loadDll(char *dllName, char *fcnName, PFN *ppfnProcAddress)
 # endif
     if(!handle) {
         dlerror();
-        return -1;
+        /* Try SNOLIB search path — same mechanism as include-file search */
+        initpath("snolib");
+        while(trypath(dllName, filebuf)) {
+#  ifdef RTLD_NOW
+            handle = dlopen(filebuf, RTLD_NOW);
+#  else
+            handle = dlopen(filebuf, RTLD_LAZY);
+#  endif
+            if(handle) break;
+            dlerror();
+        }
+        if(!handle)
+            return -1;
     }
 
     *ppfnProcAddress = (PFN)dlsym(handle, fcnName);
