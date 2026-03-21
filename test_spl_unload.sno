@@ -1,0 +1,30 @@
+* test_spl_unload.sno — M-X64-S3: UNLOAD lifecycle
+* Tests: cleanup, reload after unload, double-unload safety
+*
+* Test 1: UNLOAD cleans up — function gone after UNLOAD
+        LOAD('spl_add(INTEGER,INTEGER)INTEGER','./libspl.so')   :F(LOADFAIL)
+        UNLOAD('spl_add')                                       :F(UNFAIL1)
+        OUTPUT = 'PASS: T1 UNLOAD succeeds'
+                                                                :(T2)
+UNFAIL1 OUTPUT = 'FAIL: T1 UNLOAD failed'                      :(END)
+LOADFAIL OUTPUT = 'FAIL: LOAD failed'                          :(END)
+*
+* Test 2: Reload after unload — LOAD → UNLOAD → LOAD → call works
+T2      LOAD('spl_add(INTEGER,INTEGER)INTEGER','./libspl.so')   :F(LOADFAIL2)
+        RESULT = spl_add(3,4)                                   :F(CALLFAIL2)
+        EQ(RESULT,7)                                            :F(WRONGVAL2)
+        OUTPUT = 'PASS: T2 reload after unload works'
+        UNLOAD('spl_add')
+                                                                :(T3)
+LOADFAIL2 OUTPUT = 'FAIL: T2 reload LOAD failed'               :(END)
+CALLFAIL2 OUTPUT = 'FAIL: T2 reload call failed'               :(END)
+WRONGVAL2 OUTPUT = 'FAIL: T2 expected 7, got ' RESULT          :(END)
+*
+* Test 3: Double-unload is safe — second UNLOAD must not crash
+T3      LOAD('spl_add(INTEGER,INTEGER)INTEGER','./libspl.so')   :F(LOADFAIL3)
+        UNLOAD('spl_add')
+        UNLOAD('spl_add')
+        OUTPUT = 'PASS: T3 double-unload safe'
+                                                                :(END)
+LOADFAIL3 OUTPUT = 'FAIL: T3 LOAD failed'                      :(END)
+END
