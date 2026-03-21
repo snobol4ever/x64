@@ -18,7 +18,7 @@ DEST=$(destprefix)/bin
 DEMODEST=$(destprefix)/share/spitbol
 MANDEST=$(destprefix)/man/man1
 
-CFLAGS=-Dm64 -m64 -no-pie -fPIC  -mfpmath=sse -mlong-double-64 -ffloat-store \
+CFLAGS=-Dm64 -DEXTFUN=1 -m64 -no-pie -fPIC  -mfpmath=sse -mlong-double-64 -ffloat-store \
     -Wno-unused-command-line-argument -Wno-ignored-optimization-argument
 
 ifeq ($(DEBUG),1)
@@ -53,7 +53,7 @@ sbl: sbl.min lex.sbl asm.sbl err.sbl int.asm int.dcl int.h osint/*.c osint/*.h
 	$(ASM) $(ASMFLAGS) -l sbl.lst sbl.asm
 #stop:
 	$(CC) $(CFLAGS) -c osint/*.c
-	$(CC) $(CFLAGS) *.o -osbl -lm
+	$(CC) $(CFLAGS) *.o -osbl -lm -ldl
 
 # Use the bootstrap assembler files
 # You can then do: make BASEBOL=./bootsbl to do a first make of spitbol
@@ -64,7 +64,7 @@ bootsbl:
 	$(ASM) $(ASMFLAGS) -l int.lst int.asm
 	$(ASM) $(ASMFLAGS) -l sbl.lst sbl.asm
 	$(CC) $(CFLAGS) -c osint/*.c
-	$(CC) $(CFLAGS) *.o -obootsbl -lm
+	$(CC) $(CFLAGS) *.o -obootsbl -lm -ldl
 	rm -f *.o *.lst *.map *.err err.lex sbl.lex sbl.err sbl.asm err.asm
 
 # verify that the bootstrap files match

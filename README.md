@@ -151,7 +151,11 @@ so that one could distribute a program written in Spitbol without having to disc
 
 Load modules are not supported.
 
-Loading of external functions is not supported.
+Loading of external functions via `LOAD(s1,s2)` is now supported on Linux x86-64.
+The shared library path is passed as the second argument; the function prototype
+(name and argument types) as the first.  Build with `EXTFUN=1` (now the default
+in the Makefile) and ensure the link includes `-ldl`.  See `osint/sysld.c` and
+`osint/syslinux.c` for implementation details.
 
 ## Installing SPITBOL
 
