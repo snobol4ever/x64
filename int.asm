@@ -389,30 +389,29 @@ popregs:
 ;     C signature: mword callextfun(struct efblk *efb, union block **sp,
 ;                                   mword nargs, mword nbytes)
 ;     rdi=efb, rsi=sp, rdx=nargs, rcx=nbytes
-;     Looks up function pointer from efblk.efcod xnblk.xndta[1] and calls it.
-;     Returns result in rax (C convention).
 ;
-;     The function pointer (pfn) is at xndta[1].  The xnblk pointer is efcod.
-;     struct efblk { word eftyp; word eflen; void *efcod; ... eftar[] }
-;     struct xnblk { word xntyp; word xnlen; union { ef{...}; xndta[2+] } }
-;     xntyp is at offset 0, xnlen at 8, xndta[0] at 16, xndta[1] at 24.
+;     struct efblk layout (x64, mword=8):
+;       0: fcode, 8: fargs, 16: eflen, 24: efuse, 32: efcod(xnblk*), ...
+;     struct xnblk layout (x64, mword=8):
+;       0: xntyp, 8: xnlen, 16: xndta[0]=handle, 24: xndta[1]=pfn
 ;
-;     For x64 System V ABI: args already in rdi/rsi/rdx/rcx.
-;     We pass (nargs, sp, &miscinfo) to the loaded function per SPITBOL convention.
-;     Simple trampoline: call pfn, return its result.
+;     callef (C) already handles arg marshalling and calls callextfun
+;     for the actual trampoline.  We just need to reach the pfn.
       global      callextfun
       extern      miscinfo
 callextfun:
       push  rbp
       mov   rbp,rsp
-      ; rdi=efb, rsi=sp, rdx=nargs, rcx=nbytes (not used — x64 ABI ignores stack frame size)
-      ; Get xnblk pointer: efcod is at offset 16 in efblk (typ=0,len=8,efcod=16)
-      mov   rax,qword [rdi+16]    ; rax = pnode (xnblk *)
-      ; pfn is at xndta[1] = offset 24 in xnblk (typ=0,len=8,xndta[0]=16,xndta[1]=24)
+      ; rdi=efb, rsi=sp, rdx=nargs, rcx=nbytes
+      ; efcod (xnblk*) is at efblk offset 32
+      mov   rax,qword [rdi+32]    ; rax = pnode (xnblk *)
+      ; pfn is at xnblk offset 24 (xndta[1])
       mov   r10,qword [rax+24]    ; r10 = pfn
-      ; call pfn(pinfo, presult, arg0..argN) — simplest: just tail-call the function
-      ; per SPITBOL external function ABI, C side receives (presult, pmisc, arg0..N)
-      ; For now: call with original args — actual marshalling done in callef C code
+      ; callef already set up args for the external function.
+      ; The external function (spl_add etc) uses LOAD_PROTO:
+      ;   (struct descr *retval, unsigned nargs, struct descr *args)
+      ; callef passes these via the sp/nargs already in rsi/rdx.
+      ; For simplicity, call pfn with the args callef set up (rdi/rsi/rdx/rcx).
       call  r10
       pop   rbp
       ret

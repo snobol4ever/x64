@@ -293,7 +293,7 @@ loadDll(char *dllName, char *fcnName, PFN *ppfnProcAddress)
     handle = dlopen(dllName, RTLD_LAZY);
 # endif
     if(!handle) {
-        fcnName = dlerror();
+        dlerror();
         return -1;
     }
 

@@ -1,0 +1,17 @@
+* test_spl_add.sno — M-X64-S2: LOAD/call spl_add end-to-end
+*
+        LOAD('spl_add(INTEGER,INTEGER)INTEGER','./libspl.so')   :F(LOADFAIL)
+        RESULT = spl_add(3,4)                                   :F(CALLFAIL)
+        OUTPUT = RESULT
+        IDENT(RESULT,'7')                                       :F(WRONGVAL)
+        OUTPUT = 'PASS: spl_add(3,4) = ' RESULT
+                                                                :(END)
+LOADFAIL
+        OUTPUT = 'FAIL: LOAD() failed'
+                                                                :(END)
+CALLFAIL
+        OUTPUT = 'FAIL: spl_add() call failed'
+                                                                :(END)
+WRONGVAL
+        OUTPUT = 'FAIL: expected 7, got ' RESULT
+END

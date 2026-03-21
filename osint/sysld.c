@@ -21,6 +21,7 @@ Copyright 2024 snobol4ever contributors
  */
 
 #include "port.h"
+#include <stdio.h>
 #include <dlfcn.h>
 #include <string.h>
 
@@ -61,6 +62,7 @@ zysld()
         i = (word)sizeof(funcname) - 1;
     memcpy(funcname, fnscb->str, (size_t)i);
     funcname[i] = '\0';
+
 
     /* Open the shared library and resolve the function symbol */
     handle = loadDll(libname, funcname, &pfn);
