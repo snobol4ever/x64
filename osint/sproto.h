@@ -23,7 +23,7 @@ extern struct scblk *alocs(word nchars);
 extern union block *alost(word nchars);
 extern int appendext(char *path, char *ext, char *result, int force);
 #if EXTFUN
-extern union block *callef(struct efblk *efb, union block **sp, word nargs);
+extern union block *callef(struct efblk *efb, union block **sp, mword nargs);
 #endif
 extern int checkfpu(void);
 extern int checksave(char *namep);
@@ -84,7 +84,7 @@ extern void init_custom(void);
 extern void initpath(char *name);
 extern word lenfnm(struct scblk *scptr);
 extern int length(char *cp);
-extern void *loadef(word fd, char *filename);
+extern void *loadef(mword fd, char *filename);
 extern long lstrncmp(char *, char *, long, long);
 extern int _main(int srcfd, int argc, char *argv[]);
 extern int makeexec(struct scblk *scptr, int type);

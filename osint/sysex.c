@@ -37,7 +37,7 @@ zysex()
     /* Bypass return word in second argument to callef */
     result = callef(
         efb,
-        ((word)(MP_OFF(XS(union block **))) + sizeof(word), union block **),
+        (union block **)((word)MP_OFF(XS(union block **), word) + sizeof(word)),
         nargs);
     switch((word)result) {
     case(word)0:

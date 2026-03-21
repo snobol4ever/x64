@@ -40,14 +40,15 @@ extern double f_sub(double arg, double ra);
 extern double f_mul(double arg, double ra);
 extern double f_div(double arg, double ra);
 extern double f_neg(double ra);
-extern double f_atn(double ra);
-extern double f_chp(double ra);
-extern double f_cos(double ra);
-extern double f_etx(double ra);
-extern double f_lnf(double ra);
-extern double f_sin(double ra);
-extern double f_sqr(double ra);
-extern double f_tan(double ra);
+/* math.c provides these as void(void) using reg_ra global — cast to double(*)() in flttab */
+extern void f_atn(void);
+extern void f_chp(void);
+extern void f_cos(void);
+extern void f_etx(void);
+extern void f_lnf(void);
+extern void f_sin(void);
+extern void f_sqr(void);
+extern void f_tan(void);
 
 static APDF flttab = {
     (double (*)())f_2_i, /* float to integer */
@@ -105,7 +106,7 @@ callef(struct efblk *efb, union block **sp, mword nargs)
 {
     pXFNode pnode;
     union block *result;
-    static initsels = 0;
+    static int initsels = 0;
     static mword(*pTYPET)[];
     mword type, length;
     mword nbytes, i;

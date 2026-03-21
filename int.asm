@@ -374,6 +374,48 @@ restore_regs:
       mov   rax,m_word [save_w0]
       movsd xmm12,m_real [save_ra]
       ret
+
+;     pushregs/popregs: aliases for save_regs/restore_regs.
+;     Used by EXTFUN (LOAD/UNLOAD) machinery in syslinux.c.
+      global      pushregs
+pushregs:
+      jmp   save_regs
+
+      global      popregs
+popregs:
+      jmp   restore_regs
+
+;     callextfun - call external function loaded via LOAD().
+;     C signature: mword callextfun(struct efblk *efb, union block **sp,
+;                                   mword nargs, mword nbytes)
+;     rdi=efb, rsi=sp, rdx=nargs, rcx=nbytes
+;     Looks up function pointer from efblk.efcod xnblk.xndta[1] and calls it.
+;     Returns result in rax (C convention).
+;
+;     The function pointer (pfn) is at xndta[1].  The xnblk pointer is efcod.
+;     struct efblk { word eftyp; word eflen; void *efcod; ... eftar[] }
+;     struct xnblk { word xntyp; word xnlen; union { ef{...}; xndta[2+] } }
+;     xntyp is at offset 0, xnlen at 8, xndta[0] at 16, xndta[1] at 24.
+;
+;     For x64 System V ABI: args already in rdi/rsi/rdx/rcx.
+;     We pass (nargs, sp, &miscinfo) to the loaded function per SPITBOL convention.
+;     Simple trampoline: call pfn, return its result.
+      global      callextfun
+      extern      miscinfo
+callextfun:
+      push  rbp
+      mov   rbp,rsp
+      ; rdi=efb, rsi=sp, rdx=nargs, rcx=nbytes (not used — x64 ABI ignores stack frame size)
+      ; Get xnblk pointer: efcod is at offset 16 in efblk (typ=0,len=8,efcod=16)
+      mov   rax,qword [rdi+16]    ; rax = pnode (xnblk *)
+      ; pfn is at xndta[1] = offset 24 in xnblk (typ=0,len=8,xndta[0]=16,xndta[1]=24)
+      mov   r10,qword [rax+24]    ; r10 = pfn
+      ; call pfn(pinfo, presult, arg0..argN) — simplest: just tail-call the function
+      ; per SPITBOL external function ABI, C side receives (presult, pmisc, arg0..N)
+      ; For now: call with original args — actual marshalling done in callef C code
+      call  r10
+      pop   rbp
+      ret
 ; ;
 ; ;     startup( char *dummy1, char *dummy2) - startup compiler
 ; ;

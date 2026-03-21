@@ -143,6 +143,7 @@
     global  typet
     section .data
 
+typet:
     d_word  b_art   ; arblk type word - 0
     d_word  b_cdc   ; cdblk type word - 1
     d_word  b_exl   ; exblk type word - 2

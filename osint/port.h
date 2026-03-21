@@ -130,6 +130,24 @@ Copyright 2012-2017 David Shields
 typedef long word;           /* minimal word as signed */
 typedef unsigned long uword; /* minimal word as unsigned value */
 
+/* mword/muword: aliases used in syslinux.c (LOAD/UNLOAD path).
+ * On x64, mword = long = 8 bytes, same as word/uword.
+ */
+typedef long mword;
+typedef unsigned long muword;
+
+/* uintptr_t for pointer<->integer casts in syslinux.c */
+#include <stdint.h>
+
+/* x64 ABI frame constants.
+ * MINFRAME: no caller-saves area needed (System V AMD64 ABI uses registers).
+ * ARGPUSHSIZE: no push-based arg area on x64.
+ * SA(n): round n up to 16-byte stack alignment.
+ */
+#define MINFRAME     0
+#define ARGPUSHSIZE  0
+#define SA(n)        (((n) + 15) & ~15)
+
 /*   Define the default end of line characters.  Use Unix definition as the
  * default. */
 

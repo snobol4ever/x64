@@ -116,6 +116,12 @@ enum CALLS {
     minimal_engts
 };
 
+/* Uppercase aliases used by syslinux.c LOAD/UNLOAD machinery */
+#define MINIMAL_ALLOC  minimal_alloc
+#define MINIMAL_ALOCS  minimal_alocs
+#define MINIMAL_ALOST  minimal_alost
+#define MINIMAL_BLKLN  minimal_blkln
+
 /*
 /    Function and macro to get/set value from/to MINIMAL dataspace.
 /    The argument is an ordinal number defined below.
@@ -151,6 +157,10 @@ extern void b_xrt();
 extern void dffnc();
 extern void s_aaa();
 extern void s_yyy();
+
+/* Uppercase aliases used by syslinux.c */
+#define TYPET  typet   /* MINIMAL data: type table */
+#define B_EFC  b_efc   /* MINIMAL code: efblk type word */
 
 /* Some shorthand notations */
 #define pid1blk GET_DATA_OFFSET(id1blk, struct scblk *)

@@ -25,8 +25,8 @@ Copyright 2012-2017 David Shields
  */
 
 # include "system.h"
-typedef int mword;           /* MINIMAL word */
-typedef unsigned int muword; /* MINIMAL unsigned word */
+typedef long mword;           /* MINIMAL word — x64: long = 8 bytes */
+typedef unsigned long muword; /* MINIMAL unsigned word — x64: unsigned long = 8 bytes */
 # ifndef far
 #  define far
 # endif
