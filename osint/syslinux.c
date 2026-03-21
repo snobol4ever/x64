@@ -81,8 +81,6 @@ misc miscinfo = {
 
 /* Assembly-language helper needed for final linkage to function:
  */
-extern mword callextfun(struct efblk *efb, union block **sp, mword nargs,
-                        mword nbytes);
 
 /*
  * callef - procedure to call external function.
@@ -101,172 +99,113 @@ extern mword callextfun(struct efblk *efb, union block **sp, mword nargs,
  * Called from sysex.c.
  *
  */
+/*
+ * LOAD function calling ABI (x64 Linux, System V AMD64):
+ *
+ *   int pfn(struct ldescr *retval, unsigned nargs, struct ldescr *args)
+ *
+ * struct ldescr — matches CSNOBOL4 load.h / libspl.c empirically verified ABI:
+ *   a.i   integer value (long)
+ *   a.f   real value (double, same storage)
+ *   f     flags byte (0 for plain values)
+ *   v     type tag: 'I'=integer, 'R'=real, 'S'=string (null)
+ *
+ * SPITBOL stack layout on entry to callef:
+ *   sp[0] = last-pushed arg = arg nargs-1 (union block*)
+ *   sp[nargs-1] = first arg = arg 0
+ *   Each INTEGER arg is a union block* pointing to struct icblk {ictyp,icval}.
+ *
+ * callextfun (int.asm) is a pure trampoline: it receives the already-marshalled
+ * (pfn, retval, nargs, cargs) and calls pfn(retval, nargs, cargs) after MINSAVE
+ * has already saved Minimal register state.  That keeps the snapshot coherent
+ * for any re-entrant MINIMAL() calls pfn might make (callback into SPITBOL).
+ */
+
+struct ldescr {
+    union { long i; double f; } a;
+    char         f;
+    unsigned int v;
+};
+typedef int (*load_pfn_t)(struct ldescr *retval, unsigned nargs,
+                          struct ldescr *args);
+extern int callextfun(load_pfn_t pfn, struct ldescr *retval,
+                      unsigned nargs, struct ldescr *cargs);
+
+#define LDESCR_INT 'I'
+#define LDESCR_REAL 'R'
+#define LDESCR_STR 'S'
+#define LOAD_MAX_ARGS 32
+
 union block *
 callef(struct efblk *efb, union block **sp, mword nargs)
 {
-    pXFNode pnode;
-    union block *result;
-    static int initsels = 0;
-    static mword(*pTYPET)[];
-    mword type, length;
-    mword nbytes, i;
-    char *p;
-    char *q;
-    mword *r;
-    mword *s;
+    pXFNode    pnode;
+    load_pfn_t pfn;
+    struct ldescr cargs[LOAD_MAX_ARGS];
+    struct ldescr retval;
+    mword i;
+    int   load_rc;
 
-    pnode = ((pXFNode)(efb->efcod));
+    pnode = (pXFNode)(efb->efcod);
     if(pnode == NULL)
         return (union block *)-1L;
 
-    if(!initsels) { /* one-time initializations */
-        pTYPET = (mword(*)[])GET_DATA_OFFSET(TYPET, muword);
-        miscinfo.ptyptab = pTYPET; /* pointer to table of data types */
-        initsels++;
-    }
+    /* pfn at xnblk.xndta[1] (offset 24) — verified B-231 raw dump */
+    pfn = (load_pfn_t)(uintptr_t)pnode->xnu.xndta[1];
 
-    miscinfo.pefblk = efb; /* save efblk ptr in misc area */
+    miscinfo.pefblk = efb;
     miscinfo.pxnblk = pnode;
-    miscinfo.nargs = nargs;
+    miscinfo.nargs  = nargs;
 
-    /* Fiddle the xn1st and xnsave words in the xnblk.  If either is zero,
-     * it is left alone.  If either is non-zero, it is decremented.  This
-     * has the effect of providing the function with a 1 or a 0 if this is
-     * the first call or a subsequent call respectively.
+    /* xn1st/xnsave: provide 1 on first call, 0 on subsequent */
+    if(pnode->xnu.ef.xn1st)  pnode->xnu.ef.xn1st--;
+    if(pnode->xnu.ef.xnsave) pnode->xnu.ef.xnsave--;
+
+    if(nargs > LOAD_MAX_ARGS)
+        return (union block *)-1L;
+
+    /*
+     * Marshal SPITBOL stack args into ldescr[].
+     * sp[0] = last-pushed = arg nargs-1; sp[nargs-1] = arg 0.
+     * eftar[i]: 0=noconv, 1=string, 2=integer(conint), 3=real, 4=file.
      */
-    if(pnode->xnu.ef.xn1st)
-        pnode->xnu.ef.xn1st--;
-    if(pnode->xnu.ef.xnsave)
-        pnode->xnu.ef.xnsave--;
-
-    /* Count number of stack words needed for arguments during actual call.
-     * No Convert (type 0), Integer (type 2), and File (type 4) need one mword,
-     * String (type 1) and Real (type 3) need two words.
-     * While a switch statement would be a cleaner way to write the following
-     * code, for speed reasons, we directly take advantage of the fact that
-     * only odd-numbered argument types need two words.
-     */
-    nbytes = (nargs + 2) *
-                 sizeof(mword) + /* presult, pinfo + args (1 mword each) */
-             MINFRAME -
-             ARGPUSHSIZE; /* in/local save area + struct-ret adr */
-
-    for(i = nargs; i--;)
-        if(efb->eftar[i] & 1)        /* type 1 and type 3 require */
-            nbytes += sizeof(mword); /* two words each on stack */
-
-    /* For SPARC, the number of words reserved for arguments on the stack
-     * must be six or greater, and must be even (stack pointer must be
-     * 8-byte aligned).  (Note that real args occupy two stack words.)
-     *
-     *  high memory |                           |
-     *              |---------------------------|
-     *              |    arg n-6 (if needed)    |
-     *              |---------------------------|
-     *  arg i       |    arg n-5 (if needed)    |
-     *  refers      |---------------------------|  -------------------------
-     *  to SPITBOL  |    arg n-4 (if needed)    |                    ^
-     *  arguments   |===========================|  ---------         |
-     *  in the      |  arg n-3 = %i5 dump word  |      ^             |
-     *  external    |---------------------------|      |             |
-     *  function    |  arg n-2 = %i4 dump word  |      |             |
-     *  call        |---------------------------|      |
-     *              |  arg n-1 = %i3 dump word  |      |         minimum to
-     *              |---------------------------|      |      preserve 8-byte
-     *              |    arg n = %i2 dump word  |      |         alignment
-     *              |---------------------------|      |
-     *              | &miscinf = %i1 dump word  |                    |
-     *              |---------------------------|   required         |
-     *              |  &result = %i0 dump word  |                    |
-     *              |---------------------------|      |             |
-     *              | struct-ret adr (not used) |      |             |
-     *              |---------------------------|      |             |
-     *              |                           |      |             |
-     *              |    16 words to save       |      |             |
-     *              |   in/local regs when      |      |             |
-     *              |     save overflows        |      |             |
-     *              |                           |      v             v
-     *  low memory  |===========================| --------------------------
-     *
-     */
-    if(nbytes < MINFRAME)
-        nbytes = MINFRAME;
-
-    type = callextfun(efb, sp - 1, nargs,
-                      SA(nbytes)); /* make call with Stack Aligned nbytes */
-
-    result = (union block *)ptscblk;
-    switch(type) {
-
-    case BL_XN: /* XNBLK    external block */
-        result->xnb.xnlen =
-            ((result->xnb.xnlen + sizeof(mword) - 1) & -sizeof(mword)) +
-            FIELDOFFSET(struct xnblk, xnu.xndta[0]);
-    case BL_AR: /* ARBLK    array */
-    case BL_CD: /* CDBLK    code */
-    case BL_EX: /* EXBLK    expression */
-    case BL_IC: /* ICBLK    integer */
-    case BL_NM: /* NMBLK    name */
-    case BL_P0: /* P0BLK    pattern, 0 args */
-    case BL_P1: /* P1BLK    pattern, 1 arg */
-    case BL_P2: /* P2BLK    pattern, 2 args */
-    case BL_RC: /* RCBLK    real */
-    case BL_SC: /* SCBLK    string */
-    case BL_SE: /* SEBLK    expression */
-    case BL_TB: /* TBBLK    table */
-    case BL_VC: /* VCBLK    vector (array) */
-    case BL_XR: /* XRBLK    external, relocatable contents */
-    case BL_PD: /* PDBLK    program defined datatype */
-        result->scb.sctyp = (*pTYPET)[type];
-        break;
-
-    case BL_NC: /* return result block unchanged */
-        break;
-
-    case BL_FS: /* string pointer at tscblk.str */
-        result->fsb.fstyp = (*pTYPET)[BL_SC];
-        p = result->fsb.fsptr;
-        length = result->fsb.fslen;
-        if(!length)
-            break; /* return null string result */
-        MINSAVE();
-        SET_WA(length);
-        MINIMAL(MINIMAL_ALOCS); /* allocate string storage */
-        result = XR(union block *);
-        MINRESTORE();
-        q = result->scb.scstr;
-        while(length--)
-            *q++ = *p++;
-        break;
-
-    case BL_FX: /* pointer to external data at tscblk.str */
-        length = ((result->fxb.fxlen + sizeof(mword) - 1) & -sizeof(mword)) +
-                 FIELDOFFSET(struct xnblk, xnu.xndta[0]);
-        if(length > GET_MIN_VALUE(mxlen, mword)) {
-            result = (union block *)0;
+    for(i = 0; i < nargs; i++) {
+        union block *blk = sp[nargs - 1 - i];
+        cargs[i].f = 0;
+        switch(efb->eftar[i]) {
+        case conint: /* 2 — INTEGER */
+            cargs[i].a.i = blk->icb.icval;
+            cargs[i].v   = LDESCR_INT;
+            break;
+        default:
+            /* future: string, real, noconv */
+            cargs[i].a.i = blk->icb.icval;
+            cargs[i].v   = LDESCR_INT;
             break;
         }
-        r = result->fxb.fxptr;
-        MINSAVE();
-        SET_WA(length);
-        MINIMAL(MINIMAL_ALLOC); /* allocate block storage */
-        result = XR(union block *);
-        MINRESTORE();
-        result->xnb.xnlen = length;
-        result->xnb.xntyp = (*pTYPET)[BL_XN];
-        s = result->xnb.xnu.xndta;
-        length =
-            (length - FIELDOFFSET(struct xnblk, xnu.xndta[0])) / sizeof(mword);
-        while(length--)
-            *s++ = *r++;
-        break;
-
-    case FAIL: /* fail */
-    default:
-        result = (union block *)0;
-        break;
     }
-    return result;
+
+    retval.a.i = 0;
+    retval.f   = 0;
+    retval.v   = 0;
+
+    /*
+     * MINSAVE() saves Minimal registers before the call so pfn can
+     * safely call back into the SPITBOL runtime via MINIMAL() if needed.
+     * callextfun is the trampoline that performs pfn(retval,nargs,cargs)
+     * with correct SysV AMD64 register setup.
+     */
+    MINSAVE();
+    load_rc = callextfun(pfn, &retval, (unsigned)nargs, cargs);
+    MINRESTORE();
+
+    if(!load_rc)
+        return (union block *)0; /* FAIL */
+
+    /* Pack integer return into ticblk (scratch block outside dynamic mem) */
+    pticblk->ictyp = TYPE_ICL;
+    pticblk->icval = retval.a.i;
+    return (union block *)pticblk;
 }
 
 /* Attempt to load a DLL into memory using the name provided.

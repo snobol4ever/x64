@@ -395,24 +395,38 @@ popregs:
 ;     struct xnblk layout (x64, mword=8):
 ;       0: xntyp, 8: xnlen, 16: xndta[0]=handle, 24: xndta[1]=pfn
 ;
-;     callef (C) already handles arg marshalling and calls callextfun
-;     for the actual trampoline.  We just need to reach the pfn.
+;     callextfun - trampoline to call an external LOAD'd function.
+;
+;     C signature:
+;       int callextfun(load_pfn_t pfn,
+;                      struct ldescr *retval,
+;                      unsigned      nargs,
+;                      struct ldescr *cargs)
+;
+;     SysV AMD64: rdi=pfn, rsi=retval, rdx=nargs, rcx=cargs
+;
+;     callef (C) handles all arg marshalling from the SPITBOL stack into
+;     ldescr[] and sets up retval on its own C stack frame.  We are here
+;     purely as a trampoline so that the call to pfn happens *after*
+;     MINSAVE has already saved Minimal register state (done by callef
+;     before calling us).  That keeps the Minimal register snapshot
+;     coherent for any re-entrant MINIMAL() calls pfn might make.
+;
+;     On return: rax = rc from pfn (TRUE=1 success, FALSE=0 fail).
+;
       global      callextfun
-      extern      miscinfo
 callextfun:
       push  rbp
       mov   rbp,rsp
-      ; rdi=efb, rsi=sp, rdx=nargs, rcx=nbytes
-      ; efcod (xnblk*) is at efblk offset 32
-      mov   rax,qword [rdi+32]    ; rax = pnode (xnblk *)
-      ; pfn is at xnblk offset 24 (xndta[1])
-      mov   r10,qword [rax+24]    ; r10 = pfn
-      ; callef already set up args for the external function.
-      ; The external function (spl_add etc) uses LOAD_PROTO:
-      ;   (struct descr *retval, unsigned nargs, struct descr *args)
-      ; callef passes these via the sp/nargs already in rsi/rdx.
-      ; For simplicity, call pfn with the args callef set up (rdi/rsi/rdx/rcx).
-      call  r10
+      and   rsp,-16            ; ensure 16-byte stack alignment (SysV ABI)
+      ; rdi=pfn - move to r10 so the arg registers are free for the call
+      mov   r10,rdi
+      ; rsi=retval, rdx=nargs, rcx=cargs -> rdi, rsi, rdx per SysV
+      mov   rdi,rsi            ; retval
+      mov   rsi,rdx            ; nargs
+      mov   rdx,rcx            ; cargs
+      call  r10                ; pfn(retval, nargs, cargs)
+      mov   rsp,rbp
       pop   rbp
       ret
 ; ;

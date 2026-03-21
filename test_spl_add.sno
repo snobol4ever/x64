@@ -3,7 +3,7 @@
         LOAD('spl_add(INTEGER,INTEGER)INTEGER','./libspl.so')   :F(LOADFAIL)
         RESULT = spl_add(3,4)                                   :F(CALLFAIL)
         OUTPUT = RESULT
-        IDENT(RESULT,'7')                                       :F(WRONGVAL)
+        EQ(RESULT,7)                                            :F(WRONGVAL)
         OUTPUT = 'PASS: spl_add(3,4) = ' RESULT
                                                                 :(END)
 LOADFAIL
