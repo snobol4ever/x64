@@ -372,10 +372,12 @@ nextef(unsigned char **bufp, int io)
     for(dnamp = GET_MIN_VALUE(dnamp, union block *); scanp < dnamp;
         scanp = ((union block *)(MP_OFF(scanp, muword) + blksize))) {
         type = scanp->scb.sctyp; /* any block type lets us access type word */
-        SET_WA(type);
+        SET_WA(scanp);           /* blkln expects block pointer in wa (reads [wa-1] for type) */
         SET_XR(scanp);
         MINIMAL(MINIMAL_BLKLN); /* get length of block in bytes */
         blksize = WA(mword);
+        if(blksize == 0)         /* safety: unknown block type → skip one word */
+            blksize = sizeof(mword);
         if(type != ef_type) /* keep searching if not EFBLK */
             continue;
         pnode =
