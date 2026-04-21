@@ -14404,45 +14404,14 @@ gnv09:
         jne  gnv14                              ; 
         mov  wb,m_word [gnvnw]                  ; get word counter to control loop} lct wb gnvnw 
         mov  xr,m_word [gnvst]                  ; point to chars of new name} mov xr gnvst 
-gnv10:                                          ; [SN-25b] byte-wise fold-both-sides compare
-        push wa                                 ; save wa (per-word byte counter)
-        mov  wa,cfp_b                           ; 8 bytes per word
-gnv10a:                                         ; byte loop within current word
-        movzx r10,byte [xl]                     ; load table byte
-        movzx r11,byte [xr]                     ; load source byte
-        ; fold table byte if 'A'..'Z'
-        cmp  r10,ch_ua
-        jb   gnv10b
-        cmp  r10,ch_uz
-        ja   gnv10b
-        add  r10,32
-gnv10b:
-        ; fold source byte if 'A'..'Z'
-        cmp  r11,ch_ua
-        jb   gnv10c
-        cmp  r11,ch_uz
-        ja   gnv10c
-        add  r11,32
-gnv10c:
-        cmp  r10,r11                            ; compare folded bytes
-        jnz  gnv10m                             ; mismatch -> restore and jump to gnv11
-        inc  xl                                 ; advance table pointer
-        inc  xr                                 ; advance source pointer
-        dec  wa
-        jnz  gnv10a                             ; loop through 8 bytes
-        ; all 8 bytes matched; this word is done
-        pop  wa                                 ; restore wa (was length in bytes of the name)
-        dec  wb                                 ; decrement word counter
-        jnz  gnv10                              ; more words to check
-        jmp  gnv10d                             ; all words matched -> fall through to success
-gnv10m:                                         ; mismatch: rewind xl/xr to start of current word
-        mov  r10,cfp_b
-        sub  r10,wa                             ; r10 = bytes already advanced in this word
-        sub  xl,r10                             ; rewind table pointer
-        sub  xr,r10                             ; rewind source pointer
-        pop  wa                                 ; restore wa
-        jmp  gnv11                              ; treat this entry as mismatch
-gnv10d:                                         ; 
+gnv10:
+        mov  w0,m_word [xl]                     ; jump if name mismatch} cne (xr) (xl) gnv11
+        cmp  m_word [xr],w0                     ; 
+        jnz  gnv11                              ; 
+        add  xr,cfp_b                           ; else bump new name pointer} ica xr  
+        add  xl,cfp_b                           ; bump svblk pointer} ica xl  
+        dec  wb                                 ; else loop until all checked} bct wb gnv10 
+        jnz  gnv10                              ; 
         xor  wc,wc                              ; set vrlen value zero} zer wc  
         mov  wa,cfp_b*vrsi_                     ; set standard size} mov wa *vrsi_ 
         jmp  gnv15                              ; jump to build vrblk} brn gnv15  
