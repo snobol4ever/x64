@@ -950,31 +950,31 @@
 |btpre|dbc|2,svpre|||bit to test for preevaluation|5892
 |btval|dbc|2,svval|||bit to test for value|5893
 ||ejc|||||5894
-|ccnms|dtc|27,/case/||||5899
-||dtc|27,/doub/||||5900
-||dtc|27,/comp/||||5905
-||dtc|27,/dump/||||5907
-||dtc|27,/copy/||||5909
-||dtc|27,/ejec/||||5911
-||dtc|27,/erro/||||5912
-||dtc|27,/exec/||||5913
-||dtc|27,/fail/||||5914
-||dtc|27,/incl/||||5916
-||dtc|27,/line/||||5919
-||dtc|27,/list/||||5921
-||dtc|27,/noer/||||5922
-||dtc|27,/noex/||||5923
-||dtc|27,/nofa/||||5924
-||dtc|27,/noli/||||5925
-||dtc|27,/noop/||||5926
-||dtc|27,/nopr/||||5927
-||dtc|27,/opti/||||5928
-||dtc|27,/prin/||||5929
-||dtc|27,/sing/||||5930
-||dtc|27,/spac/||||5931
-||dtc|27,/stit/||||5932
-||dtc|27,/titl/||||5933
-||dtc|27,/trac/||||5934
+|ccnms|dtc|27,/CASE/||||5899
+||dtc|27,/DOUB/||||5900
+||dtc|27,/COMP/||||5905
+||dtc|27,/DUMP/||||5907
+||dtc|27,/COPY/||||5909
+||dtc|27,/EJEC/||||5911
+||dtc|27,/ERRO/||||5912
+||dtc|27,/EXEC/||||5913
+||dtc|27,/FAIL/||||5914
+||dtc|27,/INCL/||||5916
+||dtc|27,/LINE/||||5919
+||dtc|27,/LIST/||||5921
+||dtc|27,/NOER/||||5922
+||dtc|27,/NOEX/||||5923
+||dtc|27,/NOFA/||||5924
+||dtc|27,/NOLI/||||5925
+||dtc|27,/NOOP/||||5926
+||dtc|27,/NOPR/||||5927
+||dtc|27,/OPTI/||||5928
+||dtc|27,/PRIN/||||5929
+||dtc|27,/SING/||||5930
+||dtc|27,/SPAC/||||5931
+||dtc|27,/STIT/||||5932
+||dtc|27,/TITL/||||5933
+||dtc|27,/TRAC/||||5934
 |dmhdk|dac|6,b_scl|||dump of keyword values|5938
 ||dac|1,22||||5939
 ||dtc|27,/dump of keyword values/||||5940
@@ -1016,7 +1016,7 @@
 ||ejc|||||6013
 |ermms|dac|6,b_scl|||error|6017
 ||dac|1,5||||6018
-||dtc|27,/error/||||6019
+||dtc|27,/ERROR/||||6019
 |ermns|dac|6,b_scl|||string / -- /|6021
 ||dac|1,4||||6022
 ||dtc|27,/ -- /||||6023
@@ -1273,50 +1273,50 @@
 ||ejc|||||6399
 |scarr|dac|6,b_scl|||array|6403
 ||dac|1,5||||6404
-||dtc|27,/array/||||6405
+||dtc|27,/ARRAY/||||6405
 |sccod|dac|6,b_scl|||code|6414
 ||dac|1,4||||6415
-||dtc|27,/code/||||6416
+||dtc|27,/CODE/||||6416
 |scexp|dac|6,b_scl|||expression|6418
 ||dac|1,10||||6419
-||dtc|27,/expression/||||6420
+||dtc|27,/EXPRESSION/||||6420
 |scext|dac|6,b_scl|||external|6422
 ||dac|1,8||||6423
-||dtc|27,/external/||||6424
+||dtc|27,/EXTERNAL/||||6424
 |scint|dac|6,b_scl|||integer|6426
 ||dac|1,7||||6427
-||dtc|27,/integer/||||6428
+||dtc|27,/INTEGER/||||6428
 |scnam|dac|6,b_scl|||name|6430
 ||dac|1,4||||6431
-||dtc|27,/name/||||6432
+||dtc|27,/NAME/||||6432
 |scnum|dac|6,b_scl|||numeric|6434
 ||dac|1,7||||6435
-||dtc|27,/numeric/||||6436
+||dtc|27,/NUMERIC/||||6436
 |scpat|dac|6,b_scl|||pattern|6438
 ||dac|1,7||||6439
-||dtc|27,/pattern/||||6440
+||dtc|27,/PATTERN/||||6440
 |screa|dac|6,b_scl|||real|6444
 ||dac|1,4||||6445
-||dtc|27,/real/||||6446
+||dtc|27,/REAL/||||6446
 |scstr|dac|6,b_scl|||string|6449
 ||dac|1,6||||6450
-||dtc|27,/string/||||6451
+||dtc|27,/STRING/||||6451
 |sctab|dac|6,b_scl|||table|6453
 ||dac|1,5||||6454
-||dtc|27,/table/||||6455
+||dtc|27,/TABLE/||||6455
 |scfil|dac|6,b_scl|||file (for extended load arguments)|6457
 ||dac|1,4||||6458
-||dtc|27,/file/||||6459
+||dtc|27,/FILE/||||6459
 ||ejc|||||6461
 |scfrt|dac|6,b_scl|||freturn|6465
 ||dac|1,7||||6466
-||dtc|27,/freturn/||||6467
+||dtc|27,/FRETURN/||||6467
 |scnrt|dac|6,b_scl|||nreturn|6469
 ||dac|1,7||||6470
-||dtc|27,/nreturn/||||6471
+||dtc|27,/NRETURN/||||6471
 |scrtn|dac|6,b_scl|||return|6473
 ||dac|1,6||||6474
-||dtc|27,/return/||||6475
+||dtc|27,/RETURN/||||6475
 |scnmt|dac|4,scarr|||arblk     array|6485
 ||dac|4,sccod|||cdblk     code|6486
 ||dac|4,scexp|||exblk     expression|6487
@@ -1365,7 +1365,7 @@
 ||dtc|27,/in line/||||6577
 |stpm5|dac|6,b_scl||||6580
 ||dac|1,13||||6581
-||dtc|27,/regenerations/||||6582
+||dtc|27,/REGENERATIONS/||||6582
 |stpm6|dac|6,b_scl|||in file|6585
 ||dac|1,7||||6586
 ||dtc|27,/in file/||||6587
@@ -1378,7 +1378,7 @@
 |stpm9|dac|6,b_scl||||6598
 ||dac|1,13||||6599
 ||dtc|27,_stmt / second_||||6600
-|strtu|dtc|27,/tu/||||6604
+|strtu|dtc|27,/TU/||||6604
 |svctb|dac|4,scstr|||string|6610
 ||dac|4,scint|||integer|6611
 ||dac|4,scnam|||name|6612
@@ -1404,587 +1404,587 @@
 ||ejc|||||6654
 |v_eqf|dbc|2,svfpr|||eq|6662
 ||dac|1,2||||6663
-||dtc|27,/eq/||||6664
+||dtc|27,/EQ/||||6664
 ||dac|6,s_eqf||||6665
 ||dac|1,2||||6666
 |v_gef|dbc|2,svfpr|||ge|6668
 ||dac|1,2||||6669
-||dtc|27,/ge/||||6670
+||dtc|27,/GE/||||6670
 ||dac|6,s_gef||||6671
 ||dac|1,2||||6672
 |v_gtf|dbc|2,svfpr|||gt|6674
 ||dac|1,2||||6675
-||dtc|27,/gt/||||6676
+||dtc|27,/GT/||||6676
 ||dac|6,s_gtf||||6677
 ||dac|1,2||||6678
 |v_lef|dbc|2,svfpr|||le|6680
 ||dac|1,2||||6681
-||dtc|27,/le/||||6682
+||dtc|27,/LE/||||6682
 ||dac|6,s_lef||||6683
 ||dac|1,2||||6684
 |v_lnf|dbc|2,svfnp|||ln|6687
 ||dac|1,2||||6688
-||dtc|27,/ln/||||6689
+||dtc|27,/LN/||||6689
 ||dac|6,s_lnf||||6690
 ||dac|1,1||||6691
 |v_ltf|dbc|2,svfpr|||lt|6694
 ||dac|1,2||||6695
-||dtc|27,/lt/||||6696
+||dtc|27,/LT/||||6696
 ||dac|6,s_ltf||||6697
 ||dac|1,2||||6698
 |v_nef|dbc|2,svfpr|||ne|6700
 ||dac|1,2||||6701
-||dtc|27,/ne/||||6702
+||dtc|27,/NE/||||6702
 ||dac|6,s_nef||||6703
 ||dac|1,2||||6704
 |v_any|dbc|2,svfnp|||any|6730
 ||dac|1,3||||6731
-||dtc|27,/any/||||6732
+||dtc|27,/ANY/||||6732
 ||dac|6,s_any||||6733
 ||dac|1,1||||6734
 |v_arb|dbc|2,svkvc|||arb|6736
 ||dac|1,3||||6737
-||dtc|27,/arb/||||6738
+||dtc|27,/ARB/||||6738
 ||dac|2,k_arb||||6739
 ||dac|4,ndarb||||6740
 ||ejc|||||6741
 |v_arg|dbc|2,svfnn|||arg|6745
 ||dac|1,3||||6746
-||dtc|27,/arg/||||6747
+||dtc|27,/ARG/||||6747
 ||dac|6,s_arg||||6748
 ||dac|1,2||||6749
 |v_bal|dbc|2,svkvc|||bal|6751
 ||dac|1,3||||6752
-||dtc|27,/bal/||||6753
+||dtc|27,/BAL/||||6753
 ||dac|2,k_bal||||6754
 ||dac|4,ndbal||||6755
 |v_cos|dbc|2,svfnp|||cos|6758
 ||dac|1,3||||6759
-||dtc|27,/cos/||||6760
+||dtc|27,/COS/||||6760
 ||dac|6,s_cos||||6761
 ||dac|1,1||||6762
 |v_end|dbc|2,svlbl|||end|6765
 ||dac|1,3||||6766
-||dtc|27,/end/||||6767
+||dtc|27,/END/||||6767
 ||dac|6,l_end||||6768
 |v_exp|dbc|2,svfnp|||exp|6771
 ||dac|1,3||||6772
-||dtc|27,/exp/||||6773
+||dtc|27,/EXP/||||6773
 ||dac|6,s_exp||||6774
 ||dac|1,1||||6775
 |v_len|dbc|2,svfnp|||len|6778
 ||dac|1,3||||6779
-||dtc|27,/len/||||6780
+||dtc|27,/LEN/||||6780
 ||dac|6,s_len||||6781
 ||dac|1,1||||6782
 |v_leq|dbc|2,svfpr|||leq|6784
 ||dac|1,3||||6785
-||dtc|27,/leq/||||6786
+||dtc|27,/LEQ/||||6786
 ||dac|6,s_leq||||6787
 ||dac|1,2||||6788
 |v_lge|dbc|2,svfpr|||lge|6790
 ||dac|1,3||||6791
-||dtc|27,/lge/||||6792
+||dtc|27,/LGE/||||6792
 ||dac|6,s_lge||||6793
 ||dac|1,2||||6794
 |v_lgt|dbc|2,svfpr|||lgt|6796
 ||dac|1,3||||6797
-||dtc|27,/lgt/||||6798
+||dtc|27,/LGT/||||6798
 ||dac|6,s_lgt||||6799
 ||dac|1,2||||6800
 |v_lle|dbc|2,svfpr|||lle|6802
 ||dac|1,3||||6803
-||dtc|27,/lle/||||6804
+||dtc|27,/LLE/||||6804
 ||dac|6,s_lle||||6805
 ||dac|1,2||||6806
 ||ejc|||||6807
 |v_llt|dbc|2,svfpr|||llt|6811
 ||dac|1,3||||6812
-||dtc|27,/llt/||||6813
+||dtc|27,/LLT/||||6813
 ||dac|6,s_llt||||6814
 ||dac|1,2||||6815
 |v_lne|dbc|2,svfpr|||lne|6817
 ||dac|1,3||||6818
-||dtc|27,/lne/||||6819
+||dtc|27,/LNE/||||6819
 ||dac|6,s_lne||||6820
 ||dac|1,2||||6821
 |v_pos|dbc|2,svfnp|||pos|6823
 ||dac|1,3||||6824
-||dtc|27,/pos/||||6825
+||dtc|27,/POS/||||6825
 ||dac|6,s_pos||||6826
 ||dac|1,1||||6827
 |v_rem|dbc|2,svkvc|||rem|6829
 ||dac|1,3||||6830
-||dtc|27,/rem/||||6831
+||dtc|27,/REM/||||6831
 ||dac|2,k_rem||||6832
 ||dac|4,ndrem||||6833
 |v_sin|dbc|2,svfnp|||sin|6844
 ||dac|1,3||||6845
-||dtc|27,/sin/||||6846
+||dtc|27,/SIN/||||6846
 ||dac|6,s_sin||||6847
 ||dac|1,1||||6848
 |v_tab|dbc|2,svfnp|||tab|6851
 ||dac|1,3||||6852
-||dtc|27,/tab/||||6853
+||dtc|27,/TAB/||||6853
 ||dac|6,s_tab||||6854
 ||dac|1,1||||6855
 |v_tan|dbc|2,svfnp|||tan|6858
 ||dac|1,3||||6859
-||dtc|27,/tan/||||6860
+||dtc|27,/TAN/||||6860
 ||dac|6,s_tan||||6861
 ||dac|1,1||||6862
 |v_atn|dbc|2,svfnp|||atan|6874
 ||dac|1,4||||6875
-||dtc|27,/atan/||||6876
+||dtc|27,/ATAN/||||6876
 ||dac|6,s_atn||||6877
 ||dac|1,1||||6878
 |v_cas|dbc|2,svknm|||case|6882
 ||dac|1,4||||6883
-||dtc|27,/case/||||6884
+||dtc|27,/CASE/||||6884
 ||dac|2,k_cas||||6885
 |v_chr|dbc|2,svfnp|||char|6888
 ||dac|1,4||||6889
-||dtc|27,/char/||||6890
+||dtc|27,/CHAR/||||6890
 ||dac|6,s_chr||||6891
 ||dac|1,1||||6892
 |v_chp|dbc|2,svfnp|||chop|6896
 ||dac|1,4||||6897
-||dtc|27,/chop/||||6898
+||dtc|27,/CHOP/||||6898
 ||dac|6,s_chp||||6899
 ||dac|1,1||||6900
 |v_cod|dbc|2,svfnk|||code|6902
 ||dac|1,4||||6903
-||dtc|27,/code/||||6904
+||dtc|27,/CODE/||||6904
 ||dac|2,k_cod||||6905
 ||dac|6,s_cod||||6906
 ||dac|1,1||||6907
 |v_cop|dbc|2,svfnn|||copy|6909
 ||dac|1,4||||6910
-||dtc|27,/copy/||||6911
+||dtc|27,/COPY/||||6911
 ||dac|6,s_cop||||6912
 ||dac|1,1||||6913
 ||ejc|||||6914
 |v_dat|dbc|2,svfnn|||data|6918
 ||dac|1,4||||6919
-||dtc|27,/data/||||6920
+||dtc|27,/DATA/||||6920
 ||dac|6,s_dat||||6921
 ||dac|1,1||||6922
 |v_dte|dbc|2,svfnn|||date|6924
 ||dac|1,4||||6925
-||dtc|27,/date/||||6926
+||dtc|27,/DATE/||||6926
 ||dac|6,s_dte||||6927
 ||dac|1,1||||6928
 |v_dmp|dbc|2,svfnk|||dump|6930
 ||dac|1,4||||6931
-||dtc|27,/dump/||||6932
+||dtc|27,/DUMP/||||6932
 ||dac|2,k_dmp||||6933
 ||dac|6,s_dmp||||6934
 ||dac|1,1||||6935
 |v_dup|dbc|2,svfnn|||dupl|6937
 ||dac|1,4||||6938
-||dtc|27,/dupl/||||6939
+||dtc|27,/DUPL/||||6939
 ||dac|6,s_dup||||6940
 ||dac|1,2||||6941
 |v_evl|dbc|2,svfnn|||eval|6943
 ||dac|1,4||||6944
-||dtc|27,/eval/||||6945
+||dtc|27,/EVAL/||||6945
 ||dac|6,s_evl||||6946
 ||dac|1,1||||6947
 |v_ext|dbc|2,svfnn|||exit|6951
 ||dac|1,4||||6952
-||dtc|27,/exit/||||6953
+||dtc|27,/EXIT/||||6953
 ||dac|6,s_ext||||6954
 ||dac|1,2||||6955
 |v_fal|dbc|2,svkvc|||fail|6958
 ||dac|1,4||||6959
-||dtc|27,/fail/||||6960
+||dtc|27,/FAIL/||||6960
 ||dac|2,k_fal||||6961
 ||dac|4,ndfal||||6962
 |v_fil|dbc|2,svknm|||file|6965
 ||dac|1,4||||6966
-||dtc|27,/file/||||6967
+||dtc|27,/FILE/||||6967
 ||dac|2,k_fil||||6968
 |v_hst|dbc|2,svfnn|||host|6971
 ||dac|1,4||||6972
-||dtc|27,/host/||||6973
+||dtc|27,/HOST/||||6973
 ||dac|6,s_hst||||6974
 ||dac|1,5||||6975
 ||ejc|||||6976
 |v_itm|dbc|2,svfnf|||item|6980
 ||dac|1,4||||6981
-||dtc|27,/item/||||6982
+||dtc|27,/ITEM/||||6982
 ||dac|6,s_itm||||6983
 ||dac|1,999||||6984
 |v_lin|dbc|2,svknm|||line|6987
 ||dac|1,4||||6988
-||dtc|27,/line/||||6989
+||dtc|27,/LINE/||||6989
 ||dac|2,k_lin||||6990
 |v_lod|dbc|2,svfnn|||load|6995
 ||dac|1,4||||6996
-||dtc|27,/load/||||6997
+||dtc|27,/LOAD/||||6997
 ||dac|6,s_lod||||6998
 ||dac|1,2||||6999
 |v_lpd|dbc|2,svfnp|||lpad|7002
 ||dac|1,4||||7003
-||dtc|27,/lpad/||||7004
+||dtc|27,/LPAD/||||7004
 ||dac|6,s_lpd||||7005
 ||dac|1,3||||7006
 |v_rpd|dbc|2,svfnp|||rpad|7008
 ||dac|1,4||||7009
-||dtc|27,/rpad/||||7010
+||dtc|27,/RPAD/||||7010
 ||dac|6,s_rpd||||7011
 ||dac|1,3||||7012
 |v_rps|dbc|2,svfnp|||rpos|7014
 ||dac|1,4||||7015
-||dtc|27,/rpos/||||7016
+||dtc|27,/RPOS/||||7016
 ||dac|6,s_rps||||7017
 ||dac|1,1||||7018
 |v_rtb|dbc|2,svfnp|||rtab|7020
 ||dac|1,4||||7021
-||dtc|27,/rtab/||||7022
+||dtc|27,/RTAB/||||7022
 ||dac|6,s_rtb||||7023
 ||dac|1,1||||7024
 |v_si_|dbc|2,svfnp|||size|7026
 ||dac|1,4||||7027
-||dtc|27,/size/||||7028
+||dtc|27,/SIZE/||||7028
 ||dac|6,s_si_||||7029
 ||dac|1,1||||7030
 |v_srt|dbc|2,svfnn|||sort|7035
 ||dac|1,4||||7036
-||dtc|27,/sort/||||7037
+||dtc|27,/SORT/||||7037
 ||dac|6,s_srt||||7038
 ||dac|1,2||||7039
 |v_spn|dbc|2,svfnp|||span|7041
 ||dac|1,4||||7042
-||dtc|27,/span/||||7043
+||dtc|27,/SPAN/||||7043
 ||dac|6,s_spn||||7044
 ||dac|1,1||||7045
 ||ejc|||||7046
 |v_sqr|dbc|2,svfnp|||sqrt|7052
 ||dac|1,4||||7053
-||dtc|27,/sqrt/||||7054
+||dtc|27,/SQRT/||||7054
 ||dac|6,s_sqr||||7055
 ||dac|1,1||||7056
 |v_stn|dbc|2,svknm|||stno|7058
 ||dac|1,4||||7059
-||dtc|27,/stno/||||7060
+||dtc|27,/STNO/||||7060
 ||dac|2,k_stn||||7061
 |v_tim|dbc|2,svfnn|||time|7063
 ||dac|1,4||||7064
-||dtc|27,/time/||||7065
+||dtc|27,/TIME/||||7065
 ||dac|6,s_tim||||7066
 ||dac|1,0||||7067
 |v_trm|dbc|2,svfnk|||trim|7069
 ||dac|1,4||||7070
-||dtc|27,/trim/||||7071
+||dtc|27,/TRIM/||||7071
 ||dac|2,k_trm||||7072
 ||dac|6,s_trm||||7073
 ||dac|1,1||||7074
 |v_abe|dbc|2,svknm|||abend|7076
 ||dac|1,5||||7077
-||dtc|27,/abend/||||7078
+||dtc|27,/ABEND/||||7078
 ||dac|2,k_abe||||7079
 |v_abo|dbc|2,svkvl|||abort|7081
 ||dac|1,5||||7082
-||dtc|27,/abort/||||7083
+||dtc|27,/ABORT/||||7083
 ||dac|2,k_abo||||7084
 ||dac|6,l_abo||||7085
 ||dac|4,ndabo||||7086
 |v_app|dbc|2,svfnf|||apply|7088
 ||dac|1,5||||7089
-||dtc|27,/apply/||||7090
+||dtc|27,/APPLY/||||7090
 ||dac|6,s_app||||7091
 ||dac|1,999||||7092
 |v_abn|dbc|2,svfnp|||arbno|7094
 ||dac|1,5||||7095
-||dtc|27,/arbno/||||7096
+||dtc|27,/ARBNO/||||7096
 ||dac|6,s_abn||||7097
 ||dac|1,1||||7098
 |v_arr|dbc|2,svfnn|||array|7100
 ||dac|1,5||||7101
-||dtc|27,/array/||||7102
+||dtc|27,/ARRAY/||||7102
 ||dac|6,s_arr||||7103
 ||dac|1,2||||7104
 ||ejc|||||7105
 |v_brk|dbc|2,svfnp|||break|7109
 ||dac|1,5||||7110
-||dtc|27,/break/||||7111
+||dtc|27,/BREAK/||||7111
 ||dac|6,s_brk||||7112
 ||dac|1,1||||7113
 |v_clr|dbc|2,svfnn|||clear|7115
 ||dac|1,5||||7116
-||dtc|27,/clear/||||7117
+||dtc|27,/CLEAR/||||7117
 ||dac|6,s_clr||||7118
 ||dac|1,1||||7119
 |v_ejc|dbc|2,svfnn|||eject|7129
 ||dac|1,5||||7130
-||dtc|27,/eject/||||7131
+||dtc|27,/EJECT/||||7131
 ||dac|6,s_ejc||||7132
 ||dac|1,1||||7133
 |v_fen|dbc|2,svfpk|||fence|7135
 ||dac|1,5||||7136
-||dtc|27,/fence/||||7137
+||dtc|27,/FENCE/||||7137
 ||dac|2,k_fen||||7138
 ||dac|6,s_fnc||||7139
 ||dac|1,1||||7140
 ||dac|4,ndfen||||7141
 |v_fld|dbc|2,svfnn|||field|7143
 ||dac|1,5||||7144
-||dtc|27,/field/||||7145
+||dtc|27,/FIELD/||||7145
 ||dac|6,s_fld||||7146
 ||dac|1,2||||7147
 |v_idn|dbc|2,svfpr|||ident|7149
 ||dac|1,5||||7150
-||dtc|27,/ident/||||7151
+||dtc|27,/IDENT/||||7151
 ||dac|6,s_idn||||7152
 ||dac|1,2||||7153
 |v_inp|dbc|2,svfnk|||input|7155
 ||dac|1,5||||7156
-||dtc|27,/input/||||7157
+||dtc|27,/INPUT/||||7157
 ||dac|2,k_inp||||7158
 ||dac|6,s_inp||||7159
 ||dac|1,3||||7160
 |v_lcs|dbc|2,svkwc|||lcase|7163
 ||dac|1,5||||7164
-||dtc|27,/lcase/||||7165
+||dtc|27,/LCASE/||||7165
 ||dac|2,k_lcs||||7166
 |v_loc|dbc|2,svfnn|||local|7169
 ||dac|1,5||||7170
-||dtc|27,/local/||||7171
+||dtc|27,/LOCAL/||||7171
 ||dac|6,s_loc||||7172
 ||dac|1,2||||7173
 ||ejc|||||7174
 |v_ops|dbc|2,svfnn|||opsyn|7178
 ||dac|1,5||||7179
-||dtc|27,/opsyn/||||7180
+||dtc|27,/OPSYN/||||7180
 ||dac|6,s_ops||||7181
 ||dac|1,3||||7182
 |v_rmd|dbc|2,svfnp|||remdr|7184
 ||dac|1,5||||7185
-||dtc|27,/remdr/||||7186
+||dtc|27,/REMDR/||||7186
 ||dac|6,s_rmd||||7187
 ||dac|1,2||||7188
 |v_rsr|dbc|2,svfnn|||rsort|7192
 ||dac|1,5||||7193
-||dtc|27,/rsort/||||7194
+||dtc|27,/RSORT/||||7194
 ||dac|6,s_rsr||||7195
 ||dac|1,2||||7196
 |v_tbl|dbc|2,svfnn|||table|7199
 ||dac|1,5||||7200
-||dtc|27,/table/||||7201
+||dtc|27,/TABLE/||||7201
 ||dac|6,s_tbl||||7202
 ||dac|1,3||||7203
 |v_tra|dbc|2,svfnk|||trace|7205
 ||dac|1,5||||7206
-||dtc|27,/trace/||||7207
+||dtc|27,/TRACE/||||7207
 ||dac|2,k_tra||||7208
 ||dac|6,s_tra||||7209
 ||dac|1,4||||7210
 |v_ucs|dbc|2,svkwc|||ucase|7213
 ||dac|1,5||||7214
-||dtc|27,/ucase/||||7215
+||dtc|27,/UCASE/||||7215
 ||dac|2,k_ucs||||7216
 |v_anc|dbc|2,svknm|||anchor|7219
 ||dac|1,6||||7220
-||dtc|27,/anchor/||||7221
+||dtc|27,/ANCHOR/||||7221
 ||dac|2,k_anc||||7222
 |v_bkx|dbc|2,svfnp|||breakx|7233
 ||dac|1,6||||7234
-||dtc|27,/breakx/||||7235
+||dtc|27,/BREAKX/||||7235
 ||dac|6,s_bkx||||7236
 ||dac|1,1||||7237
 |v_def|dbc|2,svfnn|||define|7248
 ||dac|1,6||||7249
-||dtc|27,/define/||||7250
+||dtc|27,/DEFINE/||||7250
 ||dac|6,s_def||||7251
 ||dac|1,2||||7252
 |v_det|dbc|2,svfnn|||detach|7254
 ||dac|1,6||||7255
-||dtc|27,/detach/||||7256
+||dtc|27,/DETACH/||||7256
 ||dac|6,s_det||||7257
 ||dac|1,1||||7258
 ||ejc|||||7259
 |v_dif|dbc|2,svfpr|||differ|7263
 ||dac|1,6||||7264
-||dtc|27,/differ/||||7265
+||dtc|27,/DIFFER/||||7265
 ||dac|6,s_dif||||7266
 ||dac|1,2||||7267
 |v_ftr|dbc|2,svknm|||ftrace|7269
 ||dac|1,6||||7270
-||dtc|27,/ftrace/||||7271
+||dtc|27,/FTRACE/||||7271
 ||dac|2,k_ftr||||7272
 |v_lst|dbc|2,svknm|||lastno|7283
 ||dac|1,6||||7284
-||dtc|27,/lastno/||||7285
+||dtc|27,/LASTNO/||||7285
 ||dac|2,k_lst||||7286
 |v_nay|dbc|2,svfnp|||notany|7288
 ||dac|1,6||||7289
-||dtc|27,/notany/||||7290
+||dtc|27,/NOTANY/||||7290
 ||dac|6,s_nay||||7291
 ||dac|1,1||||7292
 |v_oup|dbc|2,svfnk|||output|7294
 ||dac|1,6||||7295
-||dtc|27,/output/||||7296
+||dtc|27,/OUTPUT/||||7296
 ||dac|2,k_oup||||7297
 ||dac|6,s_oup||||7298
 ||dac|1,3||||7299
 |v_ret|dbc|2,svlbl|||return|7301
 ||dac|1,6||||7302
-||dtc|27,/return/||||7303
+||dtc|27,/RETURN/||||7303
 ||dac|6,l_rtn||||7304
 |v_rew|dbc|2,svfnn|||rewind|7306
 ||dac|1,6||||7307
-||dtc|27,/rewind/||||7308
+||dtc|27,/REWIND/||||7308
 ||dac|6,s_rew||||7309
 ||dac|1,1||||7310
 |v_stt|dbc|2,svfnn|||stoptr|7312
 ||dac|1,6||||7313
-||dtc|27,/stoptr/||||7314
+||dtc|27,/STOPTR/||||7314
 ||dac|6,s_stt||||7315
 ||dac|1,2||||7316
 ||ejc|||||7317
 |v_sub|dbc|2,svfnn|||substr|7321
 ||dac|1,6||||7322
-||dtc|27,/substr/||||7323
+||dtc|27,/SUBSTR/||||7323
 ||dac|6,s_sub||||7324
 ||dac|1,3||||7325
 |v_unl|dbc|2,svfnn|||unload|7327
 ||dac|1,6||||7328
-||dtc|27,/unload/||||7329
+||dtc|27,/UNLOAD/||||7329
 ||dac|6,s_unl||||7330
 ||dac|1,1||||7331
 |v_col|dbc|2,svfnn|||collect|7333
 ||dac|1,7||||7334
-||dtc|27,/collect/||||7335
+||dtc|27,/COLLECT/||||7335
 ||dac|6,s_col||||7336
 ||dac|1,1||||7337
 |v_com|dbc|2,svknm|||compare|7340
 ||dac|1,7||||7341
-||dtc|27,/compare/||||7342
+||dtc|27,/COMPARE/||||7342
 ||dac|2,k_com||||7343
 |v_cnv|dbc|2,svfnn|||convert|7346
 ||dac|1,7||||7347
-||dtc|27,/convert/||||7348
+||dtc|27,/CONVERT/||||7348
 ||dac|6,s_cnv||||7349
 ||dac|1,2||||7350
 |v_enf|dbc|2,svfnn|||endfile|7352
 ||dac|1,7||||7353
-||dtc|27,/endfile/||||7354
+||dtc|27,/ENDFILE/||||7354
 ||dac|6,s_enf||||7355
 ||dac|1,1||||7356
 |v_etx|dbc|2,svknm|||errtext|7358
 ||dac|1,7||||7359
-||dtc|27,/errtext/||||7360
+||dtc|27,/ERRTEXT/||||7360
 ||dac|2,k_etx||||7361
 |v_ert|dbc|2,svknm|||errtype|7363
 ||dac|1,7||||7364
-||dtc|27,/errtype/||||7365
+||dtc|27,/ERRTYPE/||||7365
 ||dac|2,k_ert||||7366
 |v_frt|dbc|2,svlbl|||freturn|7368
 ||dac|1,7||||7369
-||dtc|27,/freturn/||||7370
+||dtc|27,/FRETURN/||||7370
 ||dac|6,l_frt||||7371
 |v_int|dbc|2,svfpr|||integer|7373
 ||dac|1,7||||7374
-||dtc|27,/integer/||||7375
+||dtc|27,/INTEGER/||||7375
 ||dac|6,s_int||||7376
 ||dac|1,1||||7377
 |v_nrt|dbc|2,svlbl|||nreturn|7379
 ||dac|1,7||||7380
-||dtc|27,/nreturn/||||7381
+||dtc|27,/NRETURN/||||7381
 ||dac|6,l_nrt||||7382
 ||ejc|||||7383
 |v_pfl|dbc|2,svknm|||profile|7390
 ||dac|1,7||||7391
-||dtc|27,/profile/||||7392
+||dtc|27,/PROFILE/||||7392
 ||dac|2,k_pfl||||7393
 |v_rpl|dbc|2,svfnp|||replace|7396
 ||dac|1,7||||7397
-||dtc|27,/replace/||||7398
+||dtc|27,/REPLACE/||||7398
 ||dac|6,s_rpl||||7399
 ||dac|1,3||||7400
 |v_rvs|dbc|2,svfnp|||reverse|7402
 ||dac|1,7||||7403
-||dtc|27,/reverse/||||7404
+||dtc|27,/REVERSE/||||7404
 ||dac|6,s_rvs||||7405
 ||dac|1,1||||7406
 |v_rtn|dbc|2,svknm|||rtntype|7408
 ||dac|1,7||||7409
-||dtc|27,/rtntype/||||7410
+||dtc|27,/RTNTYPE/||||7410
 ||dac|2,k_rtn||||7411
 |v_stx|dbc|2,svfnn|||setexit|7413
 ||dac|1,7||||7414
-||dtc|27,/setexit/||||7415
+||dtc|27,/SETEXIT/||||7415
 ||dac|6,s_stx||||7416
 ||dac|1,1||||7417
 |v_stc|dbc|2,svknm|||stcount|7419
 ||dac|1,7||||7420
-||dtc|27,/stcount/||||7421
+||dtc|27,/STCOUNT/||||7421
 ||dac|2,k_stc||||7422
 |v_stl|dbc|2,svknm|||stlimit|7424
 ||dac|1,7||||7425
-||dtc|27,/stlimit/||||7426
+||dtc|27,/STLIMIT/||||7426
 ||dac|2,k_stl||||7427
 |v_suc|dbc|2,svkvc|||succeed|7429
 ||dac|1,7||||7430
-||dtc|27,/succeed/||||7431
+||dtc|27,/SUCCEED/||||7431
 ||dac|2,k_suc||||7432
 ||dac|4,ndsuc||||7433
 |v_alp|dbc|2,svkwc|||alphabet|7435
 ||dac|1,8||||7436
-||dtc|27,/alphabet/||||7437
+||dtc|27,/ALPHABET/||||7437
 ||dac|2,k_alp||||7438
 |v_cnt|dbc|2,svlbl|||continue|7440
 ||dac|1,8||||7441
-||dtc|27,/continue/||||7442
+||dtc|27,/CONTINUE/||||7442
 ||dac|6,l_cnt||||7443
 ||ejc|||||7444
 |v_dtp|dbc|2,svfnp|||datatype|7448
 ||dac|1,8||||7449
-||dtc|27,/datatype/||||7450
+||dtc|27,/DATATYPE/||||7450
 ||dac|6,s_dtp||||7451
 ||dac|1,1||||7452
 |v_erl|dbc|2,svknm|||errlimit|7454
 ||dac|1,8||||7455
-||dtc|27,/errlimit/||||7456
+||dtc|27,/ERRLIMIT/||||7456
 ||dac|2,k_erl||||7457
 |v_fnc|dbc|2,svknm|||fnclevel|7459
 ||dac|1,8||||7460
-||dtc|27,/fnclevel/||||7461
+||dtc|27,/FNCLEVEL/||||7461
 ||dac|2,k_fnc||||7462
 |v_fls|dbc|2,svknm|||fullscan|7464
 ||dac|1,8||||7465
-||dtc|27,/fullscan/||||7466
+||dtc|27,/FULLSCAN/||||7466
 ||dac|2,k_fls||||7467
 |v_lfl|dbc|2,svknm|||lastfile|7470
 ||dac|1,8||||7471
-||dtc|27,/lastfile/||||7472
+||dtc|27,/LASTFILE/||||7472
 ||dac|2,k_lfl||||7473
 |v_lln|dbc|2,svknm|||lastline|7477
 ||dac|1,8||||7478
-||dtc|27,/lastline/||||7479
+||dtc|27,/LASTLINE/||||7479
 ||dac|2,k_lln||||7480
 |v_mxl|dbc|2,svknm|||maxlngth|7483
 ||dac|1,8||||7484
-||dtc|27,/maxlngth/||||7485
+||dtc|27,/MAXLNGTH/||||7485
 ||dac|2,k_mxl||||7486
 |v_ter|dbc|1,0|||terminal|7488
 ||dac|1,8||||7489
-||dtc|27,/terminal/||||7490
+||dtc|27,/TERMINAL/||||7490
 ||dac|1,0||||7491
 |v_bsp|dbc|2,svfnn|||backspace|7494
 ||dac|1,9||||7495
-||dtc|27,/backspace/||||7496
+||dtc|27,/BACKSPACE/||||7496
 ||dac|6,s_bsp||||7497
 ||dac|1,1||||7498
 |v_pro|dbc|2,svfnn|||prototype|7501
 ||dac|1,9||||7502
-||dtc|27,/prototype/||||7503
+||dtc|27,/PROTOTYPE/||||7503
 ||dac|6,s_pro||||7504
 ||dac|1,1||||7505
 |v_scn|dbc|2,svlbl|||scontinue|7507
 ||dac|1,9||||7508
-||dtc|27,/scontinue/||||7509
+||dtc|27,/SCONTINUE/||||7509
 ||dac|6,l_scn||||7510
 ||dbc|1,0|||dummy entry to end list|7512
 ||dac|1,10|||length gt 9 (scontinue)|7513
@@ -4681,7 +4681,7 @@
 ||jsr|6,gtstg|||convert second argument to string|13408
 ||ppm|6,scv29|||error if second argument not string|13409
 ||bze|8,wa|6,scv29||or if null string|13410
-||jsr|6,flstg|||fold upper case to lower case|13412
+||jsr|6,flstg|||fold lower case to upper case|13412
 ||mov|7,xl|9,(xs)||load first argument|13414
 ||bne|9,(xl)|22,=b_pdt|6,scv01|jump if not program defined|13415
 ||mov|7,xl|13,pddfp(xl)||point to dfblk|13419
@@ -4858,7 +4858,7 @@
 ||erb|1,077|26,data argument is missing a left paren|||13725
 |sdat1|mov|8,wa|13,sclen(xr)||get length|13730
 ||bze|8,wa|6,sdt1a||avoid folding if null string|13731
-||jsr|6,flstg|||fold upper case to lower case|13732
+||jsr|6,flstg|||fold lower case to upper case|13732
 |sdt1a|mov|7,xl|7,xr||save name ptr|13733
 ||mov|8,wa|13,sclen(xr)||get length|13737
 ||ctb|8,wa|2,scsi_||compute space needed|13738
@@ -5491,7 +5491,7 @@
 |slod3|mov|8,wb|8,wa||save scan mode|14722
 ||mov|8,wa|13,sclen(xr)||datatype length|14723
 ||bze|8,wa|6,sld3a||bypass if null string|14724
-||jsr|6,flstg|||fold to lower case|14725
+||jsr|6,flstg|||fold to upper case|14725
 |sld3a|mov|8,wa|8,wb||restore scan mode|14726
 ||mov|11,-(xs)|7,xr||stack datatype name pointer|14727
 ||mov|8,wb|18,=num01||set string code in case|14731
@@ -5543,7 +5543,7 @@
 ||bct|8,wc|6,slod6||loop till all stored|14796
 ||mov|7,xr|10,(xs)+||load function string name|14800
 ||mov|8,wa|13,sclen(xr)||function name length|14802
-||jsr|6,flstg|||fold to lower case|14803
+||jsr|6,flstg|||fold to upper case|14803
 ||mov|7,xl|9,(xs)||load library name|14805
 ||mov|9,(xs)|8,wb||store efblk pointer|14806
 ||jsr|6,sysld|||call function to load external func|14807
@@ -7759,7 +7759,7 @@
 ||mov|7,xr|3,r_cim||point to image|19440
 ||plc|7,xr|3,scnpt||char ptr for first char|19441
 ||lch|8,wa|10,(xr)+||get first char|19442
-||flc|8,wa|||fold to lower case|19444
+||flc|8,wa|||fold to upper case|19444
 ||beq|8,wa|18,=ch_li|6,cnc07|special case of -inxxx|19446
 |cnc0a|mnz|3,scncc|||set flag for scane|19447
 ||jsr|6,scane|||scan card name|19448
@@ -7771,7 +7771,7 @@
 ||zer|8,wb|||zero offset for substring|19458
 ||jsr|6,sbstr|||extract substring for comparison|19459
 ||mov|8,wa|13,sclen(xr)||reload length|19461
-||jsr|6,flstg|||fold to lower case|19462
+||jsr|6,flstg|||fold to upper case|19462
 ||mov|3,cnscc|7,xr||keep control card substring ptr|19464
 ||mov|7,xr|21,=ccnms||point to list of standard names|19465
 ||zer|8,wb|||initialise name offset|19466
@@ -7819,7 +7819,7 @@
 ||brn|6,cnc08|||ignore unrecognized control card|19540
 |cnc06|erb|1,247|26,invalid control statement|||19545
 |cnc07|lch|8,wa|10,(xr)+||get next char|19549
-||flc|8,wa|||fold to lower case|19551
+||flc|8,wa|||fold to upper case|19551
 ||bne|8,wa|18,=ch_ln|6,cnc0a|if not letter n|19553
 ||lch|8,wa|9,(xr)||get third char|19554
 ||blt|8,wa|18,=ch_d0|6,cnc0a|if not digit|19555
@@ -8720,9 +8720,9 @@
 ||zer|11,-(xs)|||init did fold flag|21510
 ||lct|8,wc|8,wc||load loop counter|21511
 |fst01|lch|8,wa|10,(xl)+||load character|21512
-||blt|8,wa|18,=ch_ua|6,fst02|skip if less than uc a|21513
-||bgt|8,wa|18,=ch_uz|6,fst02|skip if greater than uc z|21514
-||flc|8,wa|||fold character to lower case|21515
+||blt|8,wa|18,=ch_la|6,fst02|skip if less than lc a|21513
+||bgt|8,wa|18,=ch_l_|6,fst02|skip if greater than lc z|21514
+||flc|8,wa|||fold character to upper case|21515
 ||mnz|9,(xs)|||set did fold character flag|21516
 |fst02|sch|8,wa|10,(xr)+||store (possibly folded) character|21517
 ||bct|8,wc|6,fst01||loop thru entire string|21518
@@ -9332,7 +9332,7 @@
 ||jsr|6,gtstg|||convert argument to string|23010
 ||ppm|6,gnv01|||jump if conversion error|23011
 ||bze|8,wa|6,gnv01||null string is an error|23012
-||jsr|6,flstg|||fold upper case to lower case|23014
+||jsr|6,flstg|||fold lower case to upper case|23014
 ||mov|11,-(xs)|7,xl||save xl|23016
 ||mov|11,-(xs)|7,xr||stack string ptr for later|23017
 ||mov|8,wb|7,xr||copy string pointer|23018
@@ -11953,7 +11953,7 @@
 ||ppm|6,trc15|||jump if not string|28527
 ||plc|7,xr|||else point to string|28528
 ||lch|8,wa|9,(xr)||load first character|28529
-||flc|8,wa|||fold to lower case|28531
+||flc|8,wa|||fold to upper case|28531
 ||mov|7,xr|9,(xs)||load name argument|28533
 ||mov|9,(xs)|7,xl||stack trblk ptr or zero|28534
 ||mov|8,wc|18,=trtac||set trtyp for access trace|28535

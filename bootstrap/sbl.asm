@@ -143,7 +143,6 @@
     global  typet
     section .data
 
-typet:
     d_word  b_art   ; arblk type word - 0
     d_word  b_cdc   ; cdblk type word - 1
     d_word  b_exl   ; exblk type word - 2
@@ -1050,31 +1049,31 @@ btkwv:  d_word svkwv                            ; bits to test for keword with v
 btprd:  d_word svprd                            ; bit to test for predicate function} dbc svprd  
 btpre:  d_word svpre                            ; bit to test for preevaluation} dbc svpre  
 btval:  d_word svval                            ; bit to test for value} dbc svval  
-ccnms:  d_char 'c','a','s','e',0,0,0,0          ; } dtc /case/  
-        d_char 'd','o','u','b',0,0,0,0          ; } dtc /doub/  
-        d_char 'c','o','m','p',0,0,0,0          ; } dtc /comp/  
-        d_char 'd','u','m','p',0,0,0,0          ; } dtc /dump/  
-        d_char 'c','o','p','y',0,0,0,0          ; } dtc /copy/  
-        d_char 'e','j','e','c',0,0,0,0          ; } dtc /ejec/  
-        d_char 'e','r','r','o',0,0,0,0          ; } dtc /erro/  
-        d_char 'e','x','e','c',0,0,0,0          ; } dtc /exec/  
-        d_char 'f','a','i','l',0,0,0,0          ; } dtc /fail/  
-        d_char 'i','n','c','l',0,0,0,0          ; } dtc /incl/  
-        d_char 'l','i','n','e',0,0,0,0          ; } dtc /line/  
-        d_char 'l','i','s','t',0,0,0,0          ; } dtc /list/  
-        d_char 'n','o','e','r',0,0,0,0          ; } dtc /noer/  
-        d_char 'n','o','e','x',0,0,0,0          ; } dtc /noex/  
-        d_char 'n','o','f','a',0,0,0,0          ; } dtc /nofa/  
-        d_char 'n','o','l','i',0,0,0,0          ; } dtc /noli/  
-        d_char 'n','o','o','p',0,0,0,0          ; } dtc /noop/  
-        d_char 'n','o','p','r',0,0,0,0          ; } dtc /nopr/  
-        d_char 'o','p','t','i',0,0,0,0          ; } dtc /opti/  
-        d_char 'p','r','i','n',0,0,0,0          ; } dtc /prin/  
-        d_char 's','i','n','g',0,0,0,0          ; } dtc /sing/  
-        d_char 's','p','a','c',0,0,0,0          ; } dtc /spac/  
-        d_char 's','t','i','t',0,0,0,0          ; } dtc /stit/  
-        d_char 't','i','t','l',0,0,0,0          ; } dtc /titl/  
-        d_char 't','r','a','c',0,0,0,0          ; } dtc /trac/  
+ccnms:  d_char 'C','A','S','E',0,0,0,0          ; } dtc /CASE/  
+        d_char 'D','O','U','B',0,0,0,0          ; } dtc /DOUB/  
+        d_char 'C','O','M','P',0,0,0,0          ; } dtc /COMP/  
+        d_char 'D','U','M','P',0,0,0,0          ; } dtc /DUMP/  
+        d_char 'C','O','P','Y',0,0,0,0          ; } dtc /COPY/  
+        d_char 'E','J','E','C',0,0,0,0          ; } dtc /EJEC/  
+        d_char 'E','R','R','O',0,0,0,0          ; } dtc /ERRO/  
+        d_char 'E','X','E','C',0,0,0,0          ; } dtc /EXEC/  
+        d_char 'F','A','I','L',0,0,0,0          ; } dtc /FAIL/  
+        d_char 'I','N','C','L',0,0,0,0          ; } dtc /INCL/  
+        d_char 'L','I','N','E',0,0,0,0          ; } dtc /LINE/  
+        d_char 'L','I','S','T',0,0,0,0          ; } dtc /LIST/  
+        d_char 'N','O','E','R',0,0,0,0          ; } dtc /NOER/  
+        d_char 'N','O','E','X',0,0,0,0          ; } dtc /NOEX/  
+        d_char 'N','O','F','A',0,0,0,0          ; } dtc /NOFA/  
+        d_char 'N','O','L','I',0,0,0,0          ; } dtc /NOLI/  
+        d_char 'N','O','O','P',0,0,0,0          ; } dtc /NOOP/  
+        d_char 'N','O','P','R',0,0,0,0          ; } dtc /NOPR/  
+        d_char 'O','P','T','I',0,0,0,0          ; } dtc /OPTI/  
+        d_char 'P','R','I','N',0,0,0,0          ; } dtc /PRIN/  
+        d_char 'S','I','N','G',0,0,0,0          ; } dtc /SING/  
+        d_char 'S','P','A','C',0,0,0,0          ; } dtc /SPAC/  
+        d_char 'S','T','I','T',0,0,0,0          ; } dtc /STIT/  
+        d_char 'T','I','T','L',0,0,0,0          ; } dtc /TITL/  
+        d_char 'T','R','A','C',0,0,0,0          ; } dtc /TRAC/  
 dmhdk:  d_word b_scl                            ; dump of keyword values} dac b_scl  
         d_word 22                               ; } dac 22  
         d_char 'd','u','m','p',' ','o','f',' ','k','e','y','w','o','r','d',' ','v','a','l','u','e','s',0,0; } dtc /dump of keyword values/  
@@ -1113,7 +1112,7 @@ endtu:  d_word b_scl                            ; } dac b_scl
         d_char 'e','r','r','o','r',' ','-',' ','t','i','m','e',' ','u','p',0; } dtc /error - time up/  
 ermms:  d_word b_scl                            ; error} dac b_scl  
         d_word 5                                ; } dac 5  
-        d_char 'e','r','r','o','r',0,0,0        ; } dtc /error/  
+        d_char 'E','R','R','O','R',0,0,0        ; } dtc /ERROR/  
 ermns:  d_word b_scl                            ; string / -- /} dac b_scl  
         d_word 4                                ; } dac 4  
         d_char ' ','-','-',' ',0,0,0,0          ; } dtc / -- /  
@@ -1376,49 +1375,49 @@ reavt:  d_real 1.0e+1                           ;
 reatt:  d_real 1.0e+10                          ; 
 scarr:  d_word b_scl                            ; array} dac b_scl  
         d_word 5                                ; } dac 5  
-        d_char 'a','r','r','a','y',0,0,0        ; } dtc /array/  
+        d_char 'A','R','R','A','Y',0,0,0        ; } dtc /ARRAY/  
 sccod:  d_word b_scl                            ; code} dac b_scl  
         d_word 4                                ; } dac 4  
-        d_char 'c','o','d','e',0,0,0,0          ; } dtc /code/  
+        d_char 'C','O','D','E',0,0,0,0          ; } dtc /CODE/  
 scexp:  d_word b_scl                            ; expression} dac b_scl  
         d_word 10                               ; } dac 10  
-        d_char 'e','x','p','r','e','s','s','i','o','n',0,0,0,0,0,0; } dtc /expression/  
+        d_char 'E','X','P','R','E','S','S','I','O','N',0,0,0,0,0,0; } dtc /EXPRESSION/  
 scext:  d_word b_scl                            ; external} dac b_scl  
         d_word 8                                ; } dac 8  
-        d_char 'e','x','t','e','r','n','a','l'  ; } dtc /external/  
+        d_char 'E','X','T','E','R','N','A','L'  ; } dtc /EXTERNAL/  
 scint:  d_word b_scl                            ; integer} dac b_scl  
         d_word 7                                ; } dac 7  
-        d_char 'i','n','t','e','g','e','r',0    ; } dtc /integer/  
+        d_char 'I','N','T','E','G','E','R',0    ; } dtc /INTEGER/  
 scnam:  d_word b_scl                            ; name} dac b_scl  
         d_word 4                                ; } dac 4  
-        d_char 'n','a','m','e',0,0,0,0          ; } dtc /name/  
+        d_char 'N','A','M','E',0,0,0,0          ; } dtc /NAME/  
 scnum:  d_word b_scl                            ; numeric} dac b_scl  
         d_word 7                                ; } dac 7  
-        d_char 'n','u','m','e','r','i','c',0    ; } dtc /numeric/  
+        d_char 'N','U','M','E','R','I','C',0    ; } dtc /NUMERIC/  
 scpat:  d_word b_scl                            ; pattern} dac b_scl  
         d_word 7                                ; } dac 7  
-        d_char 'p','a','t','t','e','r','n',0    ; } dtc /pattern/  
+        d_char 'P','A','T','T','E','R','N',0    ; } dtc /PATTERN/  
 screa:  d_word b_scl                            ; real} dac b_scl  
         d_word 4                                ; } dac 4  
-        d_char 'r','e','a','l',0,0,0,0          ; } dtc /real/  
+        d_char 'R','E','A','L',0,0,0,0          ; } dtc /REAL/  
 scstr:  d_word b_scl                            ; string} dac b_scl  
         d_word 6                                ; } dac 6  
-        d_char 's','t','r','i','n','g',0,0      ; } dtc /string/  
+        d_char 'S','T','R','I','N','G',0,0      ; } dtc /STRING/  
 sctab:  d_word b_scl                            ; table} dac b_scl  
         d_word 5                                ; } dac 5  
-        d_char 't','a','b','l','e',0,0,0        ; } dtc /table/  
+        d_char 'T','A','B','L','E',0,0,0        ; } dtc /TABLE/  
 scfil:  d_word b_scl                            ; file (for extended load arguments)} dac b_scl  
         d_word 4                                ; } dac 4  
-        d_char 'f','i','l','e',0,0,0,0          ; } dtc /file/  
+        d_char 'F','I','L','E',0,0,0,0          ; } dtc /FILE/  
 scfrt:  d_word b_scl                            ; freturn} dac b_scl  
         d_word 7                                ; } dac 7  
-        d_char 'f','r','e','t','u','r','n',0    ; } dtc /freturn/  
+        d_char 'F','R','E','T','U','R','N',0    ; } dtc /FRETURN/  
 scnrt:  d_word b_scl                            ; nreturn} dac b_scl  
         d_word 7                                ; } dac 7  
-        d_char 'n','r','e','t','u','r','n',0    ; } dtc /nreturn/  
+        d_char 'N','R','E','T','U','R','N',0    ; } dtc /NRETURN/  
 scrtn:  d_word b_scl                            ; return} dac b_scl  
         d_word 6                                ; } dac 6  
-        d_char 'r','e','t','u','r','n',0,0      ; } dtc /return/  
+        d_char 'R','E','T','U','R','N',0,0      ; } dtc /RETURN/  
 scnmt:  d_word scarr                            ; arblk     array} dac scarr  
         d_word sccod                            ; cdblk     code} dac sccod  
         d_word scexp                            ; exblk     expression} dac scexp  
@@ -1465,7 +1464,7 @@ stpm4:  d_word b_scl                            ; in line} dac b_scl
         d_char 'i','n',' ','l','i','n','e',0    ; } dtc /in line/  
 stpm5:  d_word b_scl                            ; } dac b_scl  
         d_word 13                               ; } dac 13  
-        d_char 'r','e','g','e','n','e','r','a','t','i','o','n','s',0,0,0; } dtc /regenerations/  
+        d_char 'R','E','G','E','N','E','R','A','T','I','O','N','S',0,0,0; } dtc /REGENERATIONS/  
 stpm6:  d_word b_scl                            ; in file} dac b_scl  
         d_word 7                                ; } dac 7  
         d_char 'i','n',' ','f','i','l','e',0    ; } dtc /in file/  
@@ -1478,7 +1477,7 @@ stpm8:  d_word b_scl                            ; } dac b_scl
 stpm9:  d_word b_scl                            ; } dac b_scl  
         d_word 13                               ; } dac 13  
         d_char 's','t','m','t',' ','/',' ','s','e','c','o','n','d',0,0,0; } dtc _stmt / second_  
-strtu:  d_char 't','u',0,0,0,0,0,0              ; } dtc /tu/  
+strtu:  d_char 'T','U',0,0,0,0,0,0              ; } dtc /TU/  
 svctb:  d_word scstr                            ; string} dac scstr  
         d_word scint                            ; integer} dac scint  
         d_word scnam                            ; name} dac scnam  
@@ -1502,576 +1501,576 @@ trxdr:  d_word o_txr                            ; block points to return routine
 trxdc:  d_word trxdr                            ; pointer to block} dac trxdr  
 v_eqf:  d_word svfpr                            ; eq} dbc svfpr  
         d_word 2                                ; } dac 2  
-        d_char 'e','q',0,0,0,0,0,0              ; } dtc /eq/  
+        d_char 'E','Q',0,0,0,0,0,0              ; } dtc /EQ/  
         d_word s_eqf                            ; } dac s_eqf  
         d_word 2                                ; } dac 2  
 v_gef:  d_word svfpr                            ; ge} dbc svfpr  
         d_word 2                                ; } dac 2  
-        d_char 'g','e',0,0,0,0,0,0              ; } dtc /ge/  
+        d_char 'G','E',0,0,0,0,0,0              ; } dtc /GE/  
         d_word s_gef                            ; } dac s_gef  
         d_word 2                                ; } dac 2  
 v_gtf:  d_word svfpr                            ; gt} dbc svfpr  
         d_word 2                                ; } dac 2  
-        d_char 'g','t',0,0,0,0,0,0              ; } dtc /gt/  
+        d_char 'G','T',0,0,0,0,0,0              ; } dtc /GT/  
         d_word s_gtf                            ; } dac s_gtf  
         d_word 2                                ; } dac 2  
 v_lef:  d_word svfpr                            ; le} dbc svfpr  
         d_word 2                                ; } dac 2  
-        d_char 'l','e',0,0,0,0,0,0              ; } dtc /le/  
+        d_char 'L','E',0,0,0,0,0,0              ; } dtc /LE/  
         d_word s_lef                            ; } dac s_lef  
         d_word 2                                ; } dac 2  
 v_lnf:  d_word svfnp                            ; ln} dbc svfnp  
         d_word 2                                ; } dac 2  
-        d_char 'l','n',0,0,0,0,0,0              ; } dtc /ln/  
+        d_char 'L','N',0,0,0,0,0,0              ; } dtc /LN/  
         d_word s_lnf                            ; } dac s_lnf  
         d_word 1                                ; } dac 1  
 v_ltf:  d_word svfpr                            ; lt} dbc svfpr  
         d_word 2                                ; } dac 2  
-        d_char 'l','t',0,0,0,0,0,0              ; } dtc /lt/  
+        d_char 'L','T',0,0,0,0,0,0              ; } dtc /LT/  
         d_word s_ltf                            ; } dac s_ltf  
         d_word 2                                ; } dac 2  
 v_nef:  d_word svfpr                            ; ne} dbc svfpr  
         d_word 2                                ; } dac 2  
-        d_char 'n','e',0,0,0,0,0,0              ; } dtc /ne/  
+        d_char 'N','E',0,0,0,0,0,0              ; } dtc /NE/  
         d_word s_nef                            ; } dac s_nef  
         d_word 2                                ; } dac 2  
 v_any:  d_word svfnp                            ; any} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 'a','n','y',0,0,0,0,0            ; } dtc /any/  
+        d_char 'A','N','Y',0,0,0,0,0            ; } dtc /ANY/  
         d_word s_any                            ; } dac s_any  
         d_word 1                                ; } dac 1  
 v_arb:  d_word svkvc                            ; arb} dbc svkvc  
         d_word 3                                ; } dac 3  
-        d_char 'a','r','b',0,0,0,0,0            ; } dtc /arb/  
+        d_char 'A','R','B',0,0,0,0,0            ; } dtc /ARB/  
         d_word k_arb                            ; } dac k_arb  
         d_word ndarb                            ; } dac ndarb  
 v_arg:  d_word svfnn                            ; arg} dbc svfnn  
         d_word 3                                ; } dac 3  
-        d_char 'a','r','g',0,0,0,0,0            ; } dtc /arg/  
+        d_char 'A','R','G',0,0,0,0,0            ; } dtc /ARG/  
         d_word s_arg                            ; } dac s_arg  
         d_word 2                                ; } dac 2  
 v_bal:  d_word svkvc                            ; bal} dbc svkvc  
         d_word 3                                ; } dac 3  
-        d_char 'b','a','l',0,0,0,0,0            ; } dtc /bal/  
+        d_char 'B','A','L',0,0,0,0,0            ; } dtc /BAL/  
         d_word k_bal                            ; } dac k_bal  
         d_word ndbal                            ; } dac ndbal  
 v_cos:  d_word svfnp                            ; cos} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 'c','o','s',0,0,0,0,0            ; } dtc /cos/  
+        d_char 'C','O','S',0,0,0,0,0            ; } dtc /COS/  
         d_word s_cos                            ; } dac s_cos  
         d_word 1                                ; } dac 1  
 v_end:  d_word svlbl                            ; end} dbc svlbl  
         d_word 3                                ; } dac 3  
-        d_char 'e','n','d',0,0,0,0,0            ; } dtc /end/  
+        d_char 'E','N','D',0,0,0,0,0            ; } dtc /END/  
         d_word l_end                            ; } dac l_end  
 v_exp:  d_word svfnp                            ; exp} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 'e','x','p',0,0,0,0,0            ; } dtc /exp/  
+        d_char 'E','X','P',0,0,0,0,0            ; } dtc /EXP/  
         d_word s_exp                            ; } dac s_exp  
         d_word 1                                ; } dac 1  
 v_len:  d_word svfnp                            ; len} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 'l','e','n',0,0,0,0,0            ; } dtc /len/  
+        d_char 'L','E','N',0,0,0,0,0            ; } dtc /LEN/  
         d_word s_len                            ; } dac s_len  
         d_word 1                                ; } dac 1  
 v_leq:  d_word svfpr                            ; leq} dbc svfpr  
         d_word 3                                ; } dac 3  
-        d_char 'l','e','q',0,0,0,0,0            ; } dtc /leq/  
+        d_char 'L','E','Q',0,0,0,0,0            ; } dtc /LEQ/  
         d_word s_leq                            ; } dac s_leq  
         d_word 2                                ; } dac 2  
 v_lge:  d_word svfpr                            ; lge} dbc svfpr  
         d_word 3                                ; } dac 3  
-        d_char 'l','g','e',0,0,0,0,0            ; } dtc /lge/  
+        d_char 'L','G','E',0,0,0,0,0            ; } dtc /LGE/  
         d_word s_lge                            ; } dac s_lge  
         d_word 2                                ; } dac 2  
 v_lgt:  d_word svfpr                            ; lgt} dbc svfpr  
         d_word 3                                ; } dac 3  
-        d_char 'l','g','t',0,0,0,0,0            ; } dtc /lgt/  
+        d_char 'L','G','T',0,0,0,0,0            ; } dtc /LGT/  
         d_word s_lgt                            ; } dac s_lgt  
         d_word 2                                ; } dac 2  
 v_lle:  d_word svfpr                            ; lle} dbc svfpr  
         d_word 3                                ; } dac 3  
-        d_char 'l','l','e',0,0,0,0,0            ; } dtc /lle/  
+        d_char 'L','L','E',0,0,0,0,0            ; } dtc /LLE/  
         d_word s_lle                            ; } dac s_lle  
         d_word 2                                ; } dac 2  
 v_llt:  d_word svfpr                            ; llt} dbc svfpr  
         d_word 3                                ; } dac 3  
-        d_char 'l','l','t',0,0,0,0,0            ; } dtc /llt/  
+        d_char 'L','L','T',0,0,0,0,0            ; } dtc /LLT/  
         d_word s_llt                            ; } dac s_llt  
         d_word 2                                ; } dac 2  
 v_lne:  d_word svfpr                            ; lne} dbc svfpr  
         d_word 3                                ; } dac 3  
-        d_char 'l','n','e',0,0,0,0,0            ; } dtc /lne/  
+        d_char 'L','N','E',0,0,0,0,0            ; } dtc /LNE/  
         d_word s_lne                            ; } dac s_lne  
         d_word 2                                ; } dac 2  
 v_pos:  d_word svfnp                            ; pos} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 'p','o','s',0,0,0,0,0            ; } dtc /pos/  
+        d_char 'P','O','S',0,0,0,0,0            ; } dtc /POS/  
         d_word s_pos                            ; } dac s_pos  
         d_word 1                                ; } dac 1  
 v_rem:  d_word svkvc                            ; rem} dbc svkvc  
         d_word 3                                ; } dac 3  
-        d_char 'r','e','m',0,0,0,0,0            ; } dtc /rem/  
+        d_char 'R','E','M',0,0,0,0,0            ; } dtc /REM/  
         d_word k_rem                            ; } dac k_rem  
         d_word ndrem                            ; } dac ndrem  
 v_sin:  d_word svfnp                            ; sin} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 's','i','n',0,0,0,0,0            ; } dtc /sin/  
+        d_char 'S','I','N',0,0,0,0,0            ; } dtc /SIN/  
         d_word s_sin                            ; } dac s_sin  
         d_word 1                                ; } dac 1  
 v_tab:  d_word svfnp                            ; tab} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 't','a','b',0,0,0,0,0            ; } dtc /tab/  
+        d_char 'T','A','B',0,0,0,0,0            ; } dtc /TAB/  
         d_word s_tab                            ; } dac s_tab  
         d_word 1                                ; } dac 1  
 v_tan:  d_word svfnp                            ; tan} dbc svfnp  
         d_word 3                                ; } dac 3  
-        d_char 't','a','n',0,0,0,0,0            ; } dtc /tan/  
+        d_char 'T','A','N',0,0,0,0,0            ; } dtc /TAN/  
         d_word s_tan                            ; } dac s_tan  
         d_word 1                                ; } dac 1  
 v_atn:  d_word svfnp                            ; atan} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'a','t','a','n',0,0,0,0          ; } dtc /atan/  
+        d_char 'A','T','A','N',0,0,0,0          ; } dtc /ATAN/  
         d_word s_atn                            ; } dac s_atn  
         d_word 1                                ; } dac 1  
 v_cas:  d_word svknm                            ; case} dbc svknm  
         d_word 4                                ; } dac 4  
-        d_char 'c','a','s','e',0,0,0,0          ; } dtc /case/  
+        d_char 'C','A','S','E',0,0,0,0          ; } dtc /CASE/  
         d_word k_cas                            ; } dac k_cas  
 v_chr:  d_word svfnp                            ; char} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'c','h','a','r',0,0,0,0          ; } dtc /char/  
+        d_char 'C','H','A','R',0,0,0,0          ; } dtc /CHAR/  
         d_word s_chr                            ; } dac s_chr  
         d_word 1                                ; } dac 1  
 v_chp:  d_word svfnp                            ; chop} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'c','h','o','p',0,0,0,0          ; } dtc /chop/  
+        d_char 'C','H','O','P',0,0,0,0          ; } dtc /CHOP/  
         d_word s_chp                            ; } dac s_chp  
         d_word 1                                ; } dac 1  
 v_cod:  d_word svfnk                            ; code} dbc svfnk  
         d_word 4                                ; } dac 4  
-        d_char 'c','o','d','e',0,0,0,0          ; } dtc /code/  
+        d_char 'C','O','D','E',0,0,0,0          ; } dtc /CODE/  
         d_word k_cod                            ; } dac k_cod  
         d_word s_cod                            ; } dac s_cod  
         d_word 1                                ; } dac 1  
 v_cop:  d_word svfnn                            ; copy} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'c','o','p','y',0,0,0,0          ; } dtc /copy/  
+        d_char 'C','O','P','Y',0,0,0,0          ; } dtc /COPY/  
         d_word s_cop                            ; } dac s_cop  
         d_word 1                                ; } dac 1  
 v_dat:  d_word svfnn                            ; data} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'd','a','t','a',0,0,0,0          ; } dtc /data/  
+        d_char 'D','A','T','A',0,0,0,0          ; } dtc /DATA/  
         d_word s_dat                            ; } dac s_dat  
         d_word 1                                ; } dac 1  
 v_dte:  d_word svfnn                            ; date} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'd','a','t','e',0,0,0,0          ; } dtc /date/  
+        d_char 'D','A','T','E',0,0,0,0          ; } dtc /DATE/  
         d_word s_dte                            ; } dac s_dte  
         d_word 1                                ; } dac 1  
 v_dmp:  d_word svfnk                            ; dump} dbc svfnk  
         d_word 4                                ; } dac 4  
-        d_char 'd','u','m','p',0,0,0,0          ; } dtc /dump/  
+        d_char 'D','U','M','P',0,0,0,0          ; } dtc /DUMP/  
         d_word k_dmp                            ; } dac k_dmp  
         d_word s_dmp                            ; } dac s_dmp  
         d_word 1                                ; } dac 1  
 v_dup:  d_word svfnn                            ; dupl} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'd','u','p','l',0,0,0,0          ; } dtc /dupl/  
+        d_char 'D','U','P','L',0,0,0,0          ; } dtc /DUPL/  
         d_word s_dup                            ; } dac s_dup  
         d_word 2                                ; } dac 2  
 v_evl:  d_word svfnn                            ; eval} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'e','v','a','l',0,0,0,0          ; } dtc /eval/  
+        d_char 'E','V','A','L',0,0,0,0          ; } dtc /EVAL/  
         d_word s_evl                            ; } dac s_evl  
         d_word 1                                ; } dac 1  
 v_ext:  d_word svfnn                            ; exit} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'e','x','i','t',0,0,0,0          ; } dtc /exit/  
+        d_char 'E','X','I','T',0,0,0,0          ; } dtc /EXIT/  
         d_word s_ext                            ; } dac s_ext  
         d_word 2                                ; } dac 2  
 v_fal:  d_word svkvc                            ; fail} dbc svkvc  
         d_word 4                                ; } dac 4  
-        d_char 'f','a','i','l',0,0,0,0          ; } dtc /fail/  
+        d_char 'F','A','I','L',0,0,0,0          ; } dtc /FAIL/  
         d_word k_fal                            ; } dac k_fal  
         d_word ndfal                            ; } dac ndfal  
 v_fil:  d_word svknm                            ; file} dbc svknm  
         d_word 4                                ; } dac 4  
-        d_char 'f','i','l','e',0,0,0,0          ; } dtc /file/  
+        d_char 'F','I','L','E',0,0,0,0          ; } dtc /FILE/  
         d_word k_fil                            ; } dac k_fil  
 v_hst:  d_word svfnn                            ; host} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'h','o','s','t',0,0,0,0          ; } dtc /host/  
+        d_char 'H','O','S','T',0,0,0,0          ; } dtc /HOST/  
         d_word s_hst                            ; } dac s_hst  
         d_word 5                                ; } dac 5  
 v_itm:  d_word svfnf                            ; item} dbc svfnf  
         d_word 4                                ; } dac 4  
-        d_char 'i','t','e','m',0,0,0,0          ; } dtc /item/  
+        d_char 'I','T','E','M',0,0,0,0          ; } dtc /ITEM/  
         d_word s_itm                            ; } dac s_itm  
         d_word 999                              ; } dac 999  
 v_lin:  d_word svknm                            ; line} dbc svknm  
         d_word 4                                ; } dac 4  
-        d_char 'l','i','n','e',0,0,0,0          ; } dtc /line/  
+        d_char 'L','I','N','E',0,0,0,0          ; } dtc /LINE/  
         d_word k_lin                            ; } dac k_lin  
 v_lod:  d_word svfnn                            ; load} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 'l','o','a','d',0,0,0,0          ; } dtc /load/  
+        d_char 'L','O','A','D',0,0,0,0          ; } dtc /LOAD/  
         d_word s_lod                            ; } dac s_lod  
         d_word 2                                ; } dac 2  
 v_lpd:  d_word svfnp                            ; lpad} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'l','p','a','d',0,0,0,0          ; } dtc /lpad/  
+        d_char 'L','P','A','D',0,0,0,0          ; } dtc /LPAD/  
         d_word s_lpd                            ; } dac s_lpd  
         d_word 3                                ; } dac 3  
 v_rpd:  d_word svfnp                            ; rpad} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'r','p','a','d',0,0,0,0          ; } dtc /rpad/  
+        d_char 'R','P','A','D',0,0,0,0          ; } dtc /RPAD/  
         d_word s_rpd                            ; } dac s_rpd  
         d_word 3                                ; } dac 3  
 v_rps:  d_word svfnp                            ; rpos} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'r','p','o','s',0,0,0,0          ; } dtc /rpos/  
+        d_char 'R','P','O','S',0,0,0,0          ; } dtc /RPOS/  
         d_word s_rps                            ; } dac s_rps  
         d_word 1                                ; } dac 1  
 v_rtb:  d_word svfnp                            ; rtab} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 'r','t','a','b',0,0,0,0          ; } dtc /rtab/  
+        d_char 'R','T','A','B',0,0,0,0          ; } dtc /RTAB/  
         d_word s_rtb                            ; } dac s_rtb  
         d_word 1                                ; } dac 1  
 v_si_:  d_word svfnp                            ; size} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 's','i','z','e',0,0,0,0          ; } dtc /size/  
+        d_char 'S','I','Z','E',0,0,0,0          ; } dtc /SIZE/  
         d_word s_si_                            ; } dac s_si_  
         d_word 1                                ; } dac 1  
 v_srt:  d_word svfnn                            ; sort} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 's','o','r','t',0,0,0,0          ; } dtc /sort/  
+        d_char 'S','O','R','T',0,0,0,0          ; } dtc /SORT/  
         d_word s_srt                            ; } dac s_srt  
         d_word 2                                ; } dac 2  
 v_spn:  d_word svfnp                            ; span} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 's','p','a','n',0,0,0,0          ; } dtc /span/  
+        d_char 'S','P','A','N',0,0,0,0          ; } dtc /SPAN/  
         d_word s_spn                            ; } dac s_spn  
         d_word 1                                ; } dac 1  
 v_sqr:  d_word svfnp                            ; sqrt} dbc svfnp  
         d_word 4                                ; } dac 4  
-        d_char 's','q','r','t',0,0,0,0          ; } dtc /sqrt/  
+        d_char 'S','Q','R','T',0,0,0,0          ; } dtc /SQRT/  
         d_word s_sqr                            ; } dac s_sqr  
         d_word 1                                ; } dac 1  
 v_stn:  d_word svknm                            ; stno} dbc svknm  
         d_word 4                                ; } dac 4  
-        d_char 's','t','n','o',0,0,0,0          ; } dtc /stno/  
+        d_char 'S','T','N','O',0,0,0,0          ; } dtc /STNO/  
         d_word k_stn                            ; } dac k_stn  
 v_tim:  d_word svfnn                            ; time} dbc svfnn  
         d_word 4                                ; } dac 4  
-        d_char 't','i','m','e',0,0,0,0          ; } dtc /time/  
+        d_char 'T','I','M','E',0,0,0,0          ; } dtc /TIME/  
         d_word s_tim                            ; } dac s_tim  
         d_word 0                                ; } dac 0  
 v_trm:  d_word svfnk                            ; trim} dbc svfnk  
         d_word 4                                ; } dac 4  
-        d_char 't','r','i','m',0,0,0,0          ; } dtc /trim/  
+        d_char 'T','R','I','M',0,0,0,0          ; } dtc /TRIM/  
         d_word k_trm                            ; } dac k_trm  
         d_word s_trm                            ; } dac s_trm  
         d_word 1                                ; } dac 1  
 v_abe:  d_word svknm                            ; abend} dbc svknm  
         d_word 5                                ; } dac 5  
-        d_char 'a','b','e','n','d',0,0,0        ; } dtc /abend/  
+        d_char 'A','B','E','N','D',0,0,0        ; } dtc /ABEND/  
         d_word k_abe                            ; } dac k_abe  
 v_abo:  d_word svkvl                            ; abort} dbc svkvl  
         d_word 5                                ; } dac 5  
-        d_char 'a','b','o','r','t',0,0,0        ; } dtc /abort/  
+        d_char 'A','B','O','R','T',0,0,0        ; } dtc /ABORT/  
         d_word k_abo                            ; } dac k_abo  
         d_word l_abo                            ; } dac l_abo  
         d_word ndabo                            ; } dac ndabo  
 v_app:  d_word svfnf                            ; apply} dbc svfnf  
         d_word 5                                ; } dac 5  
-        d_char 'a','p','p','l','y',0,0,0        ; } dtc /apply/  
+        d_char 'A','P','P','L','Y',0,0,0        ; } dtc /APPLY/  
         d_word s_app                            ; } dac s_app  
         d_word 999                              ; } dac 999  
 v_abn:  d_word svfnp                            ; arbno} dbc svfnp  
         d_word 5                                ; } dac 5  
-        d_char 'a','r','b','n','o',0,0,0        ; } dtc /arbno/  
+        d_char 'A','R','B','N','O',0,0,0        ; } dtc /ARBNO/  
         d_word s_abn                            ; } dac s_abn  
         d_word 1                                ; } dac 1  
 v_arr:  d_word svfnn                            ; array} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'a','r','r','a','y',0,0,0        ; } dtc /array/  
+        d_char 'A','R','R','A','Y',0,0,0        ; } dtc /ARRAY/  
         d_word s_arr                            ; } dac s_arr  
         d_word 2                                ; } dac 2  
 v_brk:  d_word svfnp                            ; break} dbc svfnp  
         d_word 5                                ; } dac 5  
-        d_char 'b','r','e','a','k',0,0,0        ; } dtc /break/  
+        d_char 'B','R','E','A','K',0,0,0        ; } dtc /BREAK/  
         d_word s_brk                            ; } dac s_brk  
         d_word 1                                ; } dac 1  
 v_clr:  d_word svfnn                            ; clear} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'c','l','e','a','r',0,0,0        ; } dtc /clear/  
+        d_char 'C','L','E','A','R',0,0,0        ; } dtc /CLEAR/  
         d_word s_clr                            ; } dac s_clr  
         d_word 1                                ; } dac 1  
 v_ejc:  d_word svfnn                            ; eject} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'e','j','e','c','t',0,0,0        ; } dtc /eject/  
+        d_char 'E','J','E','C','T',0,0,0        ; } dtc /EJECT/  
         d_word s_ejc                            ; } dac s_ejc  
         d_word 1                                ; } dac 1  
 v_fen:  d_word svfpk                            ; fence} dbc svfpk  
         d_word 5                                ; } dac 5  
-        d_char 'f','e','n','c','e',0,0,0        ; } dtc /fence/  
+        d_char 'F','E','N','C','E',0,0,0        ; } dtc /FENCE/  
         d_word k_fen                            ; } dac k_fen  
         d_word s_fnc                            ; } dac s_fnc  
         d_word 1                                ; } dac 1  
         d_word ndfen                            ; } dac ndfen  
 v_fld:  d_word svfnn                            ; field} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'f','i','e','l','d',0,0,0        ; } dtc /field/  
+        d_char 'F','I','E','L','D',0,0,0        ; } dtc /FIELD/  
         d_word s_fld                            ; } dac s_fld  
         d_word 2                                ; } dac 2  
 v_idn:  d_word svfpr                            ; ident} dbc svfpr  
         d_word 5                                ; } dac 5  
-        d_char 'i','d','e','n','t',0,0,0        ; } dtc /ident/  
+        d_char 'I','D','E','N','T',0,0,0        ; } dtc /IDENT/  
         d_word s_idn                            ; } dac s_idn  
         d_word 2                                ; } dac 2  
 v_inp:  d_word svfnk                            ; input} dbc svfnk  
         d_word 5                                ; } dac 5  
-        d_char 'i','n','p','u','t',0,0,0        ; } dtc /input/  
+        d_char 'I','N','P','U','T',0,0,0        ; } dtc /INPUT/  
         d_word k_inp                            ; } dac k_inp  
         d_word s_inp                            ; } dac s_inp  
         d_word 3                                ; } dac 3  
 v_lcs:  d_word svkwc                            ; lcase} dbc svkwc  
         d_word 5                                ; } dac 5  
-        d_char 'l','c','a','s','e',0,0,0        ; } dtc /lcase/  
+        d_char 'L','C','A','S','E',0,0,0        ; } dtc /LCASE/  
         d_word k_lcs                            ; } dac k_lcs  
 v_loc:  d_word svfnn                            ; local} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'l','o','c','a','l',0,0,0        ; } dtc /local/  
+        d_char 'L','O','C','A','L',0,0,0        ; } dtc /LOCAL/  
         d_word s_loc                            ; } dac s_loc  
         d_word 2                                ; } dac 2  
 v_ops:  d_word svfnn                            ; opsyn} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'o','p','s','y','n',0,0,0        ; } dtc /opsyn/  
+        d_char 'O','P','S','Y','N',0,0,0        ; } dtc /OPSYN/  
         d_word s_ops                            ; } dac s_ops  
         d_word 3                                ; } dac 3  
 v_rmd:  d_word svfnp                            ; remdr} dbc svfnp  
         d_word 5                                ; } dac 5  
-        d_char 'r','e','m','d','r',0,0,0        ; } dtc /remdr/  
+        d_char 'R','E','M','D','R',0,0,0        ; } dtc /REMDR/  
         d_word s_rmd                            ; } dac s_rmd  
         d_word 2                                ; } dac 2  
 v_rsr:  d_word svfnn                            ; rsort} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 'r','s','o','r','t',0,0,0        ; } dtc /rsort/  
+        d_char 'R','S','O','R','T',0,0,0        ; } dtc /RSORT/  
         d_word s_rsr                            ; } dac s_rsr  
         d_word 2                                ; } dac 2  
 v_tbl:  d_word svfnn                            ; table} dbc svfnn  
         d_word 5                                ; } dac 5  
-        d_char 't','a','b','l','e',0,0,0        ; } dtc /table/  
+        d_char 'T','A','B','L','E',0,0,0        ; } dtc /TABLE/  
         d_word s_tbl                            ; } dac s_tbl  
         d_word 3                                ; } dac 3  
 v_tra:  d_word svfnk                            ; trace} dbc svfnk  
         d_word 5                                ; } dac 5  
-        d_char 't','r','a','c','e',0,0,0        ; } dtc /trace/  
+        d_char 'T','R','A','C','E',0,0,0        ; } dtc /TRACE/  
         d_word k_tra                            ; } dac k_tra  
         d_word s_tra                            ; } dac s_tra  
         d_word 4                                ; } dac 4  
 v_ucs:  d_word svkwc                            ; ucase} dbc svkwc  
         d_word 5                                ; } dac 5  
-        d_char 'u','c','a','s','e',0,0,0        ; } dtc /ucase/  
+        d_char 'U','C','A','S','E',0,0,0        ; } dtc /UCASE/  
         d_word k_ucs                            ; } dac k_ucs  
 v_anc:  d_word svknm                            ; anchor} dbc svknm  
         d_word 6                                ; } dac 6  
-        d_char 'a','n','c','h','o','r',0,0      ; } dtc /anchor/  
+        d_char 'A','N','C','H','O','R',0,0      ; } dtc /ANCHOR/  
         d_word k_anc                            ; } dac k_anc  
 v_bkx:  d_word svfnp                            ; breakx} dbc svfnp  
         d_word 6                                ; } dac 6  
-        d_char 'b','r','e','a','k','x',0,0      ; } dtc /breakx/  
+        d_char 'B','R','E','A','K','X',0,0      ; } dtc /BREAKX/  
         d_word s_bkx                            ; } dac s_bkx  
         d_word 1                                ; } dac 1  
 v_def:  d_word svfnn                            ; define} dbc svfnn  
         d_word 6                                ; } dac 6  
-        d_char 'd','e','f','i','n','e',0,0      ; } dtc /define/  
+        d_char 'D','E','F','I','N','E',0,0      ; } dtc /DEFINE/  
         d_word s_def                            ; } dac s_def  
         d_word 2                                ; } dac 2  
 v_det:  d_word svfnn                            ; detach} dbc svfnn  
         d_word 6                                ; } dac 6  
-        d_char 'd','e','t','a','c','h',0,0      ; } dtc /detach/  
+        d_char 'D','E','T','A','C','H',0,0      ; } dtc /DETACH/  
         d_word s_det                            ; } dac s_det  
         d_word 1                                ; } dac 1  
 v_dif:  d_word svfpr                            ; differ} dbc svfpr  
         d_word 6                                ; } dac 6  
-        d_char 'd','i','f','f','e','r',0,0      ; } dtc /differ/  
+        d_char 'D','I','F','F','E','R',0,0      ; } dtc /DIFFER/  
         d_word s_dif                            ; } dac s_dif  
         d_word 2                                ; } dac 2  
 v_ftr:  d_word svknm                            ; ftrace} dbc svknm  
         d_word 6                                ; } dac 6  
-        d_char 'f','t','r','a','c','e',0,0      ; } dtc /ftrace/  
+        d_char 'F','T','R','A','C','E',0,0      ; } dtc /FTRACE/  
         d_word k_ftr                            ; } dac k_ftr  
 v_lst:  d_word svknm                            ; lastno} dbc svknm  
         d_word 6                                ; } dac 6  
-        d_char 'l','a','s','t','n','o',0,0      ; } dtc /lastno/  
+        d_char 'L','A','S','T','N','O',0,0      ; } dtc /LASTNO/  
         d_word k_lst                            ; } dac k_lst  
 v_nay:  d_word svfnp                            ; notany} dbc svfnp  
         d_word 6                                ; } dac 6  
-        d_char 'n','o','t','a','n','y',0,0      ; } dtc /notany/  
+        d_char 'N','O','T','A','N','Y',0,0      ; } dtc /NOTANY/  
         d_word s_nay                            ; } dac s_nay  
         d_word 1                                ; } dac 1  
 v_oup:  d_word svfnk                            ; output} dbc svfnk  
         d_word 6                                ; } dac 6  
-        d_char 'o','u','t','p','u','t',0,0      ; } dtc /output/  
+        d_char 'O','U','T','P','U','T',0,0      ; } dtc /OUTPUT/  
         d_word k_oup                            ; } dac k_oup  
         d_word s_oup                            ; } dac s_oup  
         d_word 3                                ; } dac 3  
 v_ret:  d_word svlbl                            ; return} dbc svlbl  
         d_word 6                                ; } dac 6  
-        d_char 'r','e','t','u','r','n',0,0      ; } dtc /return/  
+        d_char 'R','E','T','U','R','N',0,0      ; } dtc /RETURN/  
         d_word l_rtn                            ; } dac l_rtn  
 v_rew:  d_word svfnn                            ; rewind} dbc svfnn  
         d_word 6                                ; } dac 6  
-        d_char 'r','e','w','i','n','d',0,0      ; } dtc /rewind/  
+        d_char 'R','E','W','I','N','D',0,0      ; } dtc /REWIND/  
         d_word s_rew                            ; } dac s_rew  
         d_word 1                                ; } dac 1  
 v_stt:  d_word svfnn                            ; stoptr} dbc svfnn  
         d_word 6                                ; } dac 6  
-        d_char 's','t','o','p','t','r',0,0      ; } dtc /stoptr/  
+        d_char 'S','T','O','P','T','R',0,0      ; } dtc /STOPTR/  
         d_word s_stt                            ; } dac s_stt  
         d_word 2                                ; } dac 2  
 v_sub:  d_word svfnn                            ; substr} dbc svfnn  
         d_word 6                                ; } dac 6  
-        d_char 's','u','b','s','t','r',0,0      ; } dtc /substr/  
+        d_char 'S','U','B','S','T','R',0,0      ; } dtc /SUBSTR/  
         d_word s_sub                            ; } dac s_sub  
         d_word 3                                ; } dac 3  
 v_unl:  d_word svfnn                            ; unload} dbc svfnn  
         d_word 6                                ; } dac 6  
-        d_char 'u','n','l','o','a','d',0,0      ; } dtc /unload/  
+        d_char 'U','N','L','O','A','D',0,0      ; } dtc /UNLOAD/  
         d_word s_unl                            ; } dac s_unl  
         d_word 1                                ; } dac 1  
 v_col:  d_word svfnn                            ; collect} dbc svfnn  
         d_word 7                                ; } dac 7  
-        d_char 'c','o','l','l','e','c','t',0    ; } dtc /collect/  
+        d_char 'C','O','L','L','E','C','T',0    ; } dtc /COLLECT/  
         d_word s_col                            ; } dac s_col  
         d_word 1                                ; } dac 1  
 v_com:  d_word svknm                            ; compare} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 'c','o','m','p','a','r','e',0    ; } dtc /compare/  
+        d_char 'C','O','M','P','A','R','E',0    ; } dtc /COMPARE/  
         d_word k_com                            ; } dac k_com  
 v_cnv:  d_word svfnn                            ; convert} dbc svfnn  
         d_word 7                                ; } dac 7  
-        d_char 'c','o','n','v','e','r','t',0    ; } dtc /convert/  
+        d_char 'C','O','N','V','E','R','T',0    ; } dtc /CONVERT/  
         d_word s_cnv                            ; } dac s_cnv  
         d_word 2                                ; } dac 2  
 v_enf:  d_word svfnn                            ; endfile} dbc svfnn  
         d_word 7                                ; } dac 7  
-        d_char 'e','n','d','f','i','l','e',0    ; } dtc /endfile/  
+        d_char 'E','N','D','F','I','L','E',0    ; } dtc /ENDFILE/  
         d_word s_enf                            ; } dac s_enf  
         d_word 1                                ; } dac 1  
 v_etx:  d_word svknm                            ; errtext} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 'e','r','r','t','e','x','t',0    ; } dtc /errtext/  
+        d_char 'E','R','R','T','E','X','T',0    ; } dtc /ERRTEXT/  
         d_word k_etx                            ; } dac k_etx  
 v_ert:  d_word svknm                            ; errtype} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 'e','r','r','t','y','p','e',0    ; } dtc /errtype/  
+        d_char 'E','R','R','T','Y','P','E',0    ; } dtc /ERRTYPE/  
         d_word k_ert                            ; } dac k_ert  
 v_frt:  d_word svlbl                            ; freturn} dbc svlbl  
         d_word 7                                ; } dac 7  
-        d_char 'f','r','e','t','u','r','n',0    ; } dtc /freturn/  
+        d_char 'F','R','E','T','U','R','N',0    ; } dtc /FRETURN/  
         d_word l_frt                            ; } dac l_frt  
 v_int:  d_word svfpr                            ; integer} dbc svfpr  
         d_word 7                                ; } dac 7  
-        d_char 'i','n','t','e','g','e','r',0    ; } dtc /integer/  
+        d_char 'I','N','T','E','G','E','R',0    ; } dtc /INTEGER/  
         d_word s_int                            ; } dac s_int  
         d_word 1                                ; } dac 1  
 v_nrt:  d_word svlbl                            ; nreturn} dbc svlbl  
         d_word 7                                ; } dac 7  
-        d_char 'n','r','e','t','u','r','n',0    ; } dtc /nreturn/  
+        d_char 'N','R','E','T','U','R','N',0    ; } dtc /NRETURN/  
         d_word l_nrt                            ; } dac l_nrt  
 v_pfl:  d_word svknm                            ; profile} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 'p','r','o','f','i','l','e',0    ; } dtc /profile/  
+        d_char 'P','R','O','F','I','L','E',0    ; } dtc /PROFILE/  
         d_word k_pfl                            ; } dac k_pfl  
 v_rpl:  d_word svfnp                            ; replace} dbc svfnp  
         d_word 7                                ; } dac 7  
-        d_char 'r','e','p','l','a','c','e',0    ; } dtc /replace/  
+        d_char 'R','E','P','L','A','C','E',0    ; } dtc /REPLACE/  
         d_word s_rpl                            ; } dac s_rpl  
         d_word 3                                ; } dac 3  
 v_rvs:  d_word svfnp                            ; reverse} dbc svfnp  
         d_word 7                                ; } dac 7  
-        d_char 'r','e','v','e','r','s','e',0    ; } dtc /reverse/  
+        d_char 'R','E','V','E','R','S','E',0    ; } dtc /REVERSE/  
         d_word s_rvs                            ; } dac s_rvs  
         d_word 1                                ; } dac 1  
 v_rtn:  d_word svknm                            ; rtntype} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 'r','t','n','t','y','p','e',0    ; } dtc /rtntype/  
+        d_char 'R','T','N','T','Y','P','E',0    ; } dtc /RTNTYPE/  
         d_word k_rtn                            ; } dac k_rtn  
 v_stx:  d_word svfnn                            ; setexit} dbc svfnn  
         d_word 7                                ; } dac 7  
-        d_char 's','e','t','e','x','i','t',0    ; } dtc /setexit/  
+        d_char 'S','E','T','E','X','I','T',0    ; } dtc /SETEXIT/  
         d_word s_stx                            ; } dac s_stx  
         d_word 1                                ; } dac 1  
 v_stc:  d_word svknm                            ; stcount} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 's','t','c','o','u','n','t',0    ; } dtc /stcount/  
+        d_char 'S','T','C','O','U','N','T',0    ; } dtc /STCOUNT/  
         d_word k_stc                            ; } dac k_stc  
 v_stl:  d_word svknm                            ; stlimit} dbc svknm  
         d_word 7                                ; } dac 7  
-        d_char 's','t','l','i','m','i','t',0    ; } dtc /stlimit/  
+        d_char 'S','T','L','I','M','I','T',0    ; } dtc /STLIMIT/  
         d_word k_stl                            ; } dac k_stl  
 v_suc:  d_word svkvc                            ; succeed} dbc svkvc  
         d_word 7                                ; } dac 7  
-        d_char 's','u','c','c','e','e','d',0    ; } dtc /succeed/  
+        d_char 'S','U','C','C','E','E','D',0    ; } dtc /SUCCEED/  
         d_word k_suc                            ; } dac k_suc  
         d_word ndsuc                            ; } dac ndsuc  
 v_alp:  d_word svkwc                            ; alphabet} dbc svkwc  
         d_word 8                                ; } dac 8  
-        d_char 'a','l','p','h','a','b','e','t'  ; } dtc /alphabet/  
+        d_char 'A','L','P','H','A','B','E','T'  ; } dtc /ALPHABET/  
         d_word k_alp                            ; } dac k_alp  
 v_cnt:  d_word svlbl                            ; continue} dbc svlbl  
         d_word 8                                ; } dac 8  
-        d_char 'c','o','n','t','i','n','u','e'  ; } dtc /continue/  
+        d_char 'C','O','N','T','I','N','U','E'  ; } dtc /CONTINUE/  
         d_word l_cnt                            ; } dac l_cnt  
 v_dtp:  d_word svfnp                            ; datatype} dbc svfnp  
         d_word 8                                ; } dac 8  
-        d_char 'd','a','t','a','t','y','p','e'  ; } dtc /datatype/  
+        d_char 'D','A','T','A','T','Y','P','E'  ; } dtc /DATATYPE/  
         d_word s_dtp                            ; } dac s_dtp  
         d_word 1                                ; } dac 1  
 v_erl:  d_word svknm                            ; errlimit} dbc svknm  
         d_word 8                                ; } dac 8  
-        d_char 'e','r','r','l','i','m','i','t'  ; } dtc /errlimit/  
+        d_char 'E','R','R','L','I','M','I','T'  ; } dtc /ERRLIMIT/  
         d_word k_erl                            ; } dac k_erl  
 v_fnc:  d_word svknm                            ; fnclevel} dbc svknm  
         d_word 8                                ; } dac 8  
-        d_char 'f','n','c','l','e','v','e','l'  ; } dtc /fnclevel/  
+        d_char 'F','N','C','L','E','V','E','L'  ; } dtc /FNCLEVEL/  
         d_word k_fnc                            ; } dac k_fnc  
 v_fls:  d_word svknm                            ; fullscan} dbc svknm  
         d_word 8                                ; } dac 8  
-        d_char 'f','u','l','l','s','c','a','n'  ; } dtc /fullscan/  
+        d_char 'F','U','L','L','S','C','A','N'  ; } dtc /FULLSCAN/  
         d_word k_fls                            ; } dac k_fls  
 v_lfl:  d_word svknm                            ; lastfile} dbc svknm  
         d_word 8                                ; } dac 8  
-        d_char 'l','a','s','t','f','i','l','e'  ; } dtc /lastfile/  
+        d_char 'L','A','S','T','F','I','L','E'  ; } dtc /LASTFILE/  
         d_word k_lfl                            ; } dac k_lfl  
 v_lln:  d_word svknm                            ; lastline} dbc svknm  
         d_word 8                                ; } dac 8  
-        d_char 'l','a','s','t','l','i','n','e'  ; } dtc /lastline/  
+        d_char 'L','A','S','T','L','I','N','E'  ; } dtc /LASTLINE/  
         d_word k_lln                            ; } dac k_lln  
 v_mxl:  d_word svknm                            ; maxlngth} dbc svknm  
         d_word 8                                ; } dac 8  
-        d_char 'm','a','x','l','n','g','t','h'  ; } dtc /maxlngth/  
+        d_char 'M','A','X','L','N','G','T','H'  ; } dtc /MAXLNGTH/  
         d_word k_mxl                            ; } dac k_mxl  
 v_ter:  d_word 0                                ; terminal} dbc 0  
         d_word 8                                ; } dac 8  
-        d_char 't','e','r','m','i','n','a','l'  ; } dtc /terminal/  
+        d_char 'T','E','R','M','I','N','A','L'  ; } dtc /TERMINAL/  
         d_word 0                                ; } dac 0  
 v_bsp:  d_word svfnn                            ; backspace} dbc svfnn  
         d_word 9                                ; } dac 9  
-        d_char 'b','a','c','k','s','p','a','c','e',0,0,0,0,0,0,0; } dtc /backspace/  
+        d_char 'B','A','C','K','S','P','A','C','E',0,0,0,0,0,0,0; } dtc /BACKSPACE/  
         d_word s_bsp                            ; } dac s_bsp  
         d_word 1                                ; } dac 1  
 v_pro:  d_word svfnn                            ; prototype} dbc svfnn  
         d_word 9                                ; } dac 9  
-        d_char 'p','r','o','t','o','t','y','p','e',0,0,0,0,0,0,0; } dtc /prototype/  
+        d_char 'P','R','O','T','O','T','Y','P','E',0,0,0,0,0,0,0; } dtc /PROTOTYPE/  
         d_word s_pro                            ; } dac s_pro  
         d_word 1                                ; } dac 1  
 v_scn:  d_word svlbl                            ; scontinue} dbc svlbl  
         d_word 9                                ; } dac 9  
-        d_char 's','c','o','n','t','i','n','u','e',0,0,0,0,0,0,0; } dtc /scontinue/  
+        d_char 'S','C','O','N','T','I','N','U','E',0,0,0,0,0,0,0; } dtc /SCONTINUE/  
         d_word l_scn                            ; } dac l_scn  
         d_word 0                                ; dummy entry to end list} dbc 0  
         d_word 10                               ; length gt 9 (scontinue)} dac 10  
@@ -6331,7 +6330,7 @@ _l0138:                                         ;
 call_72:                                        ; 
         test wa,wa                              ; or if null string} bze wa scv29 
         jz   scv29                              ; 
-        call flstg                              ; fold upper case to lower case} jsr flstg  
+        call flstg                              ; fold lower case to upper case} jsr flstg  
         mov  xl,m_word [xs]                     ; load first argument} mov xl (xs) 
         cmp  m_word [xl],b_pdt                  ; jump if not program defined} bne (xl) =b_pdt scv01
         jne  scv01                              ; 
@@ -6677,7 +6676,7 @@ sdat1:
         mov  wa,m_word [(cfp_b*sclen)+xr]       ; get length} mov wa sclen(xr) 
         test wa,wa                              ; avoid folding if null string} bze wa sdt1a 
         jz   sdt1a                              ; 
-        call flstg                              ; fold upper case to lower case} jsr flstg  
+        call flstg                              ; fold lower case to upper case} jsr flstg  
 sdt1a:
         mov  xl,xr                              ; save name ptr} mov xl xr 
         mov  wa,m_word [(cfp_b*sclen)+xr]       ; get length} mov wa sclen(xr) 
@@ -8090,7 +8089,7 @@ slod3:
         mov  wa,m_word [(cfp_b*sclen)+xr]       ; datatype length} mov wa sclen(xr) 
         test wa,wa                              ; bypass if null string} bze wa sld3a 
         jz   sld3a                              ; 
-        call flstg                              ; fold to lower case} jsr flstg  
+        call flstg                              ; fold to upper case} jsr flstg  
 sld3a:
         mov  wa,wb                              ; restore scan mode} mov wa wb 
         push xr                                 ; stack datatype name pointer} mov -(xs) xr 
@@ -8175,7 +8174,7 @@ slod6:
         jnz  slod6                              ; 
         pop  xr                                 ; load function string name} mov xr (xs)+ 
         mov  wa,m_word [(cfp_b*sclen)+xr]       ; function name length} mov wa sclen(xr) 
-        call flstg                              ; fold to lower case} jsr flstg  
+        call flstg                              ; fold to upper case} jsr flstg  
         mov  xl,m_word [xs]                     ; load library name} mov xl (xs) 
         mov  m_word [xs],wb                     ; store efblk pointer} mov (xs) wb 
         call sysld                              ; call function to load external func} jsr sysld  
@@ -11882,11 +11881,11 @@ cnc01:
         mov  al,m_char [xr]                     ; 
         mov  wa,w0                              ; 
         inc  xr                                 ; 
-        cmp  cl,'A'                             ; fold to lower case} flc wa  
+        cmp  cl,'a'                             ; fold to upper case} flc wa  
         jb   _l0410                             ; 
-        cmp  cl,'Z'                             ; 
+        cmp  cl,'z'                             ; 
         ja   _l0410                             ; 
-        add  cl,32                              ; 
+        sub  cl,32                              ; 
 _l0410             :                            ; 
         cmp  wa,ch_li                           ; special case of -inxxx} beq wa =ch_li cnc07
         je   cnc07                              ; 
@@ -11904,7 +11903,7 @@ cnc0a:
         xor  wb,wb                              ; zero offset for substring} zer wb  
         call sbstr                              ; extract substring for comparison} jsr sbstr  
         mov  wa,m_word [(cfp_b*sclen)+xr]       ; reload length} mov wa sclen(xr) 
-        call flstg                              ; fold to lower case} jsr flstg  
+        call flstg                              ; fold to upper case} jsr flstg  
         mov  m_word [cnscc],xr                  ; keep control card substring ptr} mov cnscc xr 
         mov  xr,ccnms                           ; point to list of standard names} mov xr =ccnms 
         xor  wb,wb                              ; initialise name offset} zer wb  
@@ -11970,11 +11969,11 @@ cnc07:
         mov  al,m_char [xr]                     ; 
         mov  wa,w0                              ; 
         inc  xr                                 ; 
-        cmp  cl,'A'                             ; fold to lower case} flc wa  
+        cmp  cl,'a'                             ; fold to upper case} flc wa  
         jb   _l0412                             ; 
-        cmp  cl,'Z'                             ; 
+        cmp  cl,'z'                             ; 
         ja   _l0412                             ; 
-        add  cl,32                              ; 
+        sub  cl,32                              ; 
 _l0412             :                            ; 
         cmp  wa,ch_ln                           ; if not letter n} bne wa =ch_ln cnc0a
         jne  cnc0a                              ; 
@@ -13332,15 +13331,15 @@ fst01:
         mov  al,m_char [xl]                     ; 
         mov  wa,w0                              ; 
         inc  xl                                 ; 
-        cmp  wa,ch_ua                           ; skip if less than uc a} blt wa =ch_ua fst02
+        cmp  wa,ch_la                           ; skip if less than lc a} blt wa =ch_la fst02
         jb   fst02                              ; 
-        cmp  wa,ch_uz                           ; skip if greater than uc z} bgt wa =ch_uz fst02
+        cmp  wa,ch_l_                           ; skip if greater than lc z} bgt wa =ch_l_ fst02
         ja   fst02                              ; 
-        cmp  cl,'A'                             ; fold character to lower case} flc wa  
+        cmp  cl,'a'                             ; fold character to upper case} flc wa  
         jb   _l0437                             ; 
-        cmp  cl,'Z'                             ; 
+        cmp  cl,'z'                             ; 
         ja   _l0437                             ; 
-        add  cl,32                              ; 
+        sub  cl,32                              ; 
 _l0437             :                            ; 
         mov  m_word [xs],xs                     ; set did fold character flag} mnz (xs)  
 fst02:
@@ -14336,7 +14335,7 @@ _l0453:                                         ;
 call_237:                                       ; 
         test wa,wa                              ; null string is an error} bze wa gnv01 
         jz   gnv01                              ; 
-        call flstg                              ; fold upper case to lower case} jsr flstg  
+        call flstg                              ; fold lower case to upper case} jsr flstg  
         push xl                                 ; save xl} mov -(xs) xl 
         push xr                                 ; stack string ptr for later} mov -(xs) xr 
         mov  wb,xr                              ; copy string pointer} mov wb xr 
@@ -18420,11 +18419,11 @@ call_281:                                       ;
         xor  w0,w0                              ; load first character} lch wa (xr) 
         mov  al,m_char [xr]                     ; 
         mov  wa,w0                              ; 
-        cmp  cl,'A'                             ; fold to lower case} flc wa  
+        cmp  cl,'a'                             ; fold to upper case} flc wa  
         jb   _l0535                             ; 
-        cmp  cl,'Z'                             ; 
+        cmp  cl,'z'                             ; 
         ja   _l0535                             ; 
-        add  cl,32                              ; 
+        sub  cl,32                              ; 
 _l0535             :                            ; 
         mov  xr,m_word [xs]                     ; load name argument} mov xr (xs) 
         mov  m_word [xs],xl                     ; stack trblk ptr or zero} mov (xs) xl 
