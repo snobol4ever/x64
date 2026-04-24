@@ -2510,11 +2510,11 @@ g_flc
 
 *  z_suspend = 1
 
-   genop('cmp',t1,"'A'")
+   genop('cmp',t1,"'a'")
    genop('jb', t2 )
-   genop('cmp',t1,"'Z'")
+   genop('cmp',t1,"'z'")
    genop('ja', t2)
-   genop('add',t1,'32')
+   genop('sub',t1,'32')
    genopl(t2 '             :')
 
 *  z_suspend = 0

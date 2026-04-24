@@ -5896,42 +5896,42 @@ btval  dbc  svval            bit to test for value
 *      list of names used for control card processing
 
 .if    .culc
-ccnms  dtc  /case/
-       dtc  /doub/
+ccnms  dtc  /CASE/
+       dtc  /DOUB/
 .else
-ccnms  dtc  /doub/
+ccnms  dtc  /DOUB/
 .fi
 .if    .ccmk
-       dtc  /comp/
+       dtc  /COMP/
 .fi
-       dtc  /dump/
+       dtc  /DUMP/
 .if    .cinc
-       dtc  /copy/
+       dtc  /COPY/
 .fi
-       dtc  /ejec/
-       dtc  /erro/
-       dtc  /exec/
-       dtc  /fail/
+       dtc  /EJEC/
+       dtc  /ERRO/
+       dtc  /EXEC/
+       dtc  /FAIL/
 .if    .cinc
-       dtc  /incl/
+       dtc  /INCL/
 .fi
 .if    .csln
-       dtc  /line/
+       dtc  /LINE/
 .fi
-       dtc  /list/
-       dtc  /noer/
-       dtc  /noex/
-       dtc  /nofa/
-       dtc  /noli/
-       dtc  /noop/
-       dtc  /nopr/
-       dtc  /opti/
-       dtc  /prin/
-       dtc  /sing/
-       dtc  /spac/
-       dtc  /stit/
-       dtc  /titl/
-       dtc  /trac/
+       dtc  /LIST/
+       dtc  /NOER/
+       dtc  /NOEX/
+       dtc  /NOFA/
+       dtc  /NOLI/
+       dtc  /NOOP/
+       dtc  /NOPR/
+       dtc  /OPTI/
+       dtc  /PRIN/
+       dtc  /SING/
+       dtc  /SPAC/
+       dtc  /STIT/
+       dtc  /TITL/
+       dtc  /TRAC/
 
 *      header messages for dumpr procedure (scblk format)
 
@@ -6016,7 +6016,7 @@ endtu  dac  b_scl
 
 ermms  dac  b_scl            error
        dac  5
-       dtc  /error/
+       dtc  /ERROR/
 
 ermns  dac  b_scl            string / -- /
        dac  4
@@ -6402,61 +6402,61 @@ reatt  drc  +1.0e+10         10**10
 
 scarr  dac  b_scl            array
        dac  5
-       dtc  /array/
+       dtc  /ARRAY/
 .if    .cnbf
 .else
 
 scbuf  dac  b_scl            buffer
        dac  6
-       dtc  /buffer/
+       dtc  /BUFFER/
 .fi
 
 sccod  dac  b_scl            code
        dac  4
-       dtc  /code/
+       dtc  /CODE/
 
 scexp  dac  b_scl            expression
        dac  10
-       dtc  /expression/
+       dtc  /EXPRESSION/
 
 scext  dac  b_scl            external
        dac  8
-       dtc  /external/
+       dtc  /EXTERNAL/
 
 scint  dac  b_scl            integer
        dac  7
-       dtc  /integer/
+       dtc  /INTEGER/
 
 scnam  dac  b_scl            name
        dac  4
-       dtc  /name/
+       dtc  /NAME/
 
 scnum  dac  b_scl            numeric
        dac  7
-       dtc  /numeric/
+       dtc  /NUMERIC/
 
 scpat  dac  b_scl            pattern
        dac  7
-       dtc  /pattern/
+       dtc  /PATTERN/
 .if    .cnra
 .else
 
 screa  dac  b_scl            real
        dac  4
-       dtc  /real/
+       dtc  /REAL/
 .fi
 
 scstr  dac  b_scl            string
        dac  6
-       dtc  /string/
+       dtc  /STRING/
 
 sctab  dac  b_scl            table
        dac  5
-       dtc  /table/
+       dtc  /TABLE/
 .if    .cnlf
 scfil  dac  b_scl            file (for extended load arguments)
        dac  4
-       dtc  /file/
+       dtc  /FILE/
 .fi
        ejc
 
@@ -6464,15 +6464,15 @@ scfil  dac  b_scl            file (for extended load arguments)
 
 scfrt  dac  b_scl            freturn
        dac  7
-       dtc  /freturn/
+       dtc  /FRETURN/
 
 scnrt  dac  b_scl            nreturn
        dac  7
-       dtc  /nreturn/
+       dtc  /NRETURN/
 
 scrtn  dac  b_scl            return
        dac  6
-       dtc  /return/
+       dtc  /RETURN/
 
 *      datatype name table for dtype procedure. the order of
 *      these entries is tied to the b_xxx definitions for blocks
@@ -6579,7 +6579,7 @@ stpm4  dac  b_scl            in line
 
 stpm5  dac  b_scl
        dac  13
-       dtc  /regenerations/
+       dtc  /REGENERATIONS/
 
 .if    .csfn
 stpm6  dac  b_scl            in file
@@ -6601,7 +6601,7 @@ stpm9  dac  b_scl
 
 *      chars for /tu/ ending code
 
-strtu  dtc  /tu/
+strtu  dtc  /TU/
 
 *      table used by convert function to check datatype name
 *      the entries are ordered to correspond to branch table
@@ -6661,52 +6661,52 @@ trxdc  dac  trxdr            pointer to block
 
 v_eqf  dbc  svfpr            eq
        dac  2
-       dtc  /eq/
+       dtc  /EQ/
        dac  s_eqf
        dac  2
 
 v_gef  dbc  svfpr            ge
        dac  2
-       dtc  /ge/
+       dtc  /GE/
        dac  s_gef
        dac  2
 
 v_gtf  dbc  svfpr            gt
        dac  2
-       dtc  /gt/
+       dtc  /GT/
        dac  s_gtf
        dac  2
 
 v_lef  dbc  svfpr            le
        dac  2
-       dtc  /le/
+       dtc  /LE/
        dac  s_lef
        dac  2
 .if    .cmth
 
 v_lnf  dbc  svfnp            ln
        dac  2
-       dtc  /ln/
+       dtc  /LN/
        dac  s_lnf
        dac  1
 .fi
 
 v_ltf  dbc  svfpr            lt
        dac  2
-       dtc  /lt/
+       dtc  /LT/
        dac  s_ltf
        dac  2
 
 v_nef  dbc  svfpr            ne
        dac  2
-       dtc  /ne/
+       dtc  /NE/
        dac  s_nef
        dac  2
 .if    .c370
 
 v_orf  dbc  svfnp            or
        dac  2
-       dtc  /or/
+       dtc  /OR/
        dac  s_orf
        dac  2
 .fi
@@ -6714,7 +6714,7 @@ v_orf  dbc  svfnp            or
 
 v_abs  dbc  svfnp            abs
        dac  3
-       dtc  /abs/
+       dtc  /ABS/
        dac  s_abs
        dac  1
 .fi
@@ -6722,20 +6722,20 @@ v_abs  dbc  svfnp            abs
 
 v_and  dbc  svfnp            and
        dac  3
-       dtc  /and/
+       dtc  /AND/
        dac  s_and
        dac  2
 .fi
 
 v_any  dbc  svfnp            any
        dac  3
-       dtc  /any/
+       dtc  /ANY/
        dac  s_any
        dac  1
 
 v_arb  dbc  svkvc            arb
        dac  3
-       dtc  /arb/
+       dtc  /ARB/
        dac  k_arb
        dac  ndarb
        ejc
@@ -6744,64 +6744,64 @@ v_arb  dbc  svkvc            arb
 
 v_arg  dbc  svfnn            arg
        dac  3
-       dtc  /arg/
+       dtc  /ARG/
        dac  s_arg
        dac  2
 
 v_bal  dbc  svkvc            bal
        dac  3
-       dtc  /bal/
+       dtc  /BAL/
        dac  k_bal
        dac  ndbal
 .if    .cmth
 
 v_cos  dbc  svfnp            cos
        dac  3
-       dtc  /cos/
+       dtc  /COS/
        dac  s_cos
        dac  1
 .fi
 
 v_end  dbc  svlbl            end
        dac  3
-       dtc  /end/
+       dtc  /END/
        dac  l_end
 .if    .cmth
 
 v_exp  dbc  svfnp            exp
        dac  3
-       dtc  /exp/
+       dtc  /EXP/
        dac  s_exp
        dac  1
 .fi
 
 v_len  dbc  svfnp            len
        dac  3
-       dtc  /len/
+       dtc  /LEN/
        dac  s_len
        dac  1
 
 v_leq  dbc  svfpr            leq
        dac  3
-       dtc  /leq/
+       dtc  /LEQ/
        dac  s_leq
        dac  2
 
 v_lge  dbc  svfpr            lge
        dac  3
-       dtc  /lge/
+       dtc  /LGE/
        dac  s_lge
        dac  2
 
 v_lgt  dbc  svfpr            lgt
        dac  3
-       dtc  /lgt/
+       dtc  /LGT/
        dac  s_lgt
        dac  2
 
 v_lle  dbc  svfpr            lle
        dac  3
-       dtc  /lle/
+       dtc  /LLE/
        dac  s_lle
        dac  2
        ejc
@@ -6810,32 +6810,32 @@ v_lle  dbc  svfpr            lle
 
 v_llt  dbc  svfpr            llt
        dac  3
-       dtc  /llt/
+       dtc  /LLT/
        dac  s_llt
        dac  2
 
 v_lne  dbc  svfpr            lne
        dac  3
-       dtc  /lne/
+       dtc  /LNE/
        dac  s_lne
        dac  2
 
 v_pos  dbc  svfnp            pos
        dac  3
-       dtc  /pos/
+       dtc  /POS/
        dac  s_pos
        dac  1
 
 v_rem  dbc  svkvc            rem
        dac  3
-       dtc  /rem/
+       dtc  /REM/
        dac  k_rem
        dac  ndrem
 .if    .cust
 
 v_set  dbc  svfnn            set (renamed to zet for setl4)
        dac  3
-       dtc  /zet/
+       dtc  /ZET/
        dac  s_set
        dac  3
 .fi
@@ -6843,21 +6843,21 @@ v_set  dbc  svfnn            set (renamed to zet for setl4)
 
 v_sin  dbc  svfnp            sin
        dac  3
-       dtc  /sin/
+       dtc  /SIN/
        dac  s_sin
        dac  1
 .fi
 
 v_tab  dbc  svfnp            tab
        dac  3
-       dtc  /tab/
+       dtc  /TAB/
        dac  s_tab
        dac  1
 .if    .cmth
 
 v_tan  dbc  svfnp            tan
        dac  3
-       dtc  /tan/
+       dtc  /TAN/
        dac  s_tan
        dac  1
 .fi
@@ -6865,7 +6865,7 @@ v_tan  dbc  svfnp            tan
 
 v_xor  dbc  svfnp            xor
        dac  3
-       dtc  /xor/
+       dtc  /XOR/
        dac  s_xor
        dac  2
 .fi
@@ -6873,7 +6873,7 @@ v_xor  dbc  svfnp            xor
 
 v_atn  dbc  svfnp            atan
        dac  4
-       dtc  /atan/
+       dtc  /ATAN/
        dac  s_atn
        dac  1
 .fi
@@ -6881,13 +6881,13 @@ v_atn  dbc  svfnp            atan
 
 v_cas  dbc  svknm            case
        dac  4
-       dtc  /case/
+       dtc  /CASE/
        dac  k_cas
 .fi
 
 v_chr  dbc  svfnp            char
        dac  4
-       dtc  /char/
+       dtc  /CHAR/
        dac  s_chr
        dac  1
 
@@ -6895,20 +6895,20 @@ v_chr  dbc  svfnp            char
 
 v_chp  dbc  svfnp            chop
        dac  4
-       dtc  /chop/
+       dtc  /CHOP/
        dac  s_chp
        dac  1
 .fi
 v_cod  dbc  svfnk            code
        dac  4
-       dtc  /code/
+       dtc  /CODE/
        dac  k_cod
        dac  s_cod
        dac  1
 
 v_cop  dbc  svfnn            copy
        dac  4
-       dtc  /copy/
+       dtc  /COPY/
        dac  s_cop
        dac  1
        ejc
@@ -6917,32 +6917,32 @@ v_cop  dbc  svfnn            copy
 
 v_dat  dbc  svfnn            data
        dac  4
-       dtc  /data/
+       dtc  /DATA/
        dac  s_dat
        dac  1
 
 v_dte  dbc  svfnn            date
        dac  4
-       dtc  /date/
+       dtc  /DATE/
        dac  s_dte
        dac  1
 
 v_dmp  dbc  svfnk            dump
        dac  4
-       dtc  /dump/
+       dtc  /DUMP/
        dac  k_dmp
        dac  s_dmp
        dac  1
 
 v_dup  dbc  svfnn            dupl
        dac  4
-       dtc  /dupl/
+       dtc  /DUPL/
        dac  s_dup
        dac  2
 
 v_evl  dbc  svfnn            eval
        dac  4
-       dtc  /eval/
+       dtc  /EVAL/
        dac  s_evl
        dac  1
 .if    .cnex
@@ -6950,27 +6950,27 @@ v_evl  dbc  svfnn            eval
 
 v_ext  dbc  svfnn            exit
        dac  4
-       dtc  /exit/
+       dtc  /EXIT/
        dac  s_ext
        dac  2
 .fi
 
 v_fal  dbc  svkvc            fail
        dac  4
-       dtc  /fail/
+       dtc  /FAIL/
        dac  k_fal
        dac  ndfal
 
 .if    .csfn
 v_fil  dbc  svknm            file
        dac  4
-       dtc  /file/
+       dtc  /FILE/
        dac  k_fil
 
 .fi
 v_hst  dbc  svfnn            host
        dac  4
-       dtc  /host/
+       dtc  /HOST/
        dac  s_hst
        dac  5
        ejc
@@ -6979,14 +6979,14 @@ v_hst  dbc  svfnn            host
 
 v_itm  dbc  svfnf            item
        dac  4
-       dtc  /item/
+       dtc  /ITEM/
        dac  s_itm
        dac  999
 .if    .csln
 
 v_lin  dbc  svknm            line
        dac  4
-       dtc  /line/
+       dtc  /LINE/
        dac  k_lin
 .fi
 .if    .cnld
@@ -6994,38 +6994,38 @@ v_lin  dbc  svknm            line
 
 v_lod  dbc  svfnn            load
        dac  4
-       dtc  /load/
+       dtc  /LOAD/
        dac  s_lod
        dac  2
 .fi
 
 v_lpd  dbc  svfnp            lpad
        dac  4
-       dtc  /lpad/
+       dtc  /LPAD/
        dac  s_lpd
        dac  3
 
 v_rpd  dbc  svfnp            rpad
        dac  4
-       dtc  /rpad/
+       dtc  /RPAD/
        dac  s_rpd
        dac  3
 
 v_rps  dbc  svfnp            rpos
        dac  4
-       dtc  /rpos/
+       dtc  /RPOS/
        dac  s_rps
        dac  1
 
 v_rtb  dbc  svfnp            rtab
        dac  4
-       dtc  /rtab/
+       dtc  /RTAB/
        dac  s_rtb
        dac  1
 
 v_si_  dbc  svfnp            size
        dac  4
-       dtc  /size/
+       dtc  /SIZE/
        dac  s_si_
        dac  1
 
@@ -7034,13 +7034,13 @@ v_si_  dbc  svfnp            size
 
 v_srt  dbc  svfnn            sort
        dac  4
-       dtc  /sort/
+       dtc  /SORT/
        dac  s_srt
        dac  2
 .fi
 v_spn  dbc  svfnp            span
        dac  4
-       dtc  /span/
+       dtc  /SPAN/
        dac  s_spn
        dac  1
        ejc
@@ -7051,55 +7051,55 @@ v_spn  dbc  svfnp            span
 
 v_sqr  dbc  svfnp            sqrt
        dac  4
-       dtc  /sqrt/
+       dtc  /SQRT/
        dac  s_sqr
        dac  1
 .fi
 v_stn  dbc  svknm            stno
        dac  4
-       dtc  /stno/
+       dtc  /STNO/
        dac  k_stn
 
 v_tim  dbc  svfnn            time
        dac  4
-       dtc  /time/
+       dtc  /TIME/
        dac  s_tim
        dac  0
 
 v_trm  dbc  svfnk            trim
        dac  4
-       dtc  /trim/
+       dtc  /TRIM/
        dac  k_trm
        dac  s_trm
        dac  1
 
 v_abe  dbc  svknm            abend
        dac  5
-       dtc  /abend/
+       dtc  /ABEND/
        dac  k_abe
 
 v_abo  dbc  svkvl            abort
        dac  5
-       dtc  /abort/
+       dtc  /ABORT/
        dac  k_abo
        dac  l_abo
        dac  ndabo
 
 v_app  dbc  svfnf            apply
        dac  5
-       dtc  /apply/
+       dtc  /APPLY/
        dac  s_app
        dac  999
 
 v_abn  dbc  svfnp            arbno
        dac  5
-       dtc  /arbno/
+       dtc  /ARBNO/
        dac  s_abn
        dac  1
 
 v_arr  dbc  svfnn            array
        dac  5
-       dtc  /array/
+       dtc  /ARRAY/
        dac  s_arr
        dac  2
        ejc
@@ -7108,33 +7108,33 @@ v_arr  dbc  svfnn            array
 
 v_brk  dbc  svfnp            break
        dac  5
-       dtc  /break/
+       dtc  /BREAK/
        dac  s_brk
        dac  1
 
 v_clr  dbc  svfnn            clear
        dac  5
-       dtc  /clear/
+       dtc  /CLEAR/
        dac  s_clr
        dac  1
 .if    .c370
 
 v_cmp  dbc  svfnp            compl
        dac  5
-       dtc  /compl/
+       dtc  /COMPL/
        dac  s_cmp
        dac  1
 .fi
 
 v_ejc  dbc  svfnn            eject
        dac  5
-       dtc  /eject/
+       dtc  /EJECT/
        dac  s_ejc
        dac  1
 
 v_fen  dbc  svfpk            fence
        dac  5
-       dtc  /fence/
+       dtc  /FENCE/
        dac  k_fen
        dac  s_fnc
        dac  1
@@ -7142,19 +7142,19 @@ v_fen  dbc  svfpk            fence
 
 v_fld  dbc  svfnn            field
        dac  5
-       dtc  /field/
+       dtc  /FIELD/
        dac  s_fld
        dac  2
 
 v_idn  dbc  svfpr            ident
        dac  5
-       dtc  /ident/
+       dtc  /IDENT/
        dac  s_idn
        dac  2
 
 v_inp  dbc  svfnk            input
        dac  5
-       dtc  /input/
+       dtc  /INPUT/
        dac  k_inp
        dac  s_inp
        dac  3
@@ -7162,13 +7162,13 @@ v_inp  dbc  svfnk            input
 
 v_lcs  dbc  svkwc            lcase
        dac  5
-       dtc  /lcase/
+       dtc  /LCASE/
        dac  k_lcs
 .fi
 
 v_loc  dbc  svfnn            local
        dac  5
-       dtc  /local/
+       dtc  /LOCAL/
        dac  s_loc
        dac  2
        ejc
@@ -7177,13 +7177,13 @@ v_loc  dbc  svfnn            local
 
 v_ops  dbc  svfnn            opsyn
        dac  5
-       dtc  /opsyn/
+       dtc  /OPSYN/
        dac  s_ops
        dac  3
 
 v_rmd  dbc  svfnp            remdr
        dac  5
-       dtc  /remdr/
+       dtc  /REMDR/
        dac  s_rmd
        dac  2
 .if    .cnsr
@@ -7191,20 +7191,20 @@ v_rmd  dbc  svfnp            remdr
 
 v_rsr  dbc  svfnn            rsort
        dac  5
-       dtc  /rsort/
+       dtc  /RSORT/
        dac  s_rsr
        dac  2
 .fi
 
 v_tbl  dbc  svfnn            table
        dac  5
-       dtc  /table/
+       dtc  /TABLE/
        dac  s_tbl
        dac  3
 
 v_tra  dbc  svfnk            trace
        dac  5
-       dtc  /trace/
+       dtc  /TRACE/
        dac  k_tra
        dac  s_tra
        dac  4
@@ -7212,27 +7212,27 @@ v_tra  dbc  svfnk            trace
 
 v_ucs  dbc  svkwc            ucase
        dac  5
-       dtc  /ucase/
+       dtc  /UCASE/
        dac  k_ucs
 .fi
 
 v_anc  dbc  svknm            anchor
        dac  6
-       dtc  /anchor/
+       dtc  /ANCHOR/
        dac  k_anc
 .if    .cnbf
 .else
 
 v_apn  dbc  svfnn            append
        dac  6
-       dtc  /append/
+       dtc  /APPEND/
        dac  s_apn
        dac  2
 .fi
 
 v_bkx  dbc  svfnp            breakx
        dac  6
-       dtc  /breakx/
+       dtc  /BREAKX/
        dac  s_bkx
        dac  1
 
@@ -7240,20 +7240,20 @@ v_bkx  dbc  svfnp            breakx
 .else
 v_buf  dbc  svfnn            buffer
        dac  6
-       dtc  /buffer/
+       dtc  /BUFFER/
        dac  s_buf
        dac  2
 .fi
 
 v_def  dbc  svfnn            define
        dac  6
-       dtc  /define/
+       dtc  /DEFINE/
        dac  s_def
        dac  2
 
 v_det  dbc  svfnn            detach
        dac  6
-       dtc  /detach/
+       dtc  /DETACH/
        dac  s_det
        dac  1
        ejc
@@ -7262,56 +7262,56 @@ v_det  dbc  svfnn            detach
 
 v_dif  dbc  svfpr            differ
        dac  6
-       dtc  /differ/
+       dtc  /DIFFER/
        dac  s_dif
        dac  2
 
 v_ftr  dbc  svknm            ftrace
        dac  6
-       dtc  /ftrace/
+       dtc  /FTRACE/
        dac  k_ftr
 
 .if    .cnbf
 .else
 v_ins  dbc  svfnn            insert
        dac  6
-       dtc  /insert/
+       dtc  /INSERT/
        dac  s_ins
        dac  4
 
 .fi
 v_lst  dbc  svknm            lastno
        dac  6
-       dtc  /lastno/
+       dtc  /LASTNO/
        dac  k_lst
 
 v_nay  dbc  svfnp            notany
        dac  6
-       dtc  /notany/
+       dtc  /NOTANY/
        dac  s_nay
        dac  1
 
 v_oup  dbc  svfnk            output
        dac  6
-       dtc  /output/
+       dtc  /OUTPUT/
        dac  k_oup
        dac  s_oup
        dac  3
 
 v_ret  dbc  svlbl            return
        dac  6
-       dtc  /return/
+       dtc  /RETURN/
        dac  l_rtn
 
 v_rew  dbc  svfnn            rewind
        dac  6
-       dtc  /rewind/
+       dtc  /REWIND/
        dac  s_rew
        dac  1
 
 v_stt  dbc  svfnn            stoptr
        dac  6
-       dtc  /stoptr/
+       dtc  /STOPTR/
        dac  s_stt
        dac  2
        ejc
@@ -7320,65 +7320,65 @@ v_stt  dbc  svfnn            stoptr
 
 v_sub  dbc  svfnn            substr
        dac  6
-       dtc  /substr/
+       dtc  /SUBSTR/
        dac  s_sub
        dac  3
 
 v_unl  dbc  svfnn            unload
        dac  6
-       dtc  /unload/
+       dtc  /UNLOAD/
        dac  s_unl
        dac  1
 
 v_col  dbc  svfnn            collect
        dac  7
-       dtc  /collect/
+       dtc  /COLLECT/
        dac  s_col
        dac  1
 .if    .ccmk
 
 v_com  dbc  svknm            compare
        dac  7
-       dtc  /compare/
+       dtc  /COMPARE/
        dac  k_com
 .fi
 
 v_cnv  dbc  svfnn            convert
        dac  7
-       dtc  /convert/
+       dtc  /CONVERT/
        dac  s_cnv
        dac  2
 
 v_enf  dbc  svfnn            endfile
        dac  7
-       dtc  /endfile/
+       dtc  /ENDFILE/
        dac  s_enf
        dac  1
 
 v_etx  dbc  svknm            errtext
        dac  7
-       dtc  /errtext/
+       dtc  /ERRTEXT/
        dac  k_etx
 
 v_ert  dbc  svknm            errtype
        dac  7
-       dtc  /errtype/
+       dtc  /ERRTYPE/
        dac  k_ert
 
 v_frt  dbc  svlbl            freturn
        dac  7
-       dtc  /freturn/
+       dtc  /FRETURN/
        dac  l_frt
 
 v_int  dbc  svfpr            integer
        dac  7
-       dtc  /integer/
+       dtc  /INTEGER/
        dac  s_int
        dac  1
 
 v_nrt  dbc  svlbl            nreturn
        dac  7
-       dtc  /nreturn/
+       dtc  /NRETURN/
        dac  l_nrt
        ejc
 
@@ -7389,57 +7389,57 @@ v_nrt  dbc  svlbl            nreturn
 
 v_pfl  dbc  svknm            profile
        dac  7
-       dtc  /profile/
+       dtc  /PROFILE/
        dac  k_pfl
 .fi
 
 v_rpl  dbc  svfnp            replace
        dac  7
-       dtc  /replace/
+       dtc  /REPLACE/
        dac  s_rpl
        dac  3
 
 v_rvs  dbc  svfnp            reverse
        dac  7
-       dtc  /reverse/
+       dtc  /REVERSE/
        dac  s_rvs
        dac  1
 
 v_rtn  dbc  svknm            rtntype
        dac  7
-       dtc  /rtntype/
+       dtc  /RTNTYPE/
        dac  k_rtn
 
 v_stx  dbc  svfnn            setexit
        dac  7
-       dtc  /setexit/
+       dtc  /SETEXIT/
        dac  s_stx
        dac  1
 
 v_stc  dbc  svknm            stcount
        dac  7
-       dtc  /stcount/
+       dtc  /STCOUNT/
        dac  k_stc
 
 v_stl  dbc  svknm            stlimit
        dac  7
-       dtc  /stlimit/
+       dtc  /STLIMIT/
        dac  k_stl
 
 v_suc  dbc  svkvc            succeed
        dac  7
-       dtc  /succeed/
+       dtc  /SUCCEED/
        dac  k_suc
        dac  ndsuc
 
 v_alp  dbc  svkwc            alphabet
        dac  8
-       dtc  /alphabet/
+       dtc  /ALPHABET/
        dac  k_alp
 
 v_cnt  dbc  svlbl            continue
        dac  8
-       dtc  /continue/
+       dtc  /CONTINUE/
        dac  l_cnt
        ejc
 
@@ -7447,66 +7447,66 @@ v_cnt  dbc  svlbl            continue
 
 v_dtp  dbc  svfnp            datatype
        dac  8
-       dtc  /datatype/
+       dtc  /DATATYPE/
        dac  s_dtp
        dac  1
 
 v_erl  dbc  svknm            errlimit
        dac  8
-       dtc  /errlimit/
+       dtc  /ERRLIMIT/
        dac  k_erl
 
 v_fnc  dbc  svknm            fnclevel
        dac  8
-       dtc  /fnclevel/
+       dtc  /FNCLEVEL/
        dac  k_fnc
 
 v_fls  dbc  svknm            fullscan
        dac  8
-       dtc  /fullscan/
+       dtc  /FULLSCAN/
        dac  k_fls
 
 .if    .csfn
 v_lfl  dbc  svknm            lastfile
        dac  8
-       dtc  /lastfile/
+       dtc  /LASTFILE/
        dac  k_lfl
 
 .fi
 .if    .csln
 v_lln  dbc  svknm            lastline
        dac  8
-       dtc  /lastline/
+       dtc  /LASTLINE/
        dac  k_lln
 
 .fi
 v_mxl  dbc  svknm            maxlngth
        dac  8
-       dtc  /maxlngth/
+       dtc  /MAXLNGTH/
        dac  k_mxl
 
 v_ter  dbc  0                terminal
        dac  8
-       dtc  /terminal/
+       dtc  /TERMINAL/
        dac  0
 
 .if    .cbsp
 v_bsp  dbc  svfnn            backspace
        dac  9
-       dtc  /backspace/
+       dtc  /BACKSPACE/
        dac  s_bsp
        dac  1
 
 .fi
 v_pro  dbc  svfnn            prototype
        dac  9
-       dtc  /prototype/
+       dtc  /PROTOTYPE/
        dac  s_pro
        dac  1
 
 v_scn  dbc  svlbl            scontinue
        dac  9
-       dtc  /scontinue/
+       dtc  /SCONTINUE/
        dac  l_scn
 
        dbc  0                dummy entry to end list
@@ -13409,7 +13409,7 @@ s_cnv  ent                   entry point
        ppm  scv29            error if second argument not string
        bze  wa,scv29         or if null string
 .if    .culc
-       jsr  flstg            fold upper case to lower case
+       jsr  flstg            fold lower case to upper case
 .fi
        mov  xl,(xs)          load first argument
        bne  (xl),=b_pdt,scv01 jump if not program defined
@@ -13729,7 +13729,7 @@ s_dat  ent                   entry point
 .if    .culc
 sdat1  mov  wa,sclen(xr)     get length
        bze  wa,sdt1a         avoid folding if null string
-       jsr  flstg            fold upper case to lower case
+       jsr  flstg            fold lower case to upper case
 sdt1a  mov  xl,xr            save name ptr
 .else
 sdat1  mov  xl,xr            save name ptr
@@ -14722,7 +14722,7 @@ slod2  mov  wc,=ch_rp        delimiter one is right paren
 slod3  mov  wb,wa            save scan mode
        mov  wa,sclen(xr)     datatype length
        bze  wa,sld3a         bypass if null string
-       jsr  flstg            fold to lower case
+       jsr  flstg            fold to upper case
 sld3a  mov  wa,wb            restore scan mode
        mov  -(xs),xr         stack datatype name pointer
 .else
@@ -14800,7 +14800,7 @@ slod6  mov  -(xr),(xs)+      store one type code from stack
        mov  xr,(xs)+         load function string name
 .if    .culc
        mov  wa,sclen(xr)     function name length
-       jsr  flstg            fold to lower case
+       jsr  flstg            fold to upper case
 .fi
        mov  xl,(xs)          load library name
        mov  (xs),wb          store efblk pointer
@@ -19441,7 +19441,7 @@ cnc01  bge  scnpt,scnil,cnc09 return if end of image
        plc  xr,scnpt         char ptr for first char
        lch  wa,(xr)+         get first char
 .if    .culc
-       flc  wa               fold to lower case
+       flc  wa               fold to upper case
 .fi
        beq  wa,=ch_li,cnc07  special case of -inxxx
 cnc0a  mnz  scncc            set flag for scane
@@ -19459,7 +19459,7 @@ cnc0a  mnz  scncc            set flag for scane
        jsr  sbstr            extract substring for comparison
 .if    .culc
        mov  wa,sclen(xr)     reload length
-       jsr  flstg            fold to lower case
+       jsr  flstg            fold to upper case
 .fi
        mov  cnscc,xr         keep control card substring ptr
        mov  xr,=ccnms        point to list of standard names
@@ -19548,7 +19548,7 @@ cnc06  erb  247,invalid control statement
 
 cnc07  lch  wa,(xr)+         get next char
 .if    .culc
-       flc  wa               fold to lower case
+       flc  wa               fold to upper case
 .fi
        bne  wa,=ch_ln,cnc0a  if not letter n
        lch  wa,(xr)          get third char
@@ -21486,7 +21486,7 @@ filn3  mov  wb,(xs)+         restore wb
 
 .if    .culc
 
-*      flstg -- fold string to lower case
+*      flstg -- fold string to upper case
 
 *      flstg folds a character string containing upper case
 *      characcters to one containing lower case characters.
@@ -21510,9 +21510,9 @@ flstg  prc  e,0              entry point
        zer  -(xs)            init did fold flag
        lct  wc,wc            load loop counter
 fst01  lch  wa,(xl)+         load character
-       blt  wa,=ch_ua,fst02  skip if less than uc a
-       bgt  wa,=ch_uz,fst02  skip if greater than uc z
-       flc  wa               fold character to lower case
+       blt  wa,=ch_la,fst02  skip if less than lc a
+       bgt  wa,=ch_l_,fst02  skip if greater than lc z
+       flc  wa               fold character to upper case
        mnz  (xs)             set did fold character flag
 fst02  sch  wa,(xr)+         store (possibly folded) character
        bct  wc,fst01         loop thru entire string
@@ -23011,7 +23011,7 @@ gnv02  mov  gnvsa,wa         save wa
        ppm  gnv01            jump if conversion error
        bze  wa,gnv01         null string is an error
 .if    .culc
-       jsr  flstg            fold upper case to lower case
+       jsr  flstg            fold lower case to upper case
 .fi
        mov  -(xs),xl         save xl
        mov  -(xs),xr         stack string ptr for later
@@ -28528,7 +28528,7 @@ trace  prc  n,2              entry point
        plc  xr               else point to string
        lch  wa,(xr)          load first character
 .if    .culc
-       flc  wa               fold to lower case
+       flc  wa               fold to upper case
 .fi
        mov  xr,(xs)          load name argument
        mov  (xs),xl          stack trblk ptr or zero
