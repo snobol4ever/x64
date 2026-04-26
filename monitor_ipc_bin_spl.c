@@ -16,10 +16,26 @@
  * to match SPITBOL's traditional callef() convention.
  *
  *   LOAD('MON_OPEN(STRING,STRING,STRING)INTEGER',  './monitor_ipc_bin_spl.so')
- *   LOAD('MON_PUT_VALUE(STRING,STRING)INTEGER',    './monitor_ipc_bin_spl.so')
- *   LOAD('MON_PUT_CALL(STRING)INTEGER',            './monitor_ipc_bin_spl.so')
- *   LOAD('MON_PUT_RETURN(STRING,STRING)INTEGER',   './monitor_ipc_bin_spl.so')
- *   LOAD('MON_CLOSE()INTEGER',                     './monitor_ipc_bin_spl.so')
+ *   LOAD('MON_PUT_CALL(STRING)INTEGER',             './monitor_ipc_bin_spl.so')
+ *   LOAD('MON_CLOSE()INTEGER',                      './monitor_ipc_bin_spl.so')
+ *
+ * Typed value channels — one per SNOBOL4 datatype.  Each declares its
+ * second arg with the matching prototype token so SPITBOL's argument
+ * conversion (sbl.min:14721 onward) accepts the call.  Wrapper preamble
+ * dispatches via DATATYPE($N).
+ *   LOAD('MON_PUT_S_VALUE(STRING,STRING)INTEGER',   ...)  STRING var
+ *   LOAD('MON_PUT_I_VALUE(STRING,INTEGER)INTEGER',  ...)  INTEGER var
+ *   LOAD('MON_PUT_R_VALUE(STRING,REAL)INTEGER',     ...)  REAL var
+ *   LOAD('MON_PUT_O_VALUE(STRING,STRING)INTEGER',   ...)  opaque (type-name str)
+ *   LOAD('MON_PUT_S_RETURN(STRING,STRING)INTEGER',  ...)  STRING func result
+ *   LOAD('MON_PUT_I_RETURN(STRING,INTEGER)INTEGER', ...)  INTEGER func result
+ *   LOAD('MON_PUT_R_RETURN(STRING,REAL)INTEGER',    ...)  REAL func result
+ *   LOAD('MON_PUT_O_RETURN(STRING,STRING)INTEGER',  ...)  opaque func result
+ *
+ * MON_PUT_VALUE / MON_PUT_RETURN remain as legacy polymorphic entry
+ * points (declared `(STRING,STRING)INTEGER`) for direct test use only;
+ * they cannot be called from the wrapper preamble because SPITBOL
+ * rejects non-STRING second args at the `gtstg` call site (sbl.min:10465).
  *
  * Build:
  *   gcc -shared -fPIC -O2 -Wall -o monitor_ipc_bin_spl.so monitor_ipc_bin_spl.c
@@ -347,10 +363,152 @@ lret_t mon_close(LA_ALIST) {
 }
 
 /*============================================================================
+ * Typed entry points — one per dialect datatype.
+ *
+ * Each pair (s_value/i_value/r_value/o_value, s_return/i_return/r_return/
+ * o_return) declares its second arg in the prototype with the type token
+ * matching the actual SNOBOL4 datatype, so SPITBOL's prototype-driven
+ * argument conversion (gtstg/gtint/gtrea at sbl.min:10465 onward)
+ * passes the value through cleanly without ERROR 039 / 040 / 265.
+ *
+ * Wrapper preamble dispatches based on DATATYPE($N) to pick the right
+ * channel; the SNOBOL4 side knows the type, the C side trusts it.
+ *==========================================================================*/
+
+/* Internal helpers mirror the CSN .c — emit a record of a fixed type. */
+static int _put_str_at_idx1(uint32_t kind, uint32_t name_id, struct ldescr *args) {
+    int len = _slen(1, args);
+    const char *p = _sptr(1, args);
+    if (len < 0) return FALSE;
+    return emit_record(kind, name_id, MWT_STRING, len > 0 ? p : NULL,
+                       (uint32_t)(len > 0 ? len : 0));
+}
+static int _put_int_at_idx1(uint32_t kind, uint32_t name_id, struct ldescr *args) {
+    /* SPITBOL conint marshalling stores the long value in args[1].a.i. */
+    int_t iv = args[1].a.i;
+    unsigned char buf[8];
+    for (int k = 0; k < 8; k++) buf[k] = (unsigned char)((iv >> (k*8)) & 0xff);
+    return emit_record(kind, name_id, MWT_INTEGER, buf, 8);
+}
+static int _put_real_at_idx1(uint32_t kind, uint32_t name_id, struct ldescr *args) {
+    /* SPITBOL passes a REAL-declared arg through the noconv/default
+     * branch in syslinux.c, which stuffs the rcblk pointer into
+     * args[1].a.i (NOT args[1].a.f).  The rcblk layout is:
+     *   struct rcblk { word typ; double rcval; }
+     * with rcval at offset sizeof(word) = 8.  Read from there. */
+    real_t rv = 0.0;
+    if (args[1].a.i != 0) {
+        const unsigned char *blk = (const unsigned char *)(uintptr_t)args[1].a.i;
+        memcpy(&rv, blk + sizeof(long), sizeof(double));
+    }
+    unsigned char buf[8];
+    memcpy(buf, &rv, 8);
+    return emit_record(kind, name_id, MWT_REAL, buf, 8);
+}
+
+static uint8_t opaque_name_to_wire(const char *p, int len) {
+    if (!p || len <= 0) return MWT_UNKNOWN;
+    char buf[16];
+    if (len >= (int)sizeof(buf)) return MWT_UNKNOWN;
+    for (int i = 0; i < len; i++) {
+        char c = p[i];
+        if (c >= 'a' && c <= 'z') c = (char)(c - 'a' + 'A');
+        buf[i] = c;
+    }
+    buf[len] = '\0';
+    if      (!strcmp(buf, "STRING"))     return MWT_STRING;
+    else if (!strcmp(buf, "INTEGER"))    return MWT_INTEGER;
+    else if (!strcmp(buf, "REAL"))       return MWT_REAL;
+    else if (!strcmp(buf, "NAME"))       return MWT_NAME;
+    else if (!strcmp(buf, "PATTERN"))    return MWT_PATTERN;
+    else if (!strcmp(buf, "EXPRESSION")) return MWT_EXPRESSION;
+    else if (!strcmp(buf, "ARRAY"))      return MWT_ARRAY;
+    else if (!strcmp(buf, "TABLE"))      return MWT_TABLE;
+    else if (!strcmp(buf, "CODE"))       return MWT_CODE;
+    else if (!strcmp(buf, "FILE"))       return MWT_FILE;
+    return MWT_DATA;
+}
+
+static int _put_opaque_at_idx1(uint32_t kind, uint32_t name_id, struct ldescr *args) {
+    int len = _slen(1, args);
+    const char *p = _sptr(1, args);
+    uint8_t type = opaque_name_to_wire(p, len);
+    return emit_record(kind, name_id, type, NULL, 0);
+}
+
+static int _resolve_name_id(struct ldescr *args, uint32_t *out_id) {
+    int nlen = _slen(0, args);
+    const char *nptr = _sptr(0, args);
+    if (!nptr) return FALSE;
+    uint32_t id = lookup_name_id(nptr, nlen);
+    if (id == MW_NAME_ID_NONE) return FALSE;
+    *out_id = id;
+    return TRUE;
+}
+
+/* Lowercase entry points. */
+lret_t mon_put_s_value(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_str_at_idx1(MWK_VALUE, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_i_value(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_int_at_idx1(MWK_VALUE, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_r_value(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_real_at_idx1(MWK_VALUE, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_o_value(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_opaque_at_idx1(MWK_VALUE, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_s_return(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_str_at_idx1(MWK_RETURN, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_i_return(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_int_at_idx1(MWK_RETURN, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_r_return(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_real_at_idx1(MWK_RETURN, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+lret_t mon_put_o_return(LA_ALIST) {
+    (void)nargs; uint32_t name_id;
+    if (!_resolve_name_id(args, &name_id)) RETFAIL;
+    if (!_put_opaque_at_idx1(MWK_RETURN, name_id, args)) RETFAIL;
+    RETINT(0);
+}
+
+/*============================================================================
  * UPPERCASE aliases — SPITBOL LOAD() looks up symbol verbatim from prototype.
  *==========================================================================*/
-lret_t MON_OPEN(LA_ALIST)       { return mon_open(retval, nargs, args); }
-lret_t MON_PUT_VALUE(LA_ALIST)  { return mon_put_value(retval, nargs, args); }
-lret_t MON_PUT_CALL(LA_ALIST)   { return mon_put_call(retval, nargs, args); }
-lret_t MON_PUT_RETURN(LA_ALIST) { return mon_put_return(retval, nargs, args); }
-lret_t MON_CLOSE(LA_ALIST)      { return mon_close(retval, nargs, args); }
+lret_t MON_OPEN(LA_ALIST)         { return mon_open(retval, nargs, args); }
+lret_t MON_PUT_VALUE(LA_ALIST)    { return mon_put_value(retval, nargs, args); }
+lret_t MON_PUT_CALL(LA_ALIST)     { return mon_put_call(retval, nargs, args); }
+lret_t MON_PUT_RETURN(LA_ALIST)   { return mon_put_return(retval, nargs, args); }
+lret_t MON_CLOSE(LA_ALIST)        { return mon_close(retval, nargs, args); }
+lret_t MON_PUT_S_VALUE(LA_ALIST)  { return mon_put_s_value(retval, nargs, args); }
+lret_t MON_PUT_I_VALUE(LA_ALIST)  { return mon_put_i_value(retval, nargs, args); }
+lret_t MON_PUT_R_VALUE(LA_ALIST)  { return mon_put_r_value(retval, nargs, args); }
+lret_t MON_PUT_O_VALUE(LA_ALIST)  { return mon_put_o_value(retval, nargs, args); }
+lret_t MON_PUT_S_RETURN(LA_ALIST) { return mon_put_s_return(retval, nargs, args); }
+lret_t MON_PUT_I_RETURN(LA_ALIST) { return mon_put_i_return(retval, nargs, args); }
+lret_t MON_PUT_R_RETURN(LA_ALIST) { return mon_put_r_return(retval, nargs, args); }
+lret_t MON_PUT_O_RETURN(LA_ALIST) { return mon_put_o_return(retval, nargs, args); }
