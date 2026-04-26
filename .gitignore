@@ -16,3 +16,5 @@ err.asm
 sbl.asm
 sbl.err
 sbl.lex
+# binary-protocol monitor IPC module (session #16)
+monitor_ipc_bin_spl.so
