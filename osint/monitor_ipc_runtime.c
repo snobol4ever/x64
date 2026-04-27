@@ -347,10 +347,15 @@ int zysmv(void) {
     const char *np = NULL;
     int         nl = 0;
     spl_vrblk_name(vr, &np, &nl);
-    /* Skip system variables (empty name) for now — they'd all collide on
-     * name_id=0 making the wire ambiguous.  Catch-all gate is meant for
-     * user-written .sno code. */
-    if (nl == 0) return -1;
+    /* Empty name → array element / table slot / system variable.  Use a
+     * stable sentinel so the wire stream stays well-formed and the
+     * CSNOBOL4 and SPITBOL bridges emit byte-identical records on the
+     * same statement (CSN's lvalue_name_id() does the same).
+     * SN-26-bridge-coverage-a: catch-all symmetry. */
+    if (nl == 0) {
+        np = "<lval>";
+        nl = 6;
+    }
 
     uint32_t name_id = intern_name(np, nl);
     if (name_id == MW_NAME_ID_NONE) return -1;
