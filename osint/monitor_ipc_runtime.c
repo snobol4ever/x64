@@ -511,4 +511,48 @@ int zysml(void) {
     return -1;
 }
 
+/*  zysmw — VALUE event for aggregate element stores (array/table/vector/pdblk).
+ *
+ *  Called from asign/asinp fire-points in sbl.min when the call site
+ *  detects that xl is mid-arblk/teblk/vcblk/pdblk (not a real vrblk).
+ *  SN-26-bridge-coverage-l: replaces the guesswork ASCII filter in zysmv
+ *  for this path — we know it is an aggregate store, so we emit <lval>
+ *  unconditionally without trying to synthesize a name from junk bytes.
+ *
+ *  Register contract (same as zysmv):
+ *    (xs)+1 = the value being stored (pointer to typed block)
+ */
+int zysmw(void) {
+    if (!monitor_init()) return -1;
+
+    word *spl_stack = XS(word *);
+    if (!spl_stack) return -1;
+    void *value_block = (void *)(spl_stack[1]);
+
+    static const char lval_name[] = "<lval>";
+    uint32_t name_id = intern_name(lval_name, (int)(sizeof lval_name - 1));
+    if (name_id == MW_NAME_ID_NONE) return -1;
+
+    const void *chars = NULL;
+    uint32_t    vlen  = 0;
+    word       iv    = 0;
+    double      rv    = 0.0;
+    word       i_buf;
+    double      r_buf;
+    uint8_t type = spl_block_to_wire(value_block, &chars, &vlen, &iv, &rv);
+
+    const void *vp = chars;
+    if (type == MWT_INTEGER) {
+        unsigned char *p = (unsigned char *)&i_buf;
+        for (int k = 0; k < 8; k++) p[k] = (unsigned char)(((uint64_t)iv >> (k*8)) & 0xff);
+        vp = &i_buf; vlen = 8;
+    } else if (type == MWT_REAL) {
+        memcpy(&r_buf, &rv, sizeof(r_buf));
+        vp = &r_buf; vlen = 8;
+    }
+
+    emit_record_raw(MWK_VALUE, name_id, type, vp, vlen);
+    return -1;
+}
+
 /* end of monitor_ipc_runtime.c */

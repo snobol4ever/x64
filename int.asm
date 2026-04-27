@@ -847,6 +847,15 @@ sysmr:      syscall     zysmr,41
       extern      zysml
 sysml:      syscall     zysml,42
 
+;     SN-26-bridge-coverage-l: sysmw = monitor_emit_value_lval.
+;     Called from asign/asinp fire-points when xl is mid-arblk/teblk/etc.
+;     (aggregate element store).  Emits <lval> unconditionally.
+;     Same register contract as sysmv: (xs)+1 = value pointer.
+      global sysmw
+      extern      zysmw
+sysmw:     mov   m_word [reg_xs],rsp
+      syscall     zysmw,43
+
       %macro      callext     2
       extern      %1
       call  %1

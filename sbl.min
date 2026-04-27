@@ -2946,6 +2946,14 @@ sysml  exp  0                define external entry point
 *      (wa)                  &STNO value (integer) of statement being entered
 *      jsr  sysml            emit LABEL record on monitor wire
 *      (xs,xl,xr,wa,wb,wc,ia) preserved over call
+
+sysmw  exp  0                define external entry point
+
+*      SN-26-bridge-coverage-l: emit VALUE with <lval> name unconditionally.
+*      Called from asign/asinp fire-points when xl is mid-aggregate-block.
+*      (xs)+1                value being stored (same contract as sysmv)
+*      jsr  sysmw            emit VALUE <lval> record on monitor wire
+*      (xs,xl,xr,wa,wb,wc,ia) preserved over call
        ejc
 
 *      introduce the internal procedures.
@@ -17614,11 +17622,17 @@ asg01  add  xl,wa            point to variable value
 *      Subtract *vrvlo to back-step from vrval to vrsto field.
 *      Catches o_ass (X=Y), o_rpl (pat substitute), array/table element
 *      stores via arref->o_ass.  Silent no-op when env vars unset.
-       mov  -(xs),wb         stack value pointer for sysmv
+*      SN-26-bridge-coverage-l: distinguish natural-var (vrsto holds =b_vrs)
+*      from aggregate-element (xl is mid-arblk/teblk/etc) — call sysmw 
+*      for aggregate so <lval> is emitted without ASCII-filter guesswork.
+       mov  -(xs),wb         stack value pointer for sysmv/sysmw 
        mov  xr,xl            xr = vrval field
-       sub  xr,*vrvlo        xr = vrsto field (vrvlo = vrval - vrsto)
-       jsr  sysmv            emit VALUE record on monitor wire
-       mov  wb,(xs)+         pop value back
+       sub  xr,*vrvlo        xr = putative vrsto field
+       beq  (xr),=b_vrs,asga1 jump if real natural variable (vrsto = b_vrs)
+       jsr  sysmw            aggregate element store — emit <lval>
+       brn  asga2            merge
+asga1  jsr  sysmv            natural variable — emit real name
+asga2  mov  wb,(xs)+         pop value back
        mov  (xl),wb          else perform assignment
        zer  xl               clear garbage value in xl
        exi                   and return to asign caller
@@ -17875,11 +17889,16 @@ asinp  prc  r,1              entry point, recursive
 *      Catches pnth4 (PAT . X), p_imc (PAT $ X), p_cas (@X) — all three
 *      pattern-capture forms route through here.  Trapped path falls into
 *      asnp1 -> asign whose fire-point at asg01 catches that case.
-       mov  -(xs),wb         stack value pointer for sysmv
+*      SN-26-bridge-coverage-l: same natural-var vs aggregate distinction
+*      as asg01 — check vrsto field content against =b_vrs.
+       mov  -(xs),wb         stack value pointer for sysmv/sysmw 
        mov  xr,xl            xr = vrval field
-       sub  xr,*vrvlo        xr = vrsto field (vrvlo = vrval - vrsto)
-       jsr  sysmv            emit VALUE record on monitor wire
-       mov  wb,(xs)+         pop value back
+       sub  xr,*vrvlo        xr = putative vrsto field
+       beq  (xr),=b_vrs,asnpa jump if real natural variable
+       jsr  sysmw            aggregate element — emit <lval>
+       brn  asnpb            merge
+asnpa  jsr  sysmv            natural variable — emit real name
+asnpb  mov  wb,(xs)+         pop value back
        mov  (xl),wb          else perform assignment
        zer  xl               clear garbage value in xl
        exi                   return to asinp caller
