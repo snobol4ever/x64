@@ -6,19 +6,21 @@
  * csnobol4/monitor_ipc_runtime.c — lets a single controller compare the two
  * runtimes byte-for-byte.
  *
- * Design (SN-26-spl-bridge-a/-b, 2026-04-27):
+ * Design (SN-26-spl-bridge-a/-b, 2026-04-27;
+ *         SN-26-bridge-coverage-e, streaming intern):
  *   - Statically linked into sbl (object listed in osint Makefile).
  *   - No SNOBOL4 LOAD() involvement.  zysmv/zysmc/zysmr are the C-side
  *     implementations of three new MINIMAL externs sysmv/sysmc/sysmr,
  *     called from b_vrs / bpf09 / rtn03 fire-points in sbl.min.
  *   - Lazy init on first emit: reads MONITOR_READY_PIPE / MONITOR_GO_PIPE.
  *     If unset, emits become silent no-ops.
- *   - Auto-interns names into a growing in-memory table (no static
- *     MONITOR_NAMES_FILE input).  At process exit (atexit handler), the
- *     table is dumped to MONITOR_NAMES_OUT — matches the per-participant
- *     names sidecar architecture used by csnobol4 + scrip.
- *   - End record (MWK_END) emitted at exit before the names sidecar is
- *     written, so the controller sees a clean wire close.
+ *   - Auto-interns names into a growing in-memory table.  When a fresh id
+ *     is assigned, an MWK_NAME_DEF record is emitted on the wire BEFORE
+ *     the record using the new id, binding (id -> name bytes) for the
+ *     controller's per-participant intern table.  No sidecar file is
+ *     written; the wire stream is self-describing.
+ *   - End record (MWK_END) emitted at exit so the controller sees a
+ *     clean wire close.
  *
  * SPITBOL ABI specifics (differ from CSNOBOL4):
  *   - Variable identity is held in a vrblk (struct vrblk in spitblks.h).
@@ -52,6 +54,7 @@
 #define MWK_RETURN      3u
 #define MWK_END         4u
 #define MWK_LABEL       5u
+#define MWK_NAME_DEF    6u   /* SN-26-bridge-coverage-e: streaming-intern name binding */
 
 #define MWT_NULL        0
 #define MWT_STRING      1
@@ -103,10 +106,12 @@ static int     *g_name_lens   = NULL;
 static int      g_n_names     = 0;
 static int      g_names_cap   = 0;
 
-static char    *g_names_out_path = NULL;
+/* SN-26-bridge-coverage-e: streaming intern on the wire — no sidecar file. */
 
 /*============================================================================
- * atexit: emit MWK_END and dump names sidecar.
+ * atexit: emit MWK_END.  SN-26-bridge-coverage-e: names are announced on
+ * the wire via MWK_NAME_DEF records as they are interned, so no sidecar
+ * dump happens here.
  *==========================================================================*/
 static void emit_record_raw(uint32_t kind, uint32_t name_id, uint8_t type,
                             const void *value, uint32_t value_len);
@@ -117,16 +122,6 @@ static void monitor_atexit(void) {
 
     if (g_init_ok && g_ready_fd >= 0) {
         emit_record_raw(MWK_END, MW_NAME_ID_NONE, MWT_NULL, NULL, 0);
-    }
-    if (g_names_out_path && g_names) {
-        FILE *f = fopen(g_names_out_path, "w");
-        if (f) {
-            for (int i = 0; i < g_n_names; i++) {
-                fwrite(g_names[i], 1, (size_t)g_name_lens[i], f);
-                fputc('\n', f);
-            }
-            fclose(f);
-        }
     }
     if (g_ready_fd >= 0) { close(g_ready_fd); g_ready_fd = -1; }
     if (g_go_fd    >= 0) { close(g_go_fd);    g_go_fd    = -1; }
@@ -141,7 +136,6 @@ static int monitor_init(void) {
 
     const char *ready_path = getenv("MONITOR_READY_PIPE");
     const char *go_path    = getenv("MONITOR_GO_PIPE");
-    const char *names_path = getenv("MONITOR_NAMES_OUT");
     if (!ready_path || !*ready_path) return 0;
     if (!go_path    || !*go_path)    return 0;
 
@@ -157,18 +151,18 @@ static int monitor_init(void) {
 
     g_ready_fd = rfd;
     g_go_fd    = gfd;
-    if (names_path && *names_path) {
-        size_t n = strlen(names_path);
-        g_names_out_path = (char *)malloc(n + 1);
-        if (g_names_out_path) memcpy(g_names_out_path, names_path, n + 1);
-    }
-    g_init_ok = 1;
+    g_init_ok  = 1;
     atexit(monitor_atexit);
     return 1;
 }
 
 /*============================================================================
  * Name interning — linear scan, append on miss.  Returns name_id.
+ *
+ * SN-26-bridge-coverage-e: when a fresh id is assigned and the wire is
+ * live, an MWK_NAME_DEF record is emitted BEFORE returning the new id,
+ * binding (id -> name bytes) for the controller's per-participant intern
+ * table.  No sidecar file is written.
  *==========================================================================*/
 static uint32_t intern_name(const char *p, int len) {
     if (!p || len < 0) return MW_NAME_ID_NONE;
@@ -190,9 +184,18 @@ static uint32_t intern_name(const char *p, int len) {
     if (!copy) return MW_NAME_ID_NONE;
     if (len > 0) memcpy(copy, p, (size_t)len);
     copy[len] = '\0';
+    uint32_t id = (uint32_t)g_n_names;
     g_names[g_n_names]     = copy;
     g_name_lens[g_n_names] = len;
-    return (uint32_t)g_n_names++;
+    g_n_names++;
+    /* SN-26-bridge-coverage-e: announce the new binding on the wire BEFORE
+     * any record using this id flows.  Silent no-op if monitoring is not
+     * yet initialized. */
+    if (g_init_ok && g_ready_fd >= 0) {
+        emit_record_raw(MWK_NAME_DEF, id, MWT_STRING,
+                        (len > 0) ? (const void *)copy : NULL, (uint32_t)len);
+    }
+    return id;
 }
 
 /*============================================================================
