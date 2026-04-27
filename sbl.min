@@ -2911,6 +2911,36 @@ sysxi  exp  2                define external entry point
 .fi
        ejc
 
+*      SN-26-spl-bridge-b: monitor_ipc_runtime fire-points.
+*      sysmv -- monitor emit value (called from b_vrs)
+*      sysmc -- monitor emit call  (called from bpf09)
+*      sysmr -- monitor emit return (called from rtn03 region)
+*
+*      All three are externs implemented in osint/monitor_ipc_runtime.c.
+*      They consult MONITOR_READY_PIPE / MONITOR_GO_PIPE env vars; if
+*      unset, the calls are silent no-ops with negligible overhead.
+
+sysmv  exp  0                define external entry point
+
+*      (xr)                  ptr to vrsto field of vrblk
+*      (xs)                  top of stack = value being stored
+*      jsr  sysmv            emit VALUE record on monitor wire
+*      (xs,xl,xr,wa,wb,wc,ia) preserved over call
+
+sysmc  exp  0                define external entry point
+
+*      (xr)                  ptr to vrblk for function name
+*      jsr  sysmc            emit CALL record on monitor wire
+*      (xs,xl,xr,wa,wb,wc,ia) preserved over call
+
+sysmr  exp  0                define external entry point
+
+*      (xr)                  ptr to vrblk for function name
+*      (wa)                  scblk ptr for return type ("RETURN" / "FRETURN" / "NRETURN")
+*      jsr  sysmr            emit RETURN record on monitor wire
+*      (xs,xl,xr,wa,wb,wc,ia) preserved over call
+       ejc
+
 *      introduce the internal procedures.
 
 acess  inp  r,1
@@ -10831,6 +10861,15 @@ bpf7c  mov  -(xs),xr         stack icblk ptr (or zero)
        chk                   check for stack overflow
        mov  flptr,xs         set new fail return value
        mov  flprt,xs         set new flprt
+*      SN-26-spl-bridge-b: monitor CALL fire-point (silent no-op if unset).
+*      Fires unconditionally — catch-all is gated only by env vars in the
+*      C runtime, NOT by SPITBOL's &TRACE/&FTRACE.
+*      At this point: xl = pfblk ptr (stable since line 10853).
+*      sysmc expects xr = vrblk ptr for the function name.
+       mov  wb,xl            save pfblk pointer
+       mov  xr,pfvbl(xl)     load vrblk pointer for function name
+       jsr  sysmc            emit CALL record on monitor wire
+       mov  xl,wb            restore pfblk pointer
        mov  wa,kvtra         load trace value
        add  wa,kvftr         add ftrace value
        bnz  wa,bpf09         jump if tracing possible
@@ -11041,6 +11080,10 @@ b_vrl  ent                   entry point
 *      (xr)                  pointer to vrsto field of vrblk
 
 b_vrs  ent                   entry point
+*      SN-26-spl-bridge-b: monitor fire-point (silent no-op if unset).
+*      Fires before the actual store so the wire record reflects the
+*      pre-write state of the value-block (which we read from (xs)).
+       jsr  sysmv            emit VALUE record on monitor wire
        mov  vrvlo(xr),(xs)   store value, leave on stack
        lcw  xr               get next code word
        bri  (xr)             execute next code word
@@ -16320,6 +16363,18 @@ rtn01  mov  xs,flprt         pop stack
        add  wb,wc            make old code pointer absolute
        lcp  wb               restore old code pointer
        mov  r_cod,wc         restore old code block pointer
+*      SN-26-spl-bridge-b: monitor RETURN fire-point (silent no-op if unset).
+*      Fires unconditionally — catch-all is gated only by env vars in the
+*      C runtime, NOT by SPITBOL's &TRACE/&FTRACE (those control the
+*      printed trace at rtn03 below).
+*      At this point: xr = pfblk ptr; wa = rtntype scblk ("RETURN"/"FRETURN"/"NRETURN").
+*      sysmr expects xr = vrblk ptr for fn name; rtntype scblk in wa.
+       mov  -(xs),xr         save pfblk pointer
+       mov  -(xs),wa         save rtntype scblk
+       mov  xr,pfvbl(xr)     load vrblk pointer for function name
+       jsr  sysmr            emit RETURN record on monitor wire
+       mov  wa,(xs)+         restore rtntype scblk
+       mov  xr,(xs)+         restore pfblk pointer
        dcv  kvfnc            decrement function level
        mov  wb,kvtra         load trace
        add  wb,kvftr         add ftrace

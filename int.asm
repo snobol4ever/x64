@@ -823,6 +823,24 @@ sysul:      syscall     zysul,37
 sysxi:      mov   m_word [reg_xs],rsp
       syscall     zysxi,38
 
+;     SN-26-spl-bridge-b: monitor_ipc_runtime fire-points.
+;     sysmv = monitor_emit_value: called from b_vrs (universal var-store).
+;             Needs reg_xs current because the value to emit is at (xs).
+;     sysmc = monitor_emit_call:  called from bpf09 (function-call gate).
+;     sysmr = monitor_emit_return: called from rtn03 region (return gate).
+      global sysmv
+      extern      zysmv
+sysmv:      mov   m_word [reg_xs],rsp
+      syscall     zysmv,39
+
+      global sysmc
+      extern      zysmc
+sysmc:      syscall     zysmc,40
+
+      global sysmr
+      extern      zysmr
+sysmr:      syscall     zysmr,41
+
       %macro      callext     2
       extern      %1
       call  %1

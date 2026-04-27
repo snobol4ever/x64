@@ -382,6 +382,9 @@ sec01:                                          ;
         extern systt                            ; define external entry point} exp 0  
         extern sysul                            ; define external entry point} exp 0  
         extern sysxi                            ; define external entry point} exp 2  
+        extern sysmv                            ; define external entry point} exp 0  
+        extern sysmc                            ; define external entry point} exp 0  
+        extern sysmr                            ; define external entry point} exp 0  
                                                 ; } inr   
                                                 ; } inr   
                                                 ; } inr   
@@ -4484,6 +4487,10 @@ bpf7c:
 _l0062:                                         ; 
         mov  m_word [flptr],xs                  ; set new fail return value} mov flptr xs 
         mov  m_word [flprt],xs                  ; set new flprt} mov flprt xs 
+        mov  wb,xl                              ; save pfblk pointer} mov wb xl 
+        mov  xr,m_word [(cfp_b*pfvbl)+xl]       ; load vrblk pointer for function name} mov xr pfvbl(xl) 
+        call sysmc                              ; emit CALL record on monitor wire} jsr sysmc  
+        mov  xl,wb                              ; restore pfblk pointer} mov xl wb 
         mov  wa,m_word [kvtra]                  ; load trace value} mov wa kvtra 
         add  wa,m_word [kvftr]                  ; add ftrace value} add wa kvftr 
         test wa,wa                              ; jump if tracing possible} bnz wa bpf09 
@@ -4623,6 +4630,7 @@ b_vrl:                                          ;
         align 2                                 ; entry point} ent   
         nop                                     ; 
 b_vrs:                                          ; 
+        call sysmv                              ; emit VALUE record on monitor wire} jsr sysmv  
         mov  w0,m_word [xs]                     ; store value, leave on stack} mov vrvlo(xr) (xs) 
         mov  m_word [(cfp_b*vrvlo)+xr],w0       ; 
         mov  r10,m_word [r13]                   ; get next code word} lcw xr  
@@ -9664,6 +9672,12 @@ rtn01:
         add  wb,wc                              ; make old code pointer absolute} add wb wc 
         mov  r13,wb                             ; restore old code pointer} lcp wb  
         mov  m_word [r_cod],wc                  ; restore old code block pointer} mov r_cod wc 
+        push xr                                 ; save pfblk pointer} mov -(xs) xr 
+        push wa                                 ; save rtntype scblk} mov -(xs) wa 
+        mov  xr,m_word [(cfp_b*pfvbl)+xr]       ; load vrblk pointer for function name} mov xr pfvbl(xr) 
+        call sysmr                              ; emit RETURN record on monitor wire} jsr sysmr  
+        pop  wa                                 ; restore rtntype scblk} mov wa (xs)+ 
+        pop  xr                                 ; restore pfblk pointer} mov xr (xs)+ 
         dec  m_word [kvfnc]                     ; decrement function level} dcv kvfnc  
         mov  wb,m_word [kvtra]                  ; load trace} mov wb kvtra 
         add  wb,m_word [kvftr]                  ; add ftrace} add wb kvftr 
