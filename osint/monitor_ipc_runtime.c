@@ -51,6 +51,7 @@
 #define MWK_CALL        2u
 #define MWK_RETURN      3u
 #define MWK_END         4u
+#define MWK_LABEL       5u
 
 #define MWT_NULL        0
 #define MWT_STRING      1
@@ -477,6 +478,33 @@ int zysmr(void) {
     uint8_t type = spl_block_to_wire(rtype_blk, &chars, &vlen, &iv, &rv);
 
     emit_record_raw(MWK_RETURN, name_id, type, chars, vlen);
+    return -1;
+}
+
+/*  zysml — LABEL event from stmgo / stgo3 (statement-advance path).
+ *
+ *  Call sites (sbl.min stmgo + stgo3, post-SN-26-bridge-coverage-f):
+ *      mov  wa,kvstn         load stno into wa
+ *      jsr  sysml            emit LABEL record on monitor wire
+ *
+ *  At entry:
+ *     wa = &STNO (integer) of statement being entered
+ *
+ *  Wire payload is name_id=NONE, type=INTEGER, 8-byte LE STNO.  Mirrors
+ *  csnobol4's monitor_emit_label semantics — see ../scripts/monitor/
+ *  monitor_wire.h MWK_LABEL doc.
+ */
+int zysml(void) {
+    if (!monitor_init()) return -1;
+
+    /* WA macro reads reg_wa as the requested type.  kvstn is a word-sized
+     * integer keyword, so we cast wa as word. */
+    word stno = WA(word);
+
+    unsigned char buf[8];
+    for (int k = 0; k < 8; k++) buf[k] = (unsigned char)(((uint64_t)stno >> (k*8)) & 0xff);
+
+    emit_record_raw(MWK_LABEL, MW_NAME_ID_NONE, MWT_INTEGER, buf, 8);
     return -1;
 }
 

@@ -841,6 +841,12 @@ sysmc:      syscall     zysmc,40
       extern      zysmr
 sysmr:      syscall     zysmr,41
 
+;     SN-26-bridge-coverage-f: sysml = monitor_emit_label.
+;     Called from stmgo / stgo3 on every statement entry.  wa carries &STNO.
+      global sysml
+      extern      zysml
+sysml:      syscall     zysml,42
+
       %macro      callext     2
       extern      %1
       call  %1

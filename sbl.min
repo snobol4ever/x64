@@ -2939,6 +2939,13 @@ sysmr  exp  0                define external entry point
 *      (wa)                  scblk ptr for return type ("RETURN" / "FRETURN" / "NRETURN")
 *      jsr  sysmr            emit RETURN record on monitor wire
 *      (xs,xl,xr,wa,wb,wc,ia) preserved over call
+
+sysml  exp  0                define external entry point
+
+*      SN-26-bridge-coverage-f: emit MWK_LABEL on every stmt entry.
+*      (wa)                  &STNO value (integer) of statement being entered
+*      jsr  sysml            emit LABEL record on monitor wire
+*      (xs,xl,xr,wa,wb,wc,ia) preserved over call
        ejc
 
 *      introduce the internal procedures.
@@ -16574,6 +16581,8 @@ stmgo  rtn
        bze  stmct,stgo2      jump if so
        mov  kvlst,kvstn      set lastno
        mov  kvstn,cdstm(xr)  set stno
+       mov  wa,kvstn         load stno into wa for sysml
+       jsr  sysml            emit LABEL record on monitor wire   SN-26-bridge-coverage-f
 .if    .csln
        mov  kvlln,kvlin      set lastline
        mov  kvlin,cdsln(xr)  set line
@@ -16596,6 +16605,8 @@ stgo2  bze  kvpfl,stgo3      skip if no profiling
 
 stgo3  mov  kvlst,kvstn      set lastno
        mov  kvstn,cdstm(xr)  set stno
+       mov  wa,kvstn         load stno into wa for sysml
+       jsr  sysml            emit LABEL record on monitor wire   SN-26-bridge-coverage-f
 .if    .csln
        mov  kvlln,kvlin      set lastline
        mov  kvlin,cdsln(xr)  set line
