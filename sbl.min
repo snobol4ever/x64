@@ -17596,6 +17596,18 @@ asign  prc  r,1              entry point (recursive)
 asg01  add  xl,wa            point to variable value
        mov  xr,(xl)          load variable value
        beq  (xr),=b_trt,asg02 jump if trapped
+*      SN-26-bridge-coverage-b: monitor fire-point (untrapped fast path).
+*      At entry: xl = vrval field (post add at 17596 — natural-var offset
+*      is *vrval per sbl.min:1359), wb = value pointer.
+*      zysmv contract: xr = vrsto field, (xs)+1 = value (after RA push).
+*      Subtract *vrvlo to back-step from vrval to vrsto field.
+*      Catches o_ass (X=Y), o_rpl (pat substitute), array/table element
+*      stores via arref->o_ass.  Silent no-op when env vars unset.
+       mov  -(xs),wb         stack value pointer for sysmv
+       mov  xr,xl            xr = vrval field
+       sub  xr,*vrvlo        xr = vrsto field (vrvlo = vrval - vrsto)
+       jsr  sysmv            emit VALUE record on monitor wire
+       mov  wb,(xs)+         pop value back
        mov  (xl),wb          else perform assignment
        zer  xl               clear garbage value in xl
        exi                   and return to asign caller
@@ -17844,6 +17856,19 @@ asinp  prc  r,1              entry point, recursive
        add  xl,wa            point to variable
        mov  xr,(xl)          load current contents
        beq  (xr),=b_trt,asnp1 jump if trapped
+*      SN-26-bridge-coverage-b: monitor fire-point (untrapped fast path).
+*      At entry: xl = vrval field (post add at 17853 — natural-var offset
+*      is *vrval per sbl.min:1359), wb = value pointer.
+*      Subtract *vrvlo to back-step from vrval to vrsto field, matching
+*      the zysmv b_vrs contract.
+*      Catches pnth4 (PAT . X), p_imc (PAT $ X), p_cas (@X) — all three
+*      pattern-capture forms route through here.  Trapped path falls into
+*      asnp1 -> asign whose fire-point at asg01 catches that case.
+       mov  -(xs),wb         stack value pointer for sysmv
+       mov  xr,xl            xr = vrval field
+       sub  xr,*vrvlo        xr = vrsto field (vrvlo = vrval - vrsto)
+       jsr  sysmv            emit VALUE record on monitor wire
+       mov  wb,(xs)+         pop value back
        mov  (xl),wb          else perform assignment
        zer  xl               clear garbage value in xl
        exi                   return to asinp caller

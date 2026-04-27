@@ -6836,5517 +6836,5527 @@
 |asg01|add|7,xl|8,wa||point to variable value|17596
 ||mov|7,xr|9,(xl)||load variable value|17597
 ||beq|9,(xr)|22,=b_trt|6,asg02|jump if trapped|17598
-||mov|9,(xl)|8,wb||else perform assignment|17599
-||zer|7,xl|||clear garbage value in xl|17600
-||exi||||and return to asign caller|17601
-|asg02|sub|7,xl|8,wa||restore name base|17605
-||beq|7,xr|21,=trbkv|6,asg14|jump if keyword variable|17606
-||bne|7,xr|21,=trbev|6,asg04|jump if not expression variable|17607
-||mov|7,xr|13,evexp(xl)||point to expression|17611
-||mov|11,-(xs)|8,wb||store value to assign on stack|17612
-||mov|8,wb|18,=num01||set for evaluation by name|17613
-||jsr|6,evalx|||evaluate expression by name|17614
-||ppm|6,asg03|||jump if evaluation fails|17615
-||mov|8,wb|10,(xs)+||else reload value to assign|17616
-||brn|6,asg01|||loop back to perform assignment|17617
-||ejc|||||17618
-|asg03|ica|7,xs|||remove stacked value entry|17624
-||exi|1,1|||take failure exit|17625
-|asg04|mov|11,-(xs)|7,xr||save ptr to first trblk|17629
-|asg05|mov|8,wc|7,xr||save ptr to this trblk|17633
-||mov|7,xr|13,trnxt(xr)||point to next trblk|17634
-||beq|9,(xr)|22,=b_trt|6,asg05|loop back if another trblk|17635
-||mov|7,xr|8,wc||else point back to last trblk|17636
-||mov|13,trval(xr)|8,wb||store value at end of chain|17637
-||mov|7,xr|10,(xs)+||restore ptr to first trblk|17638
-|asg06|mov|8,wb|13,trtyp(xr)||load type code of trblk|17642
-||beq|8,wb|18,=trtvl|6,asg08|jump if value trace|17643
-||beq|8,wb|18,=trtou|6,asg10|jump if output association|17644
-|asg07|mov|7,xr|13,trnxt(xr)||point to next trblk on chain|17648
-||beq|9,(xr)|22,=b_trt|6,asg06|loop back if another trblk|17649
-||exi||||else end of chain, return to caller|17650
-|asg08|bze|3,kvtra|6,asg07||ignore value trace if trace off|17654
-||dcv|3,kvtra|||else decrement trace count|17655
-||bze|13,trfnc(xr)|6,asg09||jump if print trace|17656
-||jsr|6,trxeq|||else execute function trace|17657
-||brn|6,asg07|||and loop back|17658
-||ejc|||||17659
-|asg09|jsr|6,prtsn|||print statement number|17665
-||jsr|6,prtnv|||print name = value|17666
-||brn|6,asg07|||loop back for next trblk|17667
-|asg10|bze|3,kvoup|6,asg07||ignore output assoc if output off|17671
-|asg1b|mov|7,xl|7,xr||copy trblk pointer|17672
-||mov|7,xr|13,trnxt(xr)||point to next trblk|17673
-||beq|9,(xr)|22,=b_trt|6,asg1b|loop back if another trblk|17674
-||mov|7,xr|7,xl||else point back to last trblk|17675
-||mov|11,-(xs)|13,trval(xr)||stack value to output|17677
-||jsr|6,gtstg|||convert to string|17683
-||ppm|6,asg12|||get datatype name if unconvertible|17684
-|asg11|mov|8,wa|13,trfpt(xl)||fcblk ptr|17688
-||bze|8,wa|6,asg13||jump if standard output file|17689
-|asg1a|jsr|6,sysou|||call system output routine|17693
-||err|1,206|26,output caused file overflow|||17694
-||err|1,207|26,output caused non-recoverable error|||17695
-||exi||||else all done, return to caller|17696
-|asg12|jsr|6,dtype|||call datatype routine|17700
-||brn|6,asg11|||merge|17701
-|asg13|beq|13,trter(xl)|21,=v_ter|6,asg1a|jump if terminal output|17706
-||icv|8,wa|||signal standard output|17707
-||brn|6,asg1a|||use sysou to perform output|17708
-||ejc|||||17723
-|asg14|mov|7,xl|13,kvnum(xl)||load keyword number|17729
-||beq|7,xl|18,=k_etx|6,asg19|jump if errtext|17730
-||mov|7,xr|8,wb||copy value to be assigned|17731
-||jsr|6,gtint|||convert to integer|17732
-||err|1,208|26,keyword value assigned is not integer|||17733
-||ldi|13,icval(xr)|||else load value|17734
-||beq|7,xl|18,=k_stl|6,asg16|jump if special case of stlimit|17735
-||mfi|8,wa|6,asg18||else get addr integer, test ovflow|17736
-||bgt|8,wa|3,mxlen|6,asg18|fail if too large|17737
-||beq|7,xl|18,=k_ert|6,asg17|jump if special case of errtype|17738
-||beq|7,xl|18,=k_pfl|6,asg21|jump if special case of profile|17741
-||beq|7,xl|18,=k_mxl|6,asg24|jump if special case of maxlngth|17743
-||beq|7,xl|18,=k_fls|6,asg26|jump if special case of fullscan|17744
-||blt|7,xl|18,=k_p__|6,asg15|jump unless protected|17745
-||erb|1,209|26,keyword in assignment is protected|||17746
-|asg15|mov|15,kvabe(xl)|8,wa||store new value|17750
-||exi||||return to asign caller|17751
-|asg16|sbi|3,kvstl|||subtract old limit|17758
-||adi|3,kvstc|||add old counter|17759
-||sti|3,kvstc|||store course counter value|17760
-||ldi|3,kvstl|||check if counting suppressed|17761
-||ilt|6,asg25|||do not refine if so|17762
-||mov|8,wa|3,stmcs||refine with counter breakout|17763
-||sub|8,wa|3,stmct||values|17764
-||mti|8,wa|||convert to integer|17765
-||ngi||||current-start value|17766
-||adi|3,kvstc|||add in course counter value|17767
-||sti|3,kvstc|||save refined value|17768
-|asg25|ldi|13,icval(xr)|||reload new limit value|17769
-||sti|3,kvstl|||store new limit value|17770
-||jsr|6,stgcc|||recompute countdown counters|17771
-||exi||||return to asign caller|17772
-|asg17|ble|8,wa|18,=nini9|6,error|ok to signal if in range|17776
-|asg18|erb|1,210|26,keyword value assigned is negative or too large|||17780
-|asg19|mov|11,-(xs)|8,wb||stack value|17784
-||jsr|6,gtstg|||convert to string|17785
-||err|1,211|26,value assigned to keyword errtext not a string|||17786
-||mov|3,r_etx|7,xr||make assignment|17787
-||exi||||return to caller|17788
-|asg21|bgt|8,wa|18,=num02|6,asg18|moan if not 0,1, or 2|17802
-||bze|8,wa|6,asg15||just assign if zero|17803
-||bze|3,pfdmp|6,asg22||branch if first assignment|17804
-||beq|8,wa|3,pfdmp|6,asg23|also if same value as before|17805
-||erb|1,268|26,inconsistent value assigned to keyword profile|||17806
-|asg22|mov|3,pfdmp|8,wa||note value on first assignment|17808
-|asg23|mov|3,kvpfl|8,wa||store new value|17809
-||jsr|6,stgcc|||recompute countdown counts|17810
-||jsr|6,systm|||get the time|17811
-||sti|3,pfstm|||fudge some kind of start time|17812
-||exi||||return to asign caller|17813
-|asg24|bge|8,wa|18,=mnlen|6,asg15|if acceptable value|17818
-||erb|1,287|26,value assigned to keyword maxlngth is too small|||17819
-|asg26|bnz|8,wa|6,asg15||if acceptable value|17823
-||erb|1,274|26,value assigned to keyword fullscan is zero|||17824
-||enp||||end procedure asign|17826
-||ejc|||||17827
-|asinp|prc|25,r|1,1||entry point, recursive|17843
-||add|7,xl|8,wa||point to variable|17844
-||mov|7,xr|9,(xl)||load current contents|17845
-||beq|9,(xr)|22,=b_trt|6,asnp1|jump if trapped|17846
-||mov|9,(xl)|8,wb||else perform assignment|17847
-||zer|7,xl|||clear garbage value in xl|17848
-||exi||||return to asinp caller|17849
-|asnp1|sub|7,xl|8,wa||restore base pointer|17853
-||mov|11,-(xs)|3,pmssl||stack subject string length|17854
-||mov|11,-(xs)|3,pmhbs||stack history stack base ptr|17855
-||mov|11,-(xs)|3,r_pms||stack subject string pointer|17856
-||mov|11,-(xs)|3,pmdfl||stack dot flag|17857
-||jsr|6,asign|||call full-blown assignment routine|17858
-||ppm|6,asnp2|||jump if failure|17859
-||mov|3,pmdfl|10,(xs)+||restore dot flag|17860
-||mov|3,r_pms|10,(xs)+||restore subject string pointer|17861
-||mov|3,pmhbs|10,(xs)+||restore history stack base pointer|17862
-||mov|3,pmssl|10,(xs)+||restore subject string length|17863
-||exi||||return to asinp caller|17864
-|asnp2|mov|3,pmdfl|10,(xs)+||restore dot flag|17868
-||mov|3,r_pms|10,(xs)+||restore subject string pointer|17869
-||mov|3,pmhbs|10,(xs)+||restore history stack base pointer|17870
-||mov|3,pmssl|10,(xs)+||restore subject string length|17871
-||exi|1,1|||take failure exit|17872
-||enp||||end procedure asinp|17873
-||ejc|||||17874
-|blkln|prc|25,e|1,0||entry point|17892
-||mov|7,xl|8,wa||copy first word|17893
-||lei|7,xl|||get entry id (bl_xx)|17894
-||bsw|7,xl|2,bl___|6,bln00|switch on block type|17895
-||iff|2,bl_ar|6,bln01||arblk|17935
-||iff|2,bl_cd|6,bln12||cdblk|17935
-||iff|2,bl_ex|6,bln12||exblk|17935
-||iff|2,bl_ic|6,bln07||icblk|17935
-||iff|2,bl_nm|6,bln03||nmblk|17935
-||iff|2,bl_p0|6,bln02||p0blk|17935
-||iff|2,bl_p1|6,bln03||p1blk|17935
-||iff|2,bl_p2|6,bln04||p2blk|17935
-||iff|2,bl_rc|6,bln09||rcblk|17935
-||iff|2,bl_sc|6,bln10||scblk|17935
-||iff|2,bl_se|6,bln02||seblk|17935
-||iff|2,bl_tb|6,bln01||tbblk|17935
-||iff|2,bl_vc|6,bln01||vcblk|17935
-||iff|1,13|6,bln00|||17935
-||iff|1,14|6,bln00|||17935
-||iff|1,15|6,bln00|||17935
-||iff|2,bl_pd|6,bln08||pdblk|17935
-||iff|2,bl_tr|6,bln05||trblk|17935
-||iff|1,18|6,bln00|||17935
-||iff|1,19|6,bln00|||17935
-||iff|1,20|6,bln00|||17935
-||iff|2,bl_ct|6,bln06||ctblk|17935
-||iff|2,bl_df|6,bln01||dfblk|17935
-||iff|2,bl_ef|6,bln01||efblk|17935
-||iff|2,bl_ev|6,bln03||evblk|17935
-||iff|2,bl_ff|6,bln05||ffblk|17935
-||iff|2,bl_kv|6,bln03||kvblk|17935
-||iff|2,bl_pf|6,bln01||pfblk|17935
-||iff|2,bl_te|6,bln04||teblk|17935
-||esw||||end of jump table on block type|17935
-||ejc|||||17936
-|bln00|mov|8,wa|13,num01(xr)||load length|17942
-||exi||||return to blkln caller|17943
-|bln01|mov|8,wa|13,num02(xr)||load length from third word|17947
-||exi||||return to blkln caller|17948
-|bln02|mov|8,wa|19,*num02||load length (two words)|17952
-||exi||||return to blkln caller|17953
-|bln03|mov|8,wa|19,*num03||load length (three words)|17957
-||exi||||return to blkln caller|17958
-|bln04|mov|8,wa|19,*num04||load length (four words)|17962
-||exi||||return to blkln caller|17963
-|bln05|mov|8,wa|19,*num05||load length|17967
+||mov|11,-(xs)|8,wb||stack value pointer for sysmv|17606
+||mov|7,xr|7,xl||xr = vrval field|17607
+||sub|7,xr|19,*vrvlo||xr = vrsto field (vrvlo = vrval - vrsto)|17608
+||jsr|6,sysmv|||emit VALUE record on monitor wire|17609
+||mov|8,wb|10,(xs)+||pop value back|17610
+||mov|9,(xl)|8,wb||else perform assignment|17611
+||zer|7,xl|||clear garbage value in xl|17612
+||exi||||and return to asign caller|17613
+|asg02|sub|7,xl|8,wa||restore name base|17617
+||beq|7,xr|21,=trbkv|6,asg14|jump if keyword variable|17618
+||bne|7,xr|21,=trbev|6,asg04|jump if not expression variable|17619
+||mov|7,xr|13,evexp(xl)||point to expression|17623
+||mov|11,-(xs)|8,wb||store value to assign on stack|17624
+||mov|8,wb|18,=num01||set for evaluation by name|17625
+||jsr|6,evalx|||evaluate expression by name|17626
+||ppm|6,asg03|||jump if evaluation fails|17627
+||mov|8,wb|10,(xs)+||else reload value to assign|17628
+||brn|6,asg01|||loop back to perform assignment|17629
+||ejc|||||17630
+|asg03|ica|7,xs|||remove stacked value entry|17636
+||exi|1,1|||take failure exit|17637
+|asg04|mov|11,-(xs)|7,xr||save ptr to first trblk|17641
+|asg05|mov|8,wc|7,xr||save ptr to this trblk|17645
+||mov|7,xr|13,trnxt(xr)||point to next trblk|17646
+||beq|9,(xr)|22,=b_trt|6,asg05|loop back if another trblk|17647
+||mov|7,xr|8,wc||else point back to last trblk|17648
+||mov|13,trval(xr)|8,wb||store value at end of chain|17649
+||mov|7,xr|10,(xs)+||restore ptr to first trblk|17650
+|asg06|mov|8,wb|13,trtyp(xr)||load type code of trblk|17654
+||beq|8,wb|18,=trtvl|6,asg08|jump if value trace|17655
+||beq|8,wb|18,=trtou|6,asg10|jump if output association|17656
+|asg07|mov|7,xr|13,trnxt(xr)||point to next trblk on chain|17660
+||beq|9,(xr)|22,=b_trt|6,asg06|loop back if another trblk|17661
+||exi||||else end of chain, return to caller|17662
+|asg08|bze|3,kvtra|6,asg07||ignore value trace if trace off|17666
+||dcv|3,kvtra|||else decrement trace count|17667
+||bze|13,trfnc(xr)|6,asg09||jump if print trace|17668
+||jsr|6,trxeq|||else execute function trace|17669
+||brn|6,asg07|||and loop back|17670
+||ejc|||||17671
+|asg09|jsr|6,prtsn|||print statement number|17677
+||jsr|6,prtnv|||print name = value|17678
+||brn|6,asg07|||loop back for next trblk|17679
+|asg10|bze|3,kvoup|6,asg07||ignore output assoc if output off|17683
+|asg1b|mov|7,xl|7,xr||copy trblk pointer|17684
+||mov|7,xr|13,trnxt(xr)||point to next trblk|17685
+||beq|9,(xr)|22,=b_trt|6,asg1b|loop back if another trblk|17686
+||mov|7,xr|7,xl||else point back to last trblk|17687
+||mov|11,-(xs)|13,trval(xr)||stack value to output|17689
+||jsr|6,gtstg|||convert to string|17695
+||ppm|6,asg12|||get datatype name if unconvertible|17696
+|asg11|mov|8,wa|13,trfpt(xl)||fcblk ptr|17700
+||bze|8,wa|6,asg13||jump if standard output file|17701
+|asg1a|jsr|6,sysou|||call system output routine|17705
+||err|1,206|26,output caused file overflow|||17706
+||err|1,207|26,output caused non-recoverable error|||17707
+||exi||||else all done, return to caller|17708
+|asg12|jsr|6,dtype|||call datatype routine|17712
+||brn|6,asg11|||merge|17713
+|asg13|beq|13,trter(xl)|21,=v_ter|6,asg1a|jump if terminal output|17718
+||icv|8,wa|||signal standard output|17719
+||brn|6,asg1a|||use sysou to perform output|17720
+||ejc|||||17735
+|asg14|mov|7,xl|13,kvnum(xl)||load keyword number|17741
+||beq|7,xl|18,=k_etx|6,asg19|jump if errtext|17742
+||mov|7,xr|8,wb||copy value to be assigned|17743
+||jsr|6,gtint|||convert to integer|17744
+||err|1,208|26,keyword value assigned is not integer|||17745
+||ldi|13,icval(xr)|||else load value|17746
+||beq|7,xl|18,=k_stl|6,asg16|jump if special case of stlimit|17747
+||mfi|8,wa|6,asg18||else get addr integer, test ovflow|17748
+||bgt|8,wa|3,mxlen|6,asg18|fail if too large|17749
+||beq|7,xl|18,=k_ert|6,asg17|jump if special case of errtype|17750
+||beq|7,xl|18,=k_pfl|6,asg21|jump if special case of profile|17753
+||beq|7,xl|18,=k_mxl|6,asg24|jump if special case of maxlngth|17755
+||beq|7,xl|18,=k_fls|6,asg26|jump if special case of fullscan|17756
+||blt|7,xl|18,=k_p__|6,asg15|jump unless protected|17757
+||erb|1,209|26,keyword in assignment is protected|||17758
+|asg15|mov|15,kvabe(xl)|8,wa||store new value|17762
+||exi||||return to asign caller|17763
+|asg16|sbi|3,kvstl|||subtract old limit|17770
+||adi|3,kvstc|||add old counter|17771
+||sti|3,kvstc|||store course counter value|17772
+||ldi|3,kvstl|||check if counting suppressed|17773
+||ilt|6,asg25|||do not refine if so|17774
+||mov|8,wa|3,stmcs||refine with counter breakout|17775
+||sub|8,wa|3,stmct||values|17776
+||mti|8,wa|||convert to integer|17777
+||ngi||||current-start value|17778
+||adi|3,kvstc|||add in course counter value|17779
+||sti|3,kvstc|||save refined value|17780
+|asg25|ldi|13,icval(xr)|||reload new limit value|17781
+||sti|3,kvstl|||store new limit value|17782
+||jsr|6,stgcc|||recompute countdown counters|17783
+||exi||||return to asign caller|17784
+|asg17|ble|8,wa|18,=nini9|6,error|ok to signal if in range|17788
+|asg18|erb|1,210|26,keyword value assigned is negative or too large|||17792
+|asg19|mov|11,-(xs)|8,wb||stack value|17796
+||jsr|6,gtstg|||convert to string|17797
+||err|1,211|26,value assigned to keyword errtext not a string|||17798
+||mov|3,r_etx|7,xr||make assignment|17799
+||exi||||return to caller|17800
+|asg21|bgt|8,wa|18,=num02|6,asg18|moan if not 0,1, or 2|17814
+||bze|8,wa|6,asg15||just assign if zero|17815
+||bze|3,pfdmp|6,asg22||branch if first assignment|17816
+||beq|8,wa|3,pfdmp|6,asg23|also if same value as before|17817
+||erb|1,268|26,inconsistent value assigned to keyword profile|||17818
+|asg22|mov|3,pfdmp|8,wa||note value on first assignment|17820
+|asg23|mov|3,kvpfl|8,wa||store new value|17821
+||jsr|6,stgcc|||recompute countdown counts|17822
+||jsr|6,systm|||get the time|17823
+||sti|3,pfstm|||fudge some kind of start time|17824
+||exi||||return to asign caller|17825
+|asg24|bge|8,wa|18,=mnlen|6,asg15|if acceptable value|17830
+||erb|1,287|26,value assigned to keyword maxlngth is too small|||17831
+|asg26|bnz|8,wa|6,asg15||if acceptable value|17835
+||erb|1,274|26,value assigned to keyword fullscan is zero|||17836
+||enp||||end procedure asign|17838
+||ejc|||||17839
+|asinp|prc|25,r|1,1||entry point, recursive|17855
+||add|7,xl|8,wa||point to variable|17856
+||mov|7,xr|9,(xl)||load current contents|17857
+||beq|9,(xr)|22,=b_trt|6,asnp1|jump if trapped|17858
+||mov|11,-(xs)|8,wb||stack value pointer for sysmv|17867
+||mov|7,xr|7,xl||xr = vrval field|17868
+||sub|7,xr|19,*vrvlo||xr = vrsto field (vrvlo = vrval - vrsto)|17869
+||jsr|6,sysmv|||emit VALUE record on monitor wire|17870
+||mov|8,wb|10,(xs)+||pop value back|17871
+||mov|9,(xl)|8,wb||else perform assignment|17872
+||zer|7,xl|||clear garbage value in xl|17873
+||exi||||return to asinp caller|17874
+|asnp1|sub|7,xl|8,wa||restore base pointer|17878
+||mov|11,-(xs)|3,pmssl||stack subject string length|17879
+||mov|11,-(xs)|3,pmhbs||stack history stack base ptr|17880
+||mov|11,-(xs)|3,r_pms||stack subject string pointer|17881
+||mov|11,-(xs)|3,pmdfl||stack dot flag|17882
+||jsr|6,asign|||call full-blown assignment routine|17883
+||ppm|6,asnp2|||jump if failure|17884
+||mov|3,pmdfl|10,(xs)+||restore dot flag|17885
+||mov|3,r_pms|10,(xs)+||restore subject string pointer|17886
+||mov|3,pmhbs|10,(xs)+||restore history stack base pointer|17887
+||mov|3,pmssl|10,(xs)+||restore subject string length|17888
+||exi||||return to asinp caller|17889
+|asnp2|mov|3,pmdfl|10,(xs)+||restore dot flag|17893
+||mov|3,r_pms|10,(xs)+||restore subject string pointer|17894
+||mov|3,pmhbs|10,(xs)+||restore history stack base pointer|17895
+||mov|3,pmssl|10,(xs)+||restore subject string length|17896
+||exi|1,1|||take failure exit|17897
+||enp||||end procedure asinp|17898
+||ejc|||||17899
+|blkln|prc|25,e|1,0||entry point|17917
+||mov|7,xl|8,wa||copy first word|17918
+||lei|7,xl|||get entry id (bl_xx)|17919
+||bsw|7,xl|2,bl___|6,bln00|switch on block type|17920
+||iff|2,bl_ar|6,bln01||arblk|17960
+||iff|2,bl_cd|6,bln12||cdblk|17960
+||iff|2,bl_ex|6,bln12||exblk|17960
+||iff|2,bl_ic|6,bln07||icblk|17960
+||iff|2,bl_nm|6,bln03||nmblk|17960
+||iff|2,bl_p0|6,bln02||p0blk|17960
+||iff|2,bl_p1|6,bln03||p1blk|17960
+||iff|2,bl_p2|6,bln04||p2blk|17960
+||iff|2,bl_rc|6,bln09||rcblk|17960
+||iff|2,bl_sc|6,bln10||scblk|17960
+||iff|2,bl_se|6,bln02||seblk|17960
+||iff|2,bl_tb|6,bln01||tbblk|17960
+||iff|2,bl_vc|6,bln01||vcblk|17960
+||iff|1,13|6,bln00|||17960
+||iff|1,14|6,bln00|||17960
+||iff|1,15|6,bln00|||17960
+||iff|2,bl_pd|6,bln08||pdblk|17960
+||iff|2,bl_tr|6,bln05||trblk|17960
+||iff|1,18|6,bln00|||17960
+||iff|1,19|6,bln00|||17960
+||iff|1,20|6,bln00|||17960
+||iff|2,bl_ct|6,bln06||ctblk|17960
+||iff|2,bl_df|6,bln01||dfblk|17960
+||iff|2,bl_ef|6,bln01||efblk|17960
+||iff|2,bl_ev|6,bln03||evblk|17960
+||iff|2,bl_ff|6,bln05||ffblk|17960
+||iff|2,bl_kv|6,bln03||kvblk|17960
+||iff|2,bl_pf|6,bln01||pfblk|17960
+||iff|2,bl_te|6,bln04||teblk|17960
+||esw||||end of jump table on block type|17960
+||ejc|||||17961
+|bln00|mov|8,wa|13,num01(xr)||load length|17967
 ||exi||||return to blkln caller|17968
-||ejc|||||17969
-|bln06|mov|8,wa|19,*ctsi_||set size of ctblk|17975
-||exi||||return to blkln caller|17976
-|bln07|mov|8,wa|19,*icsi_||set size of icblk|17980
-||exi||||return to blkln caller|17981
-|bln08|mov|7,xl|13,pddfp(xr)||point to dfblk|17985
-||mov|8,wa|13,dfpdl(xl)||load pdblk length from dfblk|17986
-||exi||||return to blkln caller|17987
-|bln09|mov|8,wa|19,*rcsi_||set size of rcblk|17993
-||exi||||return to blkln caller|17994
-|bln10|mov|8,wa|13,sclen(xr)||load length in characters|17999
-||ctb|8,wa|2,scsi_||calculate length in bytes|18000
+|bln01|mov|8,wa|13,num02(xr)||load length from third word|17972
+||exi||||return to blkln caller|17973
+|bln02|mov|8,wa|19,*num02||load length (two words)|17977
+||exi||||return to blkln caller|17978
+|bln03|mov|8,wa|19,*num03||load length (three words)|17982
+||exi||||return to blkln caller|17983
+|bln04|mov|8,wa|19,*num04||load length (four words)|17987
+||exi||||return to blkln caller|17988
+|bln05|mov|8,wa|19,*num05||load length|17992
+||exi||||return to blkln caller|17993
+||ejc|||||17994
+|bln06|mov|8,wa|19,*ctsi_||set size of ctblk|18000
 ||exi||||return to blkln caller|18001
-|bln12|mov|8,wa|13,num03(xr)||load length from cdlen/exlen|18015
-||exi||||return to blkln caller|18016
-||enp||||end procedure blkln|18018
-||ejc|||||18019
-|copyb|prc|25,n|1,1||entry point|18031
-||mov|7,xr|9,(xs)||load argument|18032
-||beq|7,xr|21,=nulls|6,cop10|return argument if it is null|18033
-||mov|8,wa|9,(xr)||else load type word|18034
-||mov|8,wb|8,wa||copy type word|18035
-||jsr|6,blkln|||get length of argument block|18036
-||mov|7,xl|7,xr||copy pointer|18037
-||jsr|6,alloc|||allocate block of same size|18038
-||mov|9,(xs)|7,xr||store pointer to copy|18039
-||mvw||||copy contents of old block to new|18040
-||zer|7,xl|||clear garbage xl|18041
-||mov|7,xr|9,(xs)||reload pointer to start of copy|18042
-||beq|8,wb|22,=b_tbt|6,cop05|jump if table|18043
-||beq|8,wb|22,=b_vct|6,cop01|jump if vector|18044
-||beq|8,wb|22,=b_pdt|6,cop01|jump if program defined|18045
-||bne|8,wb|22,=b_art|6,cop10|return copy if not array|18050
-||add|7,xr|13,arofs(xr)||point to prototype field|18054
-||brn|6,cop02|||jump to merge|18055
-|cop01|add|7,xr|19,*pdfld||point to pdfld = vcvls|18059
-|cop02|mov|7,xl|9,(xr)||load next pointer|18064
-|cop03|bne|9,(xl)|22,=b_trt|6,cop04|jump if not trapped|18068
-||mov|7,xl|13,trval(xl)||else point to next value|18069
-||brn|6,cop03|||and loop back|18070
-||ejc|||||18071
-|cop04|mov|10,(xr)+|7,xl||store real value, bump pointer|18077
-||bne|7,xr|3,dnamp|6,cop02|loop back if more to go|18078
-||brn|6,cop09|||else jump to exit|18079
-|cop05|zer|13,idval(xr)|||zero id to stop dump blowing up|18083
-||mov|8,wa|19,*tesi_||set size of teblk|18084
-||mov|8,wc|19,*tbbuk||set initial offset|18085
-|cop06|mov|7,xr|9,(xs)||load table pointer|18089
-||beq|8,wc|13,tblen(xr)|6,cop09|jump to exit if all done|18090
-||mov|8,wb|8,wc||else copy offset|18091
-||sub|8,wb|19,*tenxt||subtract link offset to merge|18092
-||add|7,xr|8,wb||next bucket header less link offset|18093
-||ica|8,wc|||bump offset|18094
-|cop07|mov|7,xl|13,tenxt(xr)||load pointer to next teblk|18098
-||mov|13,tenxt(xr)|9,(xs)||set end of chain pointer in case|18099
-||beq|9,(xl)|22,=b_tbt|6,cop06|back for next bucket if chain end|18100
-||sub|7,xr|8,wb||point to head of previous block|18101
-||mov|11,-(xs)|7,xr||stack ptr to previous block|18102
-||mov|8,wa|19,*tesi_||set size of teblk|18103
-||jsr|6,alloc|||allocate new teblk|18104
-||mov|11,-(xs)|7,xr||stack ptr to new teblk|18105
-||mvw||||copy old teblk to new teblk|18106
-||mov|7,xr|10,(xs)+||restore pointer to new teblk|18107
-||mov|7,xl|10,(xs)+||restore pointer to previous block|18108
-||add|7,xl|8,wb||add offset back in|18109
-||mov|13,tenxt(xl)|7,xr||link new block to previous|18110
-||mov|7,xl|7,xr||copy pointer to new block|18111
-|cop08|mov|7,xl|13,teval(xl)||load value|18115
-||beq|9,(xl)|22,=b_trt|6,cop08|loop back if trapped|18116
-||mov|13,teval(xr)|7,xl||store untrapped value in teblk|18117
-||zer|8,wb|||zero offset within teblk|18118
-||brn|6,cop07|||back for next teblk|18119
-|cop09|mov|7,xr|10,(xs)+||load pointer to block|18123
-||exi||||return|18124
-|cop10|exi|1,1|||return|18128
-||ejc|||||18129
-||enp||||end procedure copyb|18147
-|cdgcg|prc|25,e|1,0||entry point|18158
-||mov|7,xl|13,cmopn(xr)||get unary goto operator|18159
-||mov|7,xr|13,cmrop(xr)||point to goto operand|18160
-||beq|7,xl|21,=opdvd|6,cdgc2|jump if direct goto|18161
-||jsr|6,cdgnm|||generate opnd by name if not direct|18162
-|cdgc1|mov|8,wa|7,xl||goto operator|18166
-||jsr|6,cdwrd|||generate it|18167
-||exi||||return to caller|18168
-|cdgc2|jsr|6,cdgvl|||generate operand by value|18172
-||brn|6,cdgc1|||merge to return|18173
-||enp||||end procedure cdgcg|18174
-||ejc|||||18175
-|cdgex|prc|25,r|1,0||entry point, recursive|18192
-||blo|9,(xl)|22,=b_vr_|6,cdgx1|jump if not variable|18193
-||mov|8,wa|19,*sesi_||set size of seblk|18197
-||jsr|6,alloc|||allocate space for seblk|18198
-||mov|9,(xr)|22,=b_sel||set type word|18199
-||mov|13,sevar(xr)|7,xl||store vrblk pointer|18200
-||exi||||return to cdgex caller|18201
-|cdgx1|mov|7,xr|7,xl||copy tree pointer|18205
-||mov|11,-(xs)|8,wc||save wc|18206
-||mov|7,xl|3,cwcof||save current offset|18207
-||bze|8,wa|6,cdgx2||jump if by value|18209
-||mov|8,wa|9,(xr)||get type word|18211
-||bne|8,wa|22,=b_cmt|6,cdgx2|call by value if not cmblk|18212
-||bge|13,cmtyp(xr)|18,=c__nm|6,cdgx2|jump if cmblk only by value|18213
-||ejc|||||18214
-||jsr|6,cdgnm|||generate code by name|18220
-||mov|8,wa|21,=ornm_||load return by name word|18221
-||brn|6,cdgx3|||merge with value case|18222
-|cdgx2|jsr|6,cdgvl|||generate code by value|18226
-||mov|8,wa|21,=orvl_||load return by value word|18227
-|cdgx3|jsr|6,cdwrd|||generate return word|18231
-||jsr|6,exbld|||build exblk|18232
-||mov|8,wc|10,(xs)+||restore wc|18233
-||exi||||return to cdgex caller|18234
-||enp||||end procedure cdgex|18235
-||ejc|||||18236
-|cdgnm|prc|25,r|1,0||entry point, recursive|18261
-||mov|11,-(xs)|7,xl||save entry xl|18262
-||mov|11,-(xs)|8,wb||save entry wb|18263
-||chk||||check for stack overflow|18264
-||mov|8,wa|9,(xr)||load type word|18265
-||beq|8,wa|22,=b_cmt|6,cgn04|jump if cmblk|18266
-||bhi|8,wa|22,=b_vr_|6,cgn02|jump if simple variable|18267
-|cgn01|erb|1,212|26,syntax error: value used where name is required|||18271
-|cgn02|mov|8,wa|21,=olvn_||load variable load call|18275
-||jsr|6,cdwrd|||generate it|18276
-||mov|8,wa|7,xr||copy vrblk pointer|18277
-||jsr|6,cdwrd|||generate vrblk pointer|18278
-||ejc|||||18279
-|cgn03|mov|8,wb|10,(xs)+||restore entry wb|18285
-||mov|7,xl|10,(xs)+||restore entry xl|18286
-||exi||||return to cdgnm caller|18287
-|cgn04|mov|7,xl|7,xr||copy cmblk pointer|18291
-||mov|7,xr|13,cmtyp(xr)||load cmblk type|18292
-||bge|7,xr|18,=c__nm|6,cgn01|error if not name operand|18293
-||bsw|7,xr|2,c__nm||else switch on type|18294
-||iff|2,c_arr|6,cgn05||array reference|18302
-||iff|2,c_fnc|6,cgn08||function call|18302
-||iff|2,c_def|6,cgn09||deferred expression|18302
-||iff|2,c_ind|6,cgn10||indirect reference|18302
-||iff|2,c_key|6,cgn11||keyword reference|18302
-||iff|2,c_ubo|6,cgn08||undefined binary op|18302
-||iff|2,c_uuo|6,cgn08||undefined unary op|18302
-||esw||||end switch on cmblk type|18302
-|cgn05|mov|8,wb|19,*cmopn||point to array operand|18306
-|cgn06|jsr|6,cmgen|||generate code for next operand|18310
-||mov|8,wc|13,cmlen(xl)||load length of cmblk|18311
-||blt|8,wb|8,wc|6,cgn06|loop till all generated|18312
-||mov|8,wa|21,=oaon_||load one-subscript case call|18316
-||beq|8,wc|19,*cmar1|6,cgn07|jump to exit if one subscript case|18317
-||mov|8,wa|21,=oamn_||else load multi-subscript case call|18318
-||jsr|6,cdwrd|||generate call|18319
-||mov|8,wa|8,wc||copy cmblk length|18320
-||btw|8,wa|||convert to words|18321
-||sub|8,wa|18,=cmvls||calculate number of subscripts|18322
-||ejc|||||18323
-|cgn07|mnz|8,wc|||set result non-constant|18329
-||jsr|6,cdwrd|||generate word|18330
-||brn|6,cgn03|||back to exit|18331
-|cgn08|mov|7,xr|7,xl||copy cmblk pointer|18335
-||jsr|6,cdgvl|||gen code by value for call|18336
-||mov|8,wa|21,=ofne_||get extra call for by name|18337
-||brn|6,cgn07|||back to generate and exit|18338
-|cgn09|mov|7,xr|13,cmrop(xl)||check if variable|18342
-||bhi|9,(xr)|22,=b_vr_|6,cgn02|treat *variable as simple var|18343
-||mov|7,xl|7,xr||copy ptr to expression tree|18344
-||mov|8,wa|18,=num01||return name|18346
-||jsr|6,cdgex|||else build exblk|18348
-||mov|8,wa|21,=olex_||set call to load expr by name|18349
-||jsr|6,cdwrd|||generate it|18350
-||mov|8,wa|7,xr||copy exblk pointer|18351
-||jsr|6,cdwrd|||generate exblk pointer|18352
-||brn|6,cgn03|||back to exit|18353
-|cgn10|mov|7,xr|13,cmrop(xl)||get operand|18357
-||jsr|6,cdgvl|||generate code by value for it|18358
-||mov|8,wa|21,=oinn_||load call for indirect by name|18359
-||brn|6,cgn12|||merge|18360
-|cgn11|mov|7,xr|13,cmrop(xl)||get operand|18364
-||jsr|6,cdgnm|||generate code by name for it|18365
-||mov|8,wa|21,=okwn_||load call for keyword by name|18366
-|cgn12|jsr|6,cdwrd|||generate code for operator|18370
-||brn|6,cgn03|||exit|18371
-||enp||||end procedure cdgnm|18372
-||ejc|||||18373
-|cdgvl|prc|25,r|1,0||entry point, recursive|18401
-||mov|8,wa|9,(xr)||load type word|18402
-||beq|8,wa|22,=b_cmt|6,cgv01|jump if cmblk|18403
-||blt|8,wa|22,=b_vra|6,cgv00|jump if icblk, rcblk, scblk|18404
-||bnz|13,vrlen(xr)|6,cgvl0||jump if not system variable|18405
-||mov|11,-(xs)|7,xr||stack xr|18406
-||mov|7,xr|13,vrsvp(xr)||point to svblk|18407
-||mov|8,wa|13,svbit(xr)||get svblk property bits|18408
-||mov|7,xr|10,(xs)+||recover xr|18409
-||anb|8,wa|4,btkwv||check if constant keyword value|18410
-||beq|8,wa|4,btkwv|6,cgv00|jump if constant keyword value|18411
-|cgvl0|mnz|8,wc|||indicate non-constant value|18415
-|cgv00|mov|8,wa|7,xr||copy ptr to var or constant|18420
-||jsr|6,cdwrd|||generate as code word|18421
-||exi||||return to caller|18422
-||ejc|||||18423
-|cgv01|mov|11,-(xs)|8,wb||save entry wb|18429
-||mov|11,-(xs)|7,xl||save entry xl|18430
-||mov|11,-(xs)|8,wc||save entry constant flag|18431
-||mov|11,-(xs)|3,cwcof||save initial code offset|18432
-||chk||||check for stack overflow|18433
-||mov|7,xl|7,xr||copy cmblk pointer|18441
-||mov|7,xr|13,cmtyp(xr)||load cmblk type|18442
-||mov|8,wc|3,cswno||reset constant flag|18443
-||ble|7,xr|18,=c_pr_|6,cgv02|jump if not predicate value|18444
-||mnz|8,wc|||else force non-constant case|18445
-|cgv02|bsw|7,xr|2,c__nv||switch to appropriate generator|18449
-||iff|2,c_arr|6,cgv03||array reference|18469
-||iff|2,c_fnc|6,cgv05||function call|18469
-||iff|2,c_def|6,cgv14||deferred expression|18469
-||iff|2,c_ind|6,cgv31||indirect reference|18469
-||iff|2,c_key|6,cgv27||keyword reference|18469
-||iff|2,c_ubo|6,cgv29||undefined binop|18469
-||iff|2,c_uuo|6,cgv30||undefined unop|18469
-||iff|2,c_bvl|6,cgv18||binops with val opds|18469
-||iff|2,c_uvl|6,cgv19||unops with valu opnd|18469
-||iff|2,c_alt|6,cgv18||alternation|18469
-||iff|2,c_cnc|6,cgv24||concatenation|18469
-||iff|2,c_cnp|6,cgv24||concatenation (not pattern match)|18469
-||iff|2,c_unm|6,cgv27||unops with name opnd|18469
-||iff|2,c_bvn|6,cgv26||binary _ and .|18469
-||iff|2,c_ass|6,cgv21||assignment|18469
-||iff|2,c_int|6,cgv31||interrogation|18469
-||iff|2,c_neg|6,cgv28||negation|18469
-||iff|2,c_sel|6,cgv15||selection|18469
-||iff|2,c_pmt|6,cgv18||pattern match|18469
-||esw||||end switch on cmblk type|18469
-||ejc|||||18470
-|cgv03|mov|8,wb|19,*cmopn||set offset to array operand|18476
-|cgv04|jsr|6,cmgen|||gen value code for next operand|18480
-||mov|8,wc|13,cmlen(xl)||load cmblk length|18481
-||blt|8,wb|8,wc|6,cgv04|loop back if more to go|18482
-||mov|8,wa|21,=oaov_||set one subscript call in case|18486
-||beq|8,wc|19,*cmar1|6,cgv32|jump to exit if 1-sub case|18487
-||mov|8,wa|21,=oamv_||else set call for multi-subscripts|18488
-||jsr|6,cdwrd|||generate call|18489
-||mov|8,wa|8,wc||copy length of cmblk|18490
-||sub|8,wa|19,*cmvls||subtract standard length|18491
-||btw|8,wa|||get number of words|18492
-||brn|6,cgv32|||jump to generate subscript count|18493
-|cgv05|mov|8,wb|19,*cmvls||set offset to first argument|18497
-|cgv06|beq|8,wb|13,cmlen(xl)|6,cgv07|jump if all generated|18501
-||jsr|6,cmgen|||else gen value code for next arg|18502
-||brn|6,cgv06|||back to generate next argument|18503
-|cgv07|sub|8,wb|19,*cmvls||get number of arg ptrs (bytes)|18507
-||btw|8,wb|||convert bytes to words|18508
-||mov|7,xr|13,cmopn(xl)||load function vrblk pointer|18509
-||bnz|13,vrlen(xr)|6,cgv12||jump if not system function|18510
-||mov|7,xl|13,vrsvp(xr)||load svblk ptr if system var|18511
-||mov|8,wa|13,svbit(xl)||load bit mask|18512
-||anb|8,wa|4,btffc||test for fast function call allowed|18513
-||zrb|8,wa|6,cgv12||jump if not|18514
-||ejc|||||18515
-||mov|8,wa|13,svbit(xl)||reload bit indicators|18521
-||anb|8,wa|4,btpre||test for preevaluation ok|18522
-||nzb|8,wa|6,cgv08||jump if preevaluation permitted|18523
-||mnz|8,wc|||else set result non-constant|18524
-|cgv08|mov|7,xl|13,vrfnc(xr)||load ptr to svfnc field|18528
-||mov|8,wa|13,fargs(xl)||load svnar field value|18529
-||beq|8,wa|8,wb|6,cgv11|jump if argument count is correct|18530
-||bhi|8,wa|8,wb|6,cgv09|jump if too few arguments given|18531
-||sub|8,wb|8,wa||get number of extra args|18535
-||lct|8,wb|8,wb||set as count to control loop|18536
-||mov|8,wa|21,=opop_||set pop call|18537
-||brn|6,cgv10|||jump to common loop|18538
-|cgv09|sub|8,wa|8,wb||get number of missing arguments|18542
-||lct|8,wb|8,wa||load as count to control loop|18543
-||mov|8,wa|21,=nulls||load ptr to null constant|18544
-|cgv10|jsr|6,cdwrd|||generate one call|18548
-||bct|8,wb|6,cgv10||loop till all generated|18549
-|cgv11|mov|8,wa|7,xl||copy pointer to svfnc field|18553
-||brn|6,cgv36|||jump to generate call|18554
-||ejc|||||18555
-|cgv12|mov|8,wa|21,=ofns_||set one arg call in case|18561
-||beq|8,wb|18,=num01|6,cgv13|jump if one arg case|18562
-||mov|8,wa|21,=ofnc_||else load call for more than 1 arg|18563
-||jsr|6,cdwrd|||generate it|18564
-||mov|8,wa|8,wb||copy argument count|18565
-|cgv13|jsr|6,cdwrd|||generate =o_fns or arg count|18569
-||mov|8,wa|7,xr||copy vrblk pointer|18570
-||brn|6,cgv32|||jump to generate vrblk ptr|18571
-|cgv14|mov|7,xl|13,cmrop(xl)||point to expression tree|18575
-||zer|8,wa|||return value|18577
-||jsr|6,cdgex|||build exblk or seblk|18579
-||mov|8,wa|7,xr||copy block ptr|18580
-||jsr|6,cdwrd|||generate ptr to exblk or seblk|18581
-||brn|6,cgv34|||jump to exit, constant test|18582
-|cgv15|zer|11,-(xs)|||zero ptr to chain of forward jumps|18586
-||zer|11,-(xs)|||zero ptr to prev o_slc forward ptr|18587
-||mov|8,wb|19,*cmvls||point to first alternative|18588
-||mov|8,wa|21,=osla_||set initial code word|18589
-|cgv16|jsr|6,cdwrd|||generate o_slc (o_sla first time)|18600
-||mov|9,(xs)|3,cwcof||set current loc as ptr to fill in|18601
-||jsr|6,cdwrd|||generate garbage word there for now|18602
-||jsr|6,cmgen|||gen value code for alternative|18603
-||mov|8,wa|21,=oslb_||load o_slb pointer|18604
-||jsr|6,cdwrd|||generate o_slb call|18605
-||mov|8,wa|13,num01(xs)||load old chain ptr|18606
-||mov|13,num01(xs)|3,cwcof||set current loc as new chain head|18607
-||jsr|6,cdwrd|||generate forward chain link|18608
-||ejc|||||18609
-||mov|7,xr|9,(xs)||load offset to word to plug|18615
-||add|7,xr|3,r_ccb||point to actual location to plug|18616
-||mov|9,(xr)|3,cwcof||plug proper offset in|18617
-||mov|8,wa|21,=oslc_||load o_slc ptr for next alternative|18618
-||mov|7,xr|8,wb||copy offset (destroy garbage xr)|18619
-||ica|7,xr|||bump extra time for test|18620
-||blt|7,xr|13,cmlen(xl)|6,cgv16|loop back if not last alternative|18621
-||mov|8,wa|21,=osld_||get header call|18625
-||jsr|6,cdwrd|||generate o_sld call|18626
-||jsr|6,cmgen|||generate code for last alternative|18627
-||ica|7,xs|||pop offset ptr|18628
-||mov|7,xr|10,(xs)+||load chain ptr|18629
-|cgv17|add|7,xr|3,r_ccb||make next ptr absolute|18633
-||mov|8,wa|9,(xr)||load forward ptr|18634
-||mov|9,(xr)|3,cwcof||plug required offset|18635
-||mov|7,xr|8,wa||copy forward ptr|18636
-||bnz|8,wa|6,cgv17||loop back if more to go|18637
-||brn|6,cgv33|||else jump to exit (not constant)|18638
-|cgv18|mov|7,xr|13,cmlop(xl)||load left operand pointer|18642
-||jsr|6,cdgvl|||gen value code for left operand|18643
-|cgv19|mov|7,xr|13,cmrop(xl)||load right (only) operand ptr|18647
-||jsr|6,cdgvl|||gen code by value|18648
-||ejc|||||18649
-|cgv20|mov|8,wa|13,cmopn(xl)||load operator call pointer|18655
-||brn|6,cgv36|||jump to generate it with cons test|18656
-|cgv21|mov|7,xr|13,cmlop(xl)||load left operand pointer|18660
-||blo|9,(xr)|22,=b_vr_|6,cgv22|jump if not variable|18661
-||mov|7,xr|13,cmrop(xl)||load right operand ptr|18665
-||jsr|6,cdgvl|||generate code by value|18666
-||mov|8,wa|13,cmlop(xl)||reload left operand vrblk ptr|18667
-||add|8,wa|19,*vrsto||point to vrsto field|18668
-||brn|6,cgv32|||jump to generate store ptr|18669
-|cgv22|jsr|6,expap|||test for pattern match on left side|18673
-||ppm|6,cgv23|||jump if not pattern match|18674
-||mov|13,cmlop(xl)|13,cmrop(xr)||save pattern ptr in safe place|18678
-||mov|7,xr|13,cmlop(xr)||load subject ptr|18679
-||jsr|6,cdgnm|||gen code by name for subject|18680
-||mov|7,xr|13,cmlop(xl)||load pattern ptr|18681
-||jsr|6,cdgvl|||gen code by value for pattern|18682
-||mov|8,wa|21,=opmn_||load match by name call|18683
-||jsr|6,cdwrd|||generate it|18684
-||mov|7,xr|13,cmrop(xl)||load replacement value ptr|18685
-||jsr|6,cdgvl|||gen code by value|18686
-||mov|8,wa|21,=orpl_||load replace call|18687
-||brn|6,cgv32|||jump to gen and exit (not constant)|18688
-|cgv23|mnz|8,wc|||inhibit pre-evaluation|18692
-||jsr|6,cdgnm|||gen code by name for left side|18693
-||brn|6,cgv31|||merge with unop circuit|18694
-||ejc|||||18695
-|cgv24|mov|7,xr|13,cmlop(xl)||load left operand ptr|18701
-||bne|9,(xr)|22,=b_cmt|6,cgv18|ordinary binop if not cmblk|18702
-||mov|8,wb|13,cmtyp(xr)||load cmblk type code|18703
-||beq|8,wb|18,=c_int|6,cgv25|special case if interrogation|18704
-||beq|8,wb|18,=c_neg|6,cgv25|or negation|18705
-||bne|8,wb|18,=c_fnc|6,cgv18|else ordinary binop if not function|18706
-||mov|7,xr|13,cmopn(xr)||else load function vrblk ptr|18707
-||bnz|13,vrlen(xr)|6,cgv18||ordinary binop if not system var|18708
-||mov|7,xr|13,vrsvp(xr)||else point to svblk|18709
-||mov|8,wa|13,svbit(xr)||load bit indicators|18710
-||anb|8,wa|4,btprd||test for predicate function|18711
-||zrb|8,wa|6,cgv18||ordinary binop if not|18712
-|cgv25|mov|7,xr|13,cmlop(xl)||reload left arg|18716
-||jsr|6,cdgvl|||gen code by value|18717
-||mov|8,wa|21,=opop_||load pop call|18718
-||jsr|6,cdwrd|||generate it|18719
-||mov|7,xr|13,cmrop(xl)||load right operand|18720
-||jsr|6,cdgvl|||gen code by value as result code|18721
-||brn|6,cgv33|||exit (not constant)|18722
-|cgv26|mov|7,xr|13,cmlop(xl)||load left operand|18726
-||jsr|6,cdgvl|||gen code by value, merge|18727
-|cgv27|mov|7,xr|13,cmrop(xl)||load right operand ptr|18731
-||jsr|6,cdgnm|||gen code by name for right arg|18732
-||mov|7,xr|13,cmopn(xl)||get operator code word|18733
-||bne|9,(xr)|22,=o_kwv|6,cgv20|gen call unless keyword value|18734
-||ejc|||||18735
-||bnz|8,wc|6,cgv20||gen call if non-constant (not var)|18744
-||mnz|8,wc|||else set non-constant in case|18745
-||mov|7,xr|13,cmrop(xl)||load ptr to operand vrblk|18746
-||bnz|13,vrlen(xr)|6,cgv20||gen (non-constant) if not sys var|18747
-||mov|7,xr|13,vrsvp(xr)||else load ptr to svblk|18748
-||mov|8,wa|13,svbit(xr)||load bit mask|18749
-||anb|8,wa|4,btckw||test for constant keyword|18750
-||zrb|8,wa|6,cgv20||go gen if not constant|18751
-||zer|8,wc|||else set result constant|18752
-||brn|6,cgv20|||and jump back to generate call|18753
-|cgv28|mov|8,wa|21,=onta_||get initial word|18757
-||jsr|6,cdwrd|||generate it|18758
-||mov|8,wb|3,cwcof||save next offset|18759
-||jsr|6,cdwrd|||generate gunk word for now|18760
-||mov|7,xr|13,cmrop(xl)||load right operand ptr|18761
-||jsr|6,cdgvl|||gen code by value|18762
-||mov|8,wa|21,=ontb_||load end of evaluation call|18763
-||jsr|6,cdwrd|||generate it|18764
-||mov|7,xr|8,wb||copy offset to word to plug|18765
-||add|7,xr|3,r_ccb||point to actual word to plug|18766
-||mov|9,(xr)|3,cwcof||plug word with current offset|18767
-||mov|8,wa|21,=ontc_||load final call|18768
-||brn|6,cgv32|||jump to generate it (not constant)|18769
-|cgv29|mov|7,xr|13,cmlop(xl)||load left operand ptr|18773
-||jsr|6,cdgvl|||generate code by value|18774
-||ejc|||||18775
-|cgv30|mov|8,wb|18,=c_uo_||set unop code + 1|18781
-||sub|8,wb|13,cmtyp(xl)||set number of args (1 or 2)|18782
-||mov|7,xr|13,cmrop(xl)||load right (only) operand pointer|18786
-||jsr|6,cdgvl|||gen value code for right operand|18787
-||mov|7,xr|13,cmopn(xl)||load pointer to operator dv|18788
-||mov|7,xr|13,dvopn(xr)||load pointer offset|18789
-||wtb|7,xr|||convert word offset to bytes|18790
-||add|7,xr|20,=r_uba||point to proper function ptr|18791
-||sub|7,xr|19,*vrfnc||set standard function offset|18792
-||brn|6,cgv12|||merge with function call circuit|18793
-|cgv31|mnz|8,wc|||set non constant|18797
-||brn|6,cgv19|||merge|18798
-|cgv32|jsr|6,cdwrd|||generate word, merge|18802
-|cgv33|mnz|8,wc|||indicate result is not constant|18806
-|cgv34|ica|7,xs|||pop initial code offset|18810
-||mov|8,wa|10,(xs)+||restore old constant flag|18811
-||mov|7,xl|10,(xs)+||restore entry xl|18812
-||mov|8,wb|10,(xs)+||restore entry wb|18813
-||bnz|8,wc|6,cgv35||jump if not constant|18814
-||mov|8,wc|8,wa||else restore entry constant flag|18815
-|cgv35|exi||||return to cdgvl caller|18819
-|cgv36|jsr|6,cdwrd|||generate word|18823
-||bnz|8,wc|6,cgv34||jump to exit if not constant|18824
-||ejc|||||18825
-||mov|8,wa|21,=orvl_||load call to return value|18831
-||jsr|6,cdwrd|||generate it|18832
-||mov|7,xl|9,(xs)||load initial code offset|18833
-||jsr|6,exbld|||build exblk for expression|18834
-||zer|8,wb|||set to evaluate by value|18835
-||jsr|6,evalx|||evaluate expression|18836
-||ppm||||should not fail|18837
-||mov|8,wa|9,(xr)||load type word of result|18838
-||blo|8,wa|22,=p_aaa|6,cgv37|jump if not pattern|18839
-||mov|8,wa|21,=olpt_||else load special pattern load call|18840
-||jsr|6,cdwrd|||generate it|18841
-|cgv37|mov|8,wa|7,xr||copy constant pointer|18845
-||jsr|6,cdwrd|||generate ptr|18846
-||zer|8,wc|||set result constant|18847
-||brn|6,cgv34|||jump back to exit|18848
-||enp||||end procedure cdgvl|18849
+|bln07|mov|8,wa|19,*icsi_||set size of icblk|18005
+||exi||||return to blkln caller|18006
+|bln08|mov|7,xl|13,pddfp(xr)||point to dfblk|18010
+||mov|8,wa|13,dfpdl(xl)||load pdblk length from dfblk|18011
+||exi||||return to blkln caller|18012
+|bln09|mov|8,wa|19,*rcsi_||set size of rcblk|18018
+||exi||||return to blkln caller|18019
+|bln10|mov|8,wa|13,sclen(xr)||load length in characters|18024
+||ctb|8,wa|2,scsi_||calculate length in bytes|18025
+||exi||||return to blkln caller|18026
+|bln12|mov|8,wa|13,num03(xr)||load length from cdlen/exlen|18040
+||exi||||return to blkln caller|18041
+||enp||||end procedure blkln|18043
+||ejc|||||18044
+|copyb|prc|25,n|1,1||entry point|18056
+||mov|7,xr|9,(xs)||load argument|18057
+||beq|7,xr|21,=nulls|6,cop10|return argument if it is null|18058
+||mov|8,wa|9,(xr)||else load type word|18059
+||mov|8,wb|8,wa||copy type word|18060
+||jsr|6,blkln|||get length of argument block|18061
+||mov|7,xl|7,xr||copy pointer|18062
+||jsr|6,alloc|||allocate block of same size|18063
+||mov|9,(xs)|7,xr||store pointer to copy|18064
+||mvw||||copy contents of old block to new|18065
+||zer|7,xl|||clear garbage xl|18066
+||mov|7,xr|9,(xs)||reload pointer to start of copy|18067
+||beq|8,wb|22,=b_tbt|6,cop05|jump if table|18068
+||beq|8,wb|22,=b_vct|6,cop01|jump if vector|18069
+||beq|8,wb|22,=b_pdt|6,cop01|jump if program defined|18070
+||bne|8,wb|22,=b_art|6,cop10|return copy if not array|18075
+||add|7,xr|13,arofs(xr)||point to prototype field|18079
+||brn|6,cop02|||jump to merge|18080
+|cop01|add|7,xr|19,*pdfld||point to pdfld = vcvls|18084
+|cop02|mov|7,xl|9,(xr)||load next pointer|18089
+|cop03|bne|9,(xl)|22,=b_trt|6,cop04|jump if not trapped|18093
+||mov|7,xl|13,trval(xl)||else point to next value|18094
+||brn|6,cop03|||and loop back|18095
+||ejc|||||18096
+|cop04|mov|10,(xr)+|7,xl||store real value, bump pointer|18102
+||bne|7,xr|3,dnamp|6,cop02|loop back if more to go|18103
+||brn|6,cop09|||else jump to exit|18104
+|cop05|zer|13,idval(xr)|||zero id to stop dump blowing up|18108
+||mov|8,wa|19,*tesi_||set size of teblk|18109
+||mov|8,wc|19,*tbbuk||set initial offset|18110
+|cop06|mov|7,xr|9,(xs)||load table pointer|18114
+||beq|8,wc|13,tblen(xr)|6,cop09|jump to exit if all done|18115
+||mov|8,wb|8,wc||else copy offset|18116
+||sub|8,wb|19,*tenxt||subtract link offset to merge|18117
+||add|7,xr|8,wb||next bucket header less link offset|18118
+||ica|8,wc|||bump offset|18119
+|cop07|mov|7,xl|13,tenxt(xr)||load pointer to next teblk|18123
+||mov|13,tenxt(xr)|9,(xs)||set end of chain pointer in case|18124
+||beq|9,(xl)|22,=b_tbt|6,cop06|back for next bucket if chain end|18125
+||sub|7,xr|8,wb||point to head of previous block|18126
+||mov|11,-(xs)|7,xr||stack ptr to previous block|18127
+||mov|8,wa|19,*tesi_||set size of teblk|18128
+||jsr|6,alloc|||allocate new teblk|18129
+||mov|11,-(xs)|7,xr||stack ptr to new teblk|18130
+||mvw||||copy old teblk to new teblk|18131
+||mov|7,xr|10,(xs)+||restore pointer to new teblk|18132
+||mov|7,xl|10,(xs)+||restore pointer to previous block|18133
+||add|7,xl|8,wb||add offset back in|18134
+||mov|13,tenxt(xl)|7,xr||link new block to previous|18135
+||mov|7,xl|7,xr||copy pointer to new block|18136
+|cop08|mov|7,xl|13,teval(xl)||load value|18140
+||beq|9,(xl)|22,=b_trt|6,cop08|loop back if trapped|18141
+||mov|13,teval(xr)|7,xl||store untrapped value in teblk|18142
+||zer|8,wb|||zero offset within teblk|18143
+||brn|6,cop07|||back for next teblk|18144
+|cop09|mov|7,xr|10,(xs)+||load pointer to block|18148
+||exi||||return|18149
+|cop10|exi|1,1|||return|18153
+||ejc|||||18154
+||enp||||end procedure copyb|18172
+|cdgcg|prc|25,e|1,0||entry point|18183
+||mov|7,xl|13,cmopn(xr)||get unary goto operator|18184
+||mov|7,xr|13,cmrop(xr)||point to goto operand|18185
+||beq|7,xl|21,=opdvd|6,cdgc2|jump if direct goto|18186
+||jsr|6,cdgnm|||generate opnd by name if not direct|18187
+|cdgc1|mov|8,wa|7,xl||goto operator|18191
+||jsr|6,cdwrd|||generate it|18192
+||exi||||return to caller|18193
+|cdgc2|jsr|6,cdgvl|||generate operand by value|18197
+||brn|6,cdgc1|||merge to return|18198
+||enp||||end procedure cdgcg|18199
+||ejc|||||18200
+|cdgex|prc|25,r|1,0||entry point, recursive|18217
+||blo|9,(xl)|22,=b_vr_|6,cdgx1|jump if not variable|18218
+||mov|8,wa|19,*sesi_||set size of seblk|18222
+||jsr|6,alloc|||allocate space for seblk|18223
+||mov|9,(xr)|22,=b_sel||set type word|18224
+||mov|13,sevar(xr)|7,xl||store vrblk pointer|18225
+||exi||||return to cdgex caller|18226
+|cdgx1|mov|7,xr|7,xl||copy tree pointer|18230
+||mov|11,-(xs)|8,wc||save wc|18231
+||mov|7,xl|3,cwcof||save current offset|18232
+||bze|8,wa|6,cdgx2||jump if by value|18234
+||mov|8,wa|9,(xr)||get type word|18236
+||bne|8,wa|22,=b_cmt|6,cdgx2|call by value if not cmblk|18237
+||bge|13,cmtyp(xr)|18,=c__nm|6,cdgx2|jump if cmblk only by value|18238
+||ejc|||||18239
+||jsr|6,cdgnm|||generate code by name|18245
+||mov|8,wa|21,=ornm_||load return by name word|18246
+||brn|6,cdgx3|||merge with value case|18247
+|cdgx2|jsr|6,cdgvl|||generate code by value|18251
+||mov|8,wa|21,=orvl_||load return by value word|18252
+|cdgx3|jsr|6,cdwrd|||generate return word|18256
+||jsr|6,exbld|||build exblk|18257
+||mov|8,wc|10,(xs)+||restore wc|18258
+||exi||||return to cdgex caller|18259
+||enp||||end procedure cdgex|18260
+||ejc|||||18261
+|cdgnm|prc|25,r|1,0||entry point, recursive|18286
+||mov|11,-(xs)|7,xl||save entry xl|18287
+||mov|11,-(xs)|8,wb||save entry wb|18288
+||chk||||check for stack overflow|18289
+||mov|8,wa|9,(xr)||load type word|18290
+||beq|8,wa|22,=b_cmt|6,cgn04|jump if cmblk|18291
+||bhi|8,wa|22,=b_vr_|6,cgn02|jump if simple variable|18292
+|cgn01|erb|1,212|26,syntax error: value used where name is required|||18296
+|cgn02|mov|8,wa|21,=olvn_||load variable load call|18300
+||jsr|6,cdwrd|||generate it|18301
+||mov|8,wa|7,xr||copy vrblk pointer|18302
+||jsr|6,cdwrd|||generate vrblk pointer|18303
+||ejc|||||18304
+|cgn03|mov|8,wb|10,(xs)+||restore entry wb|18310
+||mov|7,xl|10,(xs)+||restore entry xl|18311
+||exi||||return to cdgnm caller|18312
+|cgn04|mov|7,xl|7,xr||copy cmblk pointer|18316
+||mov|7,xr|13,cmtyp(xr)||load cmblk type|18317
+||bge|7,xr|18,=c__nm|6,cgn01|error if not name operand|18318
+||bsw|7,xr|2,c__nm||else switch on type|18319
+||iff|2,c_arr|6,cgn05||array reference|18327
+||iff|2,c_fnc|6,cgn08||function call|18327
+||iff|2,c_def|6,cgn09||deferred expression|18327
+||iff|2,c_ind|6,cgn10||indirect reference|18327
+||iff|2,c_key|6,cgn11||keyword reference|18327
+||iff|2,c_ubo|6,cgn08||undefined binary op|18327
+||iff|2,c_uuo|6,cgn08||undefined unary op|18327
+||esw||||end switch on cmblk type|18327
+|cgn05|mov|8,wb|19,*cmopn||point to array operand|18331
+|cgn06|jsr|6,cmgen|||generate code for next operand|18335
+||mov|8,wc|13,cmlen(xl)||load length of cmblk|18336
+||blt|8,wb|8,wc|6,cgn06|loop till all generated|18337
+||mov|8,wa|21,=oaon_||load one-subscript case call|18341
+||beq|8,wc|19,*cmar1|6,cgn07|jump to exit if one subscript case|18342
+||mov|8,wa|21,=oamn_||else load multi-subscript case call|18343
+||jsr|6,cdwrd|||generate call|18344
+||mov|8,wa|8,wc||copy cmblk length|18345
+||btw|8,wa|||convert to words|18346
+||sub|8,wa|18,=cmvls||calculate number of subscripts|18347
+||ejc|||||18348
+|cgn07|mnz|8,wc|||set result non-constant|18354
+||jsr|6,cdwrd|||generate word|18355
+||brn|6,cgn03|||back to exit|18356
+|cgn08|mov|7,xr|7,xl||copy cmblk pointer|18360
+||jsr|6,cdgvl|||gen code by value for call|18361
+||mov|8,wa|21,=ofne_||get extra call for by name|18362
+||brn|6,cgn07|||back to generate and exit|18363
+|cgn09|mov|7,xr|13,cmrop(xl)||check if variable|18367
+||bhi|9,(xr)|22,=b_vr_|6,cgn02|treat *variable as simple var|18368
+||mov|7,xl|7,xr||copy ptr to expression tree|18369
+||mov|8,wa|18,=num01||return name|18371
+||jsr|6,cdgex|||else build exblk|18373
+||mov|8,wa|21,=olex_||set call to load expr by name|18374
+||jsr|6,cdwrd|||generate it|18375
+||mov|8,wa|7,xr||copy exblk pointer|18376
+||jsr|6,cdwrd|||generate exblk pointer|18377
+||brn|6,cgn03|||back to exit|18378
+|cgn10|mov|7,xr|13,cmrop(xl)||get operand|18382
+||jsr|6,cdgvl|||generate code by value for it|18383
+||mov|8,wa|21,=oinn_||load call for indirect by name|18384
+||brn|6,cgn12|||merge|18385
+|cgn11|mov|7,xr|13,cmrop(xl)||get operand|18389
+||jsr|6,cdgnm|||generate code by name for it|18390
+||mov|8,wa|21,=okwn_||load call for keyword by name|18391
+|cgn12|jsr|6,cdwrd|||generate code for operator|18395
+||brn|6,cgn03|||exit|18396
+||enp||||end procedure cdgnm|18397
+||ejc|||||18398
+|cdgvl|prc|25,r|1,0||entry point, recursive|18426
+||mov|8,wa|9,(xr)||load type word|18427
+||beq|8,wa|22,=b_cmt|6,cgv01|jump if cmblk|18428
+||blt|8,wa|22,=b_vra|6,cgv00|jump if icblk, rcblk, scblk|18429
+||bnz|13,vrlen(xr)|6,cgvl0||jump if not system variable|18430
+||mov|11,-(xs)|7,xr||stack xr|18431
+||mov|7,xr|13,vrsvp(xr)||point to svblk|18432
+||mov|8,wa|13,svbit(xr)||get svblk property bits|18433
+||mov|7,xr|10,(xs)+||recover xr|18434
+||anb|8,wa|4,btkwv||check if constant keyword value|18435
+||beq|8,wa|4,btkwv|6,cgv00|jump if constant keyword value|18436
+|cgvl0|mnz|8,wc|||indicate non-constant value|18440
+|cgv00|mov|8,wa|7,xr||copy ptr to var or constant|18445
+||jsr|6,cdwrd|||generate as code word|18446
+||exi||||return to caller|18447
+||ejc|||||18448
+|cgv01|mov|11,-(xs)|8,wb||save entry wb|18454
+||mov|11,-(xs)|7,xl||save entry xl|18455
+||mov|11,-(xs)|8,wc||save entry constant flag|18456
+||mov|11,-(xs)|3,cwcof||save initial code offset|18457
+||chk||||check for stack overflow|18458
+||mov|7,xl|7,xr||copy cmblk pointer|18466
+||mov|7,xr|13,cmtyp(xr)||load cmblk type|18467
+||mov|8,wc|3,cswno||reset constant flag|18468
+||ble|7,xr|18,=c_pr_|6,cgv02|jump if not predicate value|18469
+||mnz|8,wc|||else force non-constant case|18470
+|cgv02|bsw|7,xr|2,c__nv||switch to appropriate generator|18474
+||iff|2,c_arr|6,cgv03||array reference|18494
+||iff|2,c_fnc|6,cgv05||function call|18494
+||iff|2,c_def|6,cgv14||deferred expression|18494
+||iff|2,c_ind|6,cgv31||indirect reference|18494
+||iff|2,c_key|6,cgv27||keyword reference|18494
+||iff|2,c_ubo|6,cgv29||undefined binop|18494
+||iff|2,c_uuo|6,cgv30||undefined unop|18494
+||iff|2,c_bvl|6,cgv18||binops with val opds|18494
+||iff|2,c_uvl|6,cgv19||unops with valu opnd|18494
+||iff|2,c_alt|6,cgv18||alternation|18494
+||iff|2,c_cnc|6,cgv24||concatenation|18494
+||iff|2,c_cnp|6,cgv24||concatenation (not pattern match)|18494
+||iff|2,c_unm|6,cgv27||unops with name opnd|18494
+||iff|2,c_bvn|6,cgv26||binary _ and .|18494
+||iff|2,c_ass|6,cgv21||assignment|18494
+||iff|2,c_int|6,cgv31||interrogation|18494
+||iff|2,c_neg|6,cgv28||negation|18494
+||iff|2,c_sel|6,cgv15||selection|18494
+||iff|2,c_pmt|6,cgv18||pattern match|18494
+||esw||||end switch on cmblk type|18494
+||ejc|||||18495
+|cgv03|mov|8,wb|19,*cmopn||set offset to array operand|18501
+|cgv04|jsr|6,cmgen|||gen value code for next operand|18505
+||mov|8,wc|13,cmlen(xl)||load cmblk length|18506
+||blt|8,wb|8,wc|6,cgv04|loop back if more to go|18507
+||mov|8,wa|21,=oaov_||set one subscript call in case|18511
+||beq|8,wc|19,*cmar1|6,cgv32|jump to exit if 1-sub case|18512
+||mov|8,wa|21,=oamv_||else set call for multi-subscripts|18513
+||jsr|6,cdwrd|||generate call|18514
+||mov|8,wa|8,wc||copy length of cmblk|18515
+||sub|8,wa|19,*cmvls||subtract standard length|18516
+||btw|8,wa|||get number of words|18517
+||brn|6,cgv32|||jump to generate subscript count|18518
+|cgv05|mov|8,wb|19,*cmvls||set offset to first argument|18522
+|cgv06|beq|8,wb|13,cmlen(xl)|6,cgv07|jump if all generated|18526
+||jsr|6,cmgen|||else gen value code for next arg|18527
+||brn|6,cgv06|||back to generate next argument|18528
+|cgv07|sub|8,wb|19,*cmvls||get number of arg ptrs (bytes)|18532
+||btw|8,wb|||convert bytes to words|18533
+||mov|7,xr|13,cmopn(xl)||load function vrblk pointer|18534
+||bnz|13,vrlen(xr)|6,cgv12||jump if not system function|18535
+||mov|7,xl|13,vrsvp(xr)||load svblk ptr if system var|18536
+||mov|8,wa|13,svbit(xl)||load bit mask|18537
+||anb|8,wa|4,btffc||test for fast function call allowed|18538
+||zrb|8,wa|6,cgv12||jump if not|18539
+||ejc|||||18540
+||mov|8,wa|13,svbit(xl)||reload bit indicators|18546
+||anb|8,wa|4,btpre||test for preevaluation ok|18547
+||nzb|8,wa|6,cgv08||jump if preevaluation permitted|18548
+||mnz|8,wc|||else set result non-constant|18549
+|cgv08|mov|7,xl|13,vrfnc(xr)||load ptr to svfnc field|18553
+||mov|8,wa|13,fargs(xl)||load svnar field value|18554
+||beq|8,wa|8,wb|6,cgv11|jump if argument count is correct|18555
+||bhi|8,wa|8,wb|6,cgv09|jump if too few arguments given|18556
+||sub|8,wb|8,wa||get number of extra args|18560
+||lct|8,wb|8,wb||set as count to control loop|18561
+||mov|8,wa|21,=opop_||set pop call|18562
+||brn|6,cgv10|||jump to common loop|18563
+|cgv09|sub|8,wa|8,wb||get number of missing arguments|18567
+||lct|8,wb|8,wa||load as count to control loop|18568
+||mov|8,wa|21,=nulls||load ptr to null constant|18569
+|cgv10|jsr|6,cdwrd|||generate one call|18573
+||bct|8,wb|6,cgv10||loop till all generated|18574
+|cgv11|mov|8,wa|7,xl||copy pointer to svfnc field|18578
+||brn|6,cgv36|||jump to generate call|18579
+||ejc|||||18580
+|cgv12|mov|8,wa|21,=ofns_||set one arg call in case|18586
+||beq|8,wb|18,=num01|6,cgv13|jump if one arg case|18587
+||mov|8,wa|21,=ofnc_||else load call for more than 1 arg|18588
+||jsr|6,cdwrd|||generate it|18589
+||mov|8,wa|8,wb||copy argument count|18590
+|cgv13|jsr|6,cdwrd|||generate =o_fns or arg count|18594
+||mov|8,wa|7,xr||copy vrblk pointer|18595
+||brn|6,cgv32|||jump to generate vrblk ptr|18596
+|cgv14|mov|7,xl|13,cmrop(xl)||point to expression tree|18600
+||zer|8,wa|||return value|18602
+||jsr|6,cdgex|||build exblk or seblk|18604
+||mov|8,wa|7,xr||copy block ptr|18605
+||jsr|6,cdwrd|||generate ptr to exblk or seblk|18606
+||brn|6,cgv34|||jump to exit, constant test|18607
+|cgv15|zer|11,-(xs)|||zero ptr to chain of forward jumps|18611
+||zer|11,-(xs)|||zero ptr to prev o_slc forward ptr|18612
+||mov|8,wb|19,*cmvls||point to first alternative|18613
+||mov|8,wa|21,=osla_||set initial code word|18614
+|cgv16|jsr|6,cdwrd|||generate o_slc (o_sla first time)|18625
+||mov|9,(xs)|3,cwcof||set current loc as ptr to fill in|18626
+||jsr|6,cdwrd|||generate garbage word there for now|18627
+||jsr|6,cmgen|||gen value code for alternative|18628
+||mov|8,wa|21,=oslb_||load o_slb pointer|18629
+||jsr|6,cdwrd|||generate o_slb call|18630
+||mov|8,wa|13,num01(xs)||load old chain ptr|18631
+||mov|13,num01(xs)|3,cwcof||set current loc as new chain head|18632
+||jsr|6,cdwrd|||generate forward chain link|18633
+||ejc|||||18634
+||mov|7,xr|9,(xs)||load offset to word to plug|18640
+||add|7,xr|3,r_ccb||point to actual location to plug|18641
+||mov|9,(xr)|3,cwcof||plug proper offset in|18642
+||mov|8,wa|21,=oslc_||load o_slc ptr for next alternative|18643
+||mov|7,xr|8,wb||copy offset (destroy garbage xr)|18644
+||ica|7,xr|||bump extra time for test|18645
+||blt|7,xr|13,cmlen(xl)|6,cgv16|loop back if not last alternative|18646
+||mov|8,wa|21,=osld_||get header call|18650
+||jsr|6,cdwrd|||generate o_sld call|18651
+||jsr|6,cmgen|||generate code for last alternative|18652
+||ica|7,xs|||pop offset ptr|18653
+||mov|7,xr|10,(xs)+||load chain ptr|18654
+|cgv17|add|7,xr|3,r_ccb||make next ptr absolute|18658
+||mov|8,wa|9,(xr)||load forward ptr|18659
+||mov|9,(xr)|3,cwcof||plug required offset|18660
+||mov|7,xr|8,wa||copy forward ptr|18661
+||bnz|8,wa|6,cgv17||loop back if more to go|18662
+||brn|6,cgv33|||else jump to exit (not constant)|18663
+|cgv18|mov|7,xr|13,cmlop(xl)||load left operand pointer|18667
+||jsr|6,cdgvl|||gen value code for left operand|18668
+|cgv19|mov|7,xr|13,cmrop(xl)||load right (only) operand ptr|18672
+||jsr|6,cdgvl|||gen code by value|18673
+||ejc|||||18674
+|cgv20|mov|8,wa|13,cmopn(xl)||load operator call pointer|18680
+||brn|6,cgv36|||jump to generate it with cons test|18681
+|cgv21|mov|7,xr|13,cmlop(xl)||load left operand pointer|18685
+||blo|9,(xr)|22,=b_vr_|6,cgv22|jump if not variable|18686
+||mov|7,xr|13,cmrop(xl)||load right operand ptr|18690
+||jsr|6,cdgvl|||generate code by value|18691
+||mov|8,wa|13,cmlop(xl)||reload left operand vrblk ptr|18692
+||add|8,wa|19,*vrsto||point to vrsto field|18693
+||brn|6,cgv32|||jump to generate store ptr|18694
+|cgv22|jsr|6,expap|||test for pattern match on left side|18698
+||ppm|6,cgv23|||jump if not pattern match|18699
+||mov|13,cmlop(xl)|13,cmrop(xr)||save pattern ptr in safe place|18703
+||mov|7,xr|13,cmlop(xr)||load subject ptr|18704
+||jsr|6,cdgnm|||gen code by name for subject|18705
+||mov|7,xr|13,cmlop(xl)||load pattern ptr|18706
+||jsr|6,cdgvl|||gen code by value for pattern|18707
+||mov|8,wa|21,=opmn_||load match by name call|18708
+||jsr|6,cdwrd|||generate it|18709
+||mov|7,xr|13,cmrop(xl)||load replacement value ptr|18710
+||jsr|6,cdgvl|||gen code by value|18711
+||mov|8,wa|21,=orpl_||load replace call|18712
+||brn|6,cgv32|||jump to gen and exit (not constant)|18713
+|cgv23|mnz|8,wc|||inhibit pre-evaluation|18717
+||jsr|6,cdgnm|||gen code by name for left side|18718
+||brn|6,cgv31|||merge with unop circuit|18719
+||ejc|||||18720
+|cgv24|mov|7,xr|13,cmlop(xl)||load left operand ptr|18726
+||bne|9,(xr)|22,=b_cmt|6,cgv18|ordinary binop if not cmblk|18727
+||mov|8,wb|13,cmtyp(xr)||load cmblk type code|18728
+||beq|8,wb|18,=c_int|6,cgv25|special case if interrogation|18729
+||beq|8,wb|18,=c_neg|6,cgv25|or negation|18730
+||bne|8,wb|18,=c_fnc|6,cgv18|else ordinary binop if not function|18731
+||mov|7,xr|13,cmopn(xr)||else load function vrblk ptr|18732
+||bnz|13,vrlen(xr)|6,cgv18||ordinary binop if not system var|18733
+||mov|7,xr|13,vrsvp(xr)||else point to svblk|18734
+||mov|8,wa|13,svbit(xr)||load bit indicators|18735
+||anb|8,wa|4,btprd||test for predicate function|18736
+||zrb|8,wa|6,cgv18||ordinary binop if not|18737
+|cgv25|mov|7,xr|13,cmlop(xl)||reload left arg|18741
+||jsr|6,cdgvl|||gen code by value|18742
+||mov|8,wa|21,=opop_||load pop call|18743
+||jsr|6,cdwrd|||generate it|18744
+||mov|7,xr|13,cmrop(xl)||load right operand|18745
+||jsr|6,cdgvl|||gen code by value as result code|18746
+||brn|6,cgv33|||exit (not constant)|18747
+|cgv26|mov|7,xr|13,cmlop(xl)||load left operand|18751
+||jsr|6,cdgvl|||gen code by value, merge|18752
+|cgv27|mov|7,xr|13,cmrop(xl)||load right operand ptr|18756
+||jsr|6,cdgnm|||gen code by name for right arg|18757
+||mov|7,xr|13,cmopn(xl)||get operator code word|18758
+||bne|9,(xr)|22,=o_kwv|6,cgv20|gen call unless keyword value|18759
+||ejc|||||18760
+||bnz|8,wc|6,cgv20||gen call if non-constant (not var)|18769
+||mnz|8,wc|||else set non-constant in case|18770
+||mov|7,xr|13,cmrop(xl)||load ptr to operand vrblk|18771
+||bnz|13,vrlen(xr)|6,cgv20||gen (non-constant) if not sys var|18772
+||mov|7,xr|13,vrsvp(xr)||else load ptr to svblk|18773
+||mov|8,wa|13,svbit(xr)||load bit mask|18774
+||anb|8,wa|4,btckw||test for constant keyword|18775
+||zrb|8,wa|6,cgv20||go gen if not constant|18776
+||zer|8,wc|||else set result constant|18777
+||brn|6,cgv20|||and jump back to generate call|18778
+|cgv28|mov|8,wa|21,=onta_||get initial word|18782
+||jsr|6,cdwrd|||generate it|18783
+||mov|8,wb|3,cwcof||save next offset|18784
+||jsr|6,cdwrd|||generate gunk word for now|18785
+||mov|7,xr|13,cmrop(xl)||load right operand ptr|18786
+||jsr|6,cdgvl|||gen code by value|18787
+||mov|8,wa|21,=ontb_||load end of evaluation call|18788
+||jsr|6,cdwrd|||generate it|18789
+||mov|7,xr|8,wb||copy offset to word to plug|18790
+||add|7,xr|3,r_ccb||point to actual word to plug|18791
+||mov|9,(xr)|3,cwcof||plug word with current offset|18792
+||mov|8,wa|21,=ontc_||load final call|18793
+||brn|6,cgv32|||jump to generate it (not constant)|18794
+|cgv29|mov|7,xr|13,cmlop(xl)||load left operand ptr|18798
+||jsr|6,cdgvl|||generate code by value|18799
+||ejc|||||18800
+|cgv30|mov|8,wb|18,=c_uo_||set unop code + 1|18806
+||sub|8,wb|13,cmtyp(xl)||set number of args (1 or 2)|18807
+||mov|7,xr|13,cmrop(xl)||load right (only) operand pointer|18811
+||jsr|6,cdgvl|||gen value code for right operand|18812
+||mov|7,xr|13,cmopn(xl)||load pointer to operator dv|18813
+||mov|7,xr|13,dvopn(xr)||load pointer offset|18814
+||wtb|7,xr|||convert word offset to bytes|18815
+||add|7,xr|20,=r_uba||point to proper function ptr|18816
+||sub|7,xr|19,*vrfnc||set standard function offset|18817
+||brn|6,cgv12|||merge with function call circuit|18818
+|cgv31|mnz|8,wc|||set non constant|18822
+||brn|6,cgv19|||merge|18823
+|cgv32|jsr|6,cdwrd|||generate word, merge|18827
+|cgv33|mnz|8,wc|||indicate result is not constant|18831
+|cgv34|ica|7,xs|||pop initial code offset|18835
+||mov|8,wa|10,(xs)+||restore old constant flag|18836
+||mov|7,xl|10,(xs)+||restore entry xl|18837
+||mov|8,wb|10,(xs)+||restore entry wb|18838
+||bnz|8,wc|6,cgv35||jump if not constant|18839
+||mov|8,wc|8,wa||else restore entry constant flag|18840
+|cgv35|exi||||return to cdgvl caller|18844
+|cgv36|jsr|6,cdwrd|||generate word|18848
+||bnz|8,wc|6,cgv34||jump to exit if not constant|18849
 ||ejc|||||18850
-|cdwrd|prc|25,e|1,0||entry point|18868
-||mov|11,-(xs)|7,xr||save entry xr|18869
-||mov|11,-(xs)|8,wa||save code word to be generated|18870
-|cdwd1|mov|7,xr|3,r_ccb||load ptr to ccblk being built|18874
-||bnz|7,xr|6,cdwd2||jump if block allocated|18875
-||mov|8,wa|19,*e_cbs||load initial length|18879
-||jsr|6,alloc|||allocate ccblk|18880
-||mov|9,(xr)|22,=b_cct||store type word|18881
-||mov|3,cwcof|19,*cccod||set initial offset|18882
-||mov|13,cclen(xr)|8,wa||store block length|18883
-||zer|13,ccsln(xr)|||zero line number|18885
-||mov|3,r_ccb|7,xr||store ptr to new block|18887
-|cdwd2|mov|8,wa|3,cwcof||load current offset|18891
-||add|8,wa|19,*num05||adjust for test (five words)|18893
-||blo|8,wa|13,cclen(xr)|6,cdwd4|jump if room in this block|18897
-||bge|8,wa|3,mxlen|6,cdwd5|jump if already at max size|18901
-||add|8,wa|19,*e_cbs||else get new size|18902
-||mov|11,-(xs)|7,xl||save entry xl|18903
-||mov|7,xl|7,xr||copy pointer|18904
-||blt|8,wa|3,mxlen|6,cdwd3|jump if not too large|18905
-||mov|8,wa|3,mxlen||else reset to max allowed size|18906
-||ejc|||||18907
-|cdwd3|jsr|6,alloc|||allocate new block|18913
-||mov|3,r_ccb|7,xr||store pointer to new block|18914
-||mov|10,(xr)+|22,=b_cct||store type word in new block|18915
-||mov|10,(xr)+|8,wa||store block length|18916
-||mov|10,(xr)+|13,ccsln(xl)||copy source line number word|18918
-||add|7,xl|19,*ccuse||point to ccuse,cccod fields in old|18920
-||mov|8,wa|9,(xl)||load ccuse value|18921
-||mvw||||copy useful words from old block|18922
-||mov|7,xl|10,(xs)+||restore xl|18923
-||brn|6,cdwd1|||merge back to try again|18924
-|cdwd4|mov|8,wa|3,cwcof||load current offset|18928
-||ica|8,wa|||get new offset|18929
-||mov|3,cwcof|8,wa||store new offset|18930
-||mov|13,ccuse(xr)|8,wa||store in ccblk for gbcol|18931
-||dca|8,wa|||restore ptr to this word|18932
-||add|7,xr|8,wa||point to current entry|18933
-||mov|8,wa|10,(xs)+||reload word to generate|18934
-||mov|9,(xr)|8,wa||store word in block|18935
-||mov|7,xr|10,(xs)+||restore entry xr|18936
-||exi||||return to caller|18937
-|cdwd5|erb|1,213|26,syntax error: statement is too complicated.|||18941
-||enp||||end procedure cdwrd|18942
-||ejc|||||18943
-|cmgen|prc|25,r|1,0||entry point, recursive|18956
-||mov|7,xr|7,xl||copy cmblk pointer|18957
-||add|7,xr|8,wb||point to cmblk pointer|18958
-||mov|7,xr|9,(xr)||load cmblk pointer|18959
-||jsr|6,cdgvl|||generate code by value|18960
-||ica|8,wb|||bump offset|18961
+||mov|8,wa|21,=orvl_||load call to return value|18856
+||jsr|6,cdwrd|||generate it|18857
+||mov|7,xl|9,(xs)||load initial code offset|18858
+||jsr|6,exbld|||build exblk for expression|18859
+||zer|8,wb|||set to evaluate by value|18860
+||jsr|6,evalx|||evaluate expression|18861
+||ppm||||should not fail|18862
+||mov|8,wa|9,(xr)||load type word of result|18863
+||blo|8,wa|22,=p_aaa|6,cgv37|jump if not pattern|18864
+||mov|8,wa|21,=olpt_||else load special pattern load call|18865
+||jsr|6,cdwrd|||generate it|18866
+|cgv37|mov|8,wa|7,xr||copy constant pointer|18870
+||jsr|6,cdwrd|||generate ptr|18871
+||zer|8,wc|||set result constant|18872
+||brn|6,cgv34|||jump back to exit|18873
+||enp||||end procedure cdgvl|18874
+||ejc|||||18875
+|cdwrd|prc|25,e|1,0||entry point|18893
+||mov|11,-(xs)|7,xr||save entry xr|18894
+||mov|11,-(xs)|8,wa||save code word to be generated|18895
+|cdwd1|mov|7,xr|3,r_ccb||load ptr to ccblk being built|18899
+||bnz|7,xr|6,cdwd2||jump if block allocated|18900
+||mov|8,wa|19,*e_cbs||load initial length|18904
+||jsr|6,alloc|||allocate ccblk|18905
+||mov|9,(xr)|22,=b_cct||store type word|18906
+||mov|3,cwcof|19,*cccod||set initial offset|18907
+||mov|13,cclen(xr)|8,wa||store block length|18908
+||zer|13,ccsln(xr)|||zero line number|18910
+||mov|3,r_ccb|7,xr||store ptr to new block|18912
+|cdwd2|mov|8,wa|3,cwcof||load current offset|18916
+||add|8,wa|19,*num05||adjust for test (five words)|18918
+||blo|8,wa|13,cclen(xr)|6,cdwd4|jump if room in this block|18922
+||bge|8,wa|3,mxlen|6,cdwd5|jump if already at max size|18926
+||add|8,wa|19,*e_cbs||else get new size|18927
+||mov|11,-(xs)|7,xl||save entry xl|18928
+||mov|7,xl|7,xr||copy pointer|18929
+||blt|8,wa|3,mxlen|6,cdwd3|jump if not too large|18930
+||mov|8,wa|3,mxlen||else reset to max allowed size|18931
+||ejc|||||18932
+|cdwd3|jsr|6,alloc|||allocate new block|18938
+||mov|3,r_ccb|7,xr||store pointer to new block|18939
+||mov|10,(xr)+|22,=b_cct||store type word in new block|18940
+||mov|10,(xr)+|8,wa||store block length|18941
+||mov|10,(xr)+|13,ccsln(xl)||copy source line number word|18943
+||add|7,xl|19,*ccuse||point to ccuse,cccod fields in old|18945
+||mov|8,wa|9,(xl)||load ccuse value|18946
+||mvw||||copy useful words from old block|18947
+||mov|7,xl|10,(xs)+||restore xl|18948
+||brn|6,cdwd1|||merge back to try again|18949
+|cdwd4|mov|8,wa|3,cwcof||load current offset|18953
+||ica|8,wa|||get new offset|18954
+||mov|3,cwcof|8,wa||store new offset|18955
+||mov|13,ccuse(xr)|8,wa||store in ccblk for gbcol|18956
+||dca|8,wa|||restore ptr to this word|18957
+||add|7,xr|8,wa||point to current entry|18958
+||mov|8,wa|10,(xs)+||reload word to generate|18959
+||mov|9,(xr)|8,wa||store word in block|18960
+||mov|7,xr|10,(xs)+||restore entry xr|18961
 ||exi||||return to caller|18962
-||enp||||end procedure cmgen|18963
-||ejc|||||18964
-||ejc|||||19021
-||ejc|||||19069
-|cmpil|prc|25,e|1,0||entry point|19075
-||lct|8,wb|18,=cmnen||set number of stack work locations|19076
-|cmp00|zer|11,-(xs)|||store a zero, make one entry|19080
-||bct|8,wb|6,cmp00||loop back until all set|19081
-||mov|3,cmpxs|7,xs||save stack pointer for error sec|19082
-||sss|3,cmpss|||save s-r stack pointer if any|19083
-|cmp01|mov|8,wb|3,scnpt||set scan pointer offset|19087
-||mov|3,scnse|8,wb||set start of element location|19088
-||mov|8,wa|21,=ocer_||point to compile error call|19089
-||jsr|6,cdwrd|||generate as temporary cdfal|19090
-||blt|8,wb|3,scnil|6,cmp04|jump if chars left on this image|19091
-|cmpce|zer|7,xr|||clear possible garbage xr value|19096
-||bnz|3,cnind|6,cmpc2||if within include file|19098
-||bne|3,stage|18,=stgic|6,cmp02|skip unless initial compile|19100
-|cmpc2|jsr|6,readr|||read next input image|19101
-||bze|7,xr|6,cmp09||jump if no input available|19102
-||jsr|6,nexts|||acquire next source image|19103
-||mov|3,lstsn|3,cmpsn||store stmt no for use by listr|19104
-||mov|3,cmpln|3,rdcln||store line number at start of stmt|19105
-||zer|3,scnpt|||reset scan pointer|19106
-||brn|6,cmp04|||go process image|19107
-|cmp02|mov|7,xr|3,r_cim||get current image|19112
-||mov|8,wb|3,scnpt||get current offset|19113
-||plc|7,xr|8,wb||prepare to get chars|19114
-|cmp03|bge|3,scnpt|3,scnil|6,cmp09|end loop if end of image|19118
-||lch|8,wc|10,(xr)+||get char|19119
-||icv|3,scnpt|||advance offset|19120
-||bne|8,wc|18,=ch_sm|6,cmp03|loop if not semi-colon|19121
-||ejc|||||19122
-|cmp04|mov|7,xr|3,r_cim||point to current image|19130
-||mov|8,wb|3,scnpt||load current offset|19131
-||mov|8,wa|8,wb||copy for label scan|19132
-||plc|7,xr|8,wb||point to first character|19133
-||lch|8,wc|10,(xr)+||load first character|19134
-||beq|8,wc|18,=ch_sm|6,cmp12|no label if semicolon|19135
-||beq|8,wc|18,=ch_as|6,cmpce|loop back if comment card|19136
-||beq|8,wc|18,=ch_mn|6,cmp32|jump if control card|19137
-||mov|3,r_cmp|3,r_cim||about to destroy r_cim|19138
-||mov|7,xl|20,=cmlab||point to label work string|19139
-||mov|3,r_cim|7,xl||scane is to scan work string|19140
-||psc|7,xl|||point to first character position|19141
-||sch|8,wc|10,(xl)+||store char just loaded|19142
-||mov|8,wc|18,=ch_sm||get a semicolon|19143
-||sch|8,wc|9,(xl)||store after first char|19144
-||csc|7,xl|||finished character storing|19145
-||zer|7,xl|||clear pointer|19146
-||zer|3,scnpt|||start at first character|19147
-||mov|11,-(xs)|3,scnil||preserve image length|19148
-||mov|3,scnil|18,=num02||read 2 chars at most|19149
-||jsr|6,scane|||scan first char for type|19150
-||mov|3,scnil|10,(xs)+||restore image length|19151
-||mov|8,wc|7,xl||note return code|19152
-||mov|7,xl|3,r_cmp||get old r_cim|19153
-||mov|3,r_cim|7,xl||put it back|19154
-||mov|3,scnpt|8,wb||reinstate offset|19155
-||bnz|3,scnbl|6,cmp12||blank seen - cant be label|19156
-||mov|7,xr|7,xl||point to current image|19157
-||plc|7,xr|8,wb||point to first char again|19158
-||beq|8,wc|18,=t_var|6,cmp06|ok if letter|19159
-||beq|8,wc|18,=t_con|6,cmp06|ok if digit|19160
-|cmple|mov|3,r_cim|3,r_cmp||point to bad line|19164
-||erb|1,214|26,bad label or misplaced continuation line|||19165
-|cmp05|beq|8,wc|18,=ch_sm|6,cmp07|skip if semicolon|19169
-||icv|8,wa|||bump offset|19170
-||beq|8,wa|3,scnil|6,cmp07|jump if end of image (label end)|19171
-||ejc|||||19172
-|cmp06|lch|8,wc|10,(xr)+||else load next character|19178
-||beq|8,wc|18,=ch_ht|6,cmp07|jump if horizontal tab|19180
-||bne|8,wc|18,=ch_bl|6,cmp05|loop back if non-blank|19185
-|cmp07|mov|3,scnpt|8,wa||save updated scan offset|19189
-||sub|8,wa|8,wb||get length of label|19190
-||bze|8,wa|6,cmp12||skip if label length zero|19191
-||zer|7,xr|||clear garbage xr value|19192
-||jsr|6,sbstr|||build scblk for label name|19193
-||jsr|6,gtnvr|||locate/contruct vrblk|19194
-||ppm||||dummy (impossible) error return|19195
-||mov|13,cmlbl(xs)|7,xr||store label pointer|19196
-||bnz|13,vrlen(xr)|6,cmp11||jump if not system label|19197
-||bne|13,vrsvp(xr)|21,=v_end|6,cmp11|jump if not end label|19198
-||add|3,stage|18,=stgnd||adjust stage appropriately|19202
-||jsr|6,scane|||scan out next element|19203
-||beq|7,xl|18,=t_smc|6,cmp10|jump if end of image|19204
-||bne|7,xl|18,=t_var|6,cmp08|else error if not variable|19205
-||beq|13,vrlbl(xr)|21,=stndl|6,cmp08|jump if not defined (error)|19209
-||mov|13,cmtra(xs)|13,vrlbl(xr)||else set initial entry pointer|19210
-||jsr|6,scane|||scan next element|19211
-||beq|7,xl|18,=t_smc|6,cmp10|jump if ok (end of image)|19212
-|cmp08|erb|1,215|26,syntax error: undefined or erroneous entry label|||19216
-|cmp09|zer|7,xr|||clear garbage xr value|19220
-||add|3,stage|18,=stgnd||adjust stage appropriately|19221
-||beq|3,stage|18,=stgxe|6,cmp10|jump if code call (ok)|19222
-||erb|1,216|26,syntax error: missing end line|||19223
-|cmp10|mov|8,wa|21,=ostp_||set stop call pointer|19227
-||jsr|6,cdwrd|||generate as statement call|19228
-||brn|6,cmpse|||jump to generate as failure|19229
-||ejc|||||19230
-|cmp11|bne|3,stage|18,=stgic|6,cmp12|jump if code call - redef. ok|19236
-||beq|13,vrlbl(xr)|21,=stndl|6,cmp12|else check for redefinition|19237
-||zer|13,cmlbl(xs)|||leave first label decln undisturbed|19238
-||erb|1,217|26,syntax error: duplicate label|||19239
-|cmp12|zer|8,wb|||set flag for statement body|19246
-||jsr|6,expan|||get tree for statement body|19247
-||mov|13,cmstm(xs)|7,xr||store for later use|19248
-||zer|13,cmsgo(xs)|||clear success goto pointer|19249
-||zer|13,cmfgo(xs)|||clear failure goto pointer|19250
-||zer|13,cmcgo(xs)|||clear conditional goto flag|19251
-||jsr|6,scane|||scan next element|19252
-||beq|7,xl|18,=t_col|6,cmp13|jump if colon (goto)|19253
-||bnz|3,cswno|6,cmp18||jump if not optimizing|19254
-||bnz|13,cmlbl(xs)|6,cmp18||jump if label present|19255
-||mov|7,xr|13,cmstm(xs)||load tree ptr for statement body|19256
-||mov|8,wa|9,(xr)||load type word|19257
-||beq|8,wa|22,=b_cmt|6,cmp18|jump if cmblk|19258
-||bge|8,wa|22,=b_vra|6,cmp18|jump if not icblk, scblk, or rcblk|19259
-||mov|7,xl|3,r_ccb||load ptr to ccblk|19260
-||mov|13,ccuse(xl)|19,*cccod||reset use offset in ccblk|19261
-||mov|3,cwcof|19,*cccod||and in global|19262
-||icv|3,cmpsn|||bump statement number|19263
-||brn|6,cmp01|||generate no code for statement|19264
-|cmp13|mnz|3,scngo|||set goto flag|19268
-||jsr|6,scane|||scan next element|19269
-||beq|7,xl|18,=t_smc|6,cmp31|jump if no fields left|19270
-||beq|7,xl|18,=t_sgo|6,cmp14|jump if s for success goto|19271
-||beq|7,xl|18,=t_fgo|6,cmp16|jump if f for failure goto|19272
-||mnz|3,scnrs|||set to rescan element not f,s|19276
-||jsr|6,scngf|||scan out goto field|19277
-||bnz|13,cmfgo(xs)|6,cmp17||error if fgoto already|19278
-||mov|13,cmfgo(xs)|7,xr||else set as fgoto|19279
-||brn|6,cmp15|||merge with sgoto circuit|19280
-|cmp14|jsr|6,scngf|||scan success goto field|19284
-||mov|13,cmcgo(xs)|18,=num01||set conditional goto flag|19285
-|cmp15|bnz|13,cmsgo(xs)|6,cmp17||error if sgoto already given|19289
-||mov|13,cmsgo(xs)|7,xr||else set sgoto|19290
-||brn|6,cmp13|||loop back for next goto field|19291
-|cmp16|jsr|6,scngf|||scan goto field|19295
-||mov|13,cmcgo(xs)|18,=num01||set conditonal goto flag|19296
-||bnz|13,cmfgo(xs)|6,cmp17||error if fgoto already given|19297
-||mov|13,cmfgo(xs)|7,xr||else store fgoto pointer|19298
-||brn|6,cmp13|||loop back for next field|19299
-||ejc|||||19300
-|cmp17|erb|1,218|26,syntax error: duplicated goto field|||19306
-|cmp18|zer|3,scnse|||stop positional error flags|19310
-||mov|7,xr|13,cmstm(xs)||load tree ptr for statement body|19311
-||zer|8,wb|||collectable value for wb for cdgvl|19312
-||zer|8,wc|||reset constant flag for cdgvl|19313
-||jsr|6,expap|||test for pattern match|19314
-||ppm|6,cmp19|||jump if not pattern match|19315
-||mov|13,cmopn(xr)|21,=opms_||else set pattern match pointer|19316
-||mov|13,cmtyp(xr)|18,=c_pmt|||19317
-|cmp19|jsr|6,cdgvl|||generate code for body of statement|19321
-||mov|7,xr|13,cmsgo(xs)||load sgoto pointer|19322
-||mov|8,wa|7,xr||copy it|19323
-||bze|7,xr|6,cmp21||jump if no success goto|19324
-||zer|13,cmsoc(xs)|||clear success offset fillin ptr|19325
-||bhi|7,xr|3,state|6,cmp20|jump if complex goto|19326
-||add|8,wa|19,*vrtra||point to vrtra field as required|19330
-||jsr|6,cdwrd|||generate success goto|19331
-||brn|6,cmp22|||jump to deal with fgoto|19332
-|cmp20|beq|7,xr|13,cmfgo(xs)|6,cmp22|no code if same as fgoto|19336
-||zer|8,wb|||else set ok value for cdgvl in wb|19337
-||jsr|6,cdgcg|||generate code for success goto|19338
-||brn|6,cmp22|||jump to deal with fgoto|19339
-|cmp21|mov|13,cmsoc(xs)|3,cwcof||set success fill in offset|19343
-||mov|8,wa|21,=ocer_||point to compile error call|19344
-||jsr|6,cdwrd|||generate as temporary value|19345
-||ejc|||||19346
-|cmp22|mov|7,xr|13,cmfgo(xs)||load failure goto pointer|19352
-||mov|8,wa|7,xr||copy it|19353
-||zer|13,cmffc(xs)|||set no fill in required yet|19354
-||bze|7,xr|6,cmp23||jump if no failure goto given|19355
-||add|8,wa|19,*vrtra||point to vrtra field in case|19356
-||blo|7,xr|3,state|6,cmpse|jump to gen if simple fgoto|19357
-||mov|8,wb|3,cwcof||save offset to o_gof call|19361
-||mov|8,wa|21,=ogof_||point to failure goto call|19362
-||jsr|6,cdwrd|||generate|19363
-||mov|8,wa|21,=ofif_||point to fail in fail word|19364
-||jsr|6,cdwrd|||generate|19365
-||jsr|6,cdgcg|||generate code for failure goto|19366
-||mov|8,wa|8,wb||copy offset to o_gof for cdfal|19367
-||mov|8,wb|22,=b_cdc||set complex case cdtyp|19368
-||brn|6,cmp25|||jump to build cdblk|19369
-|cmp23|mov|8,wa|21,=ounf_||load unexpected failure call in cas|19373
-||mov|8,wc|3,cswfl||get -nofail flag|19374
-||orb|8,wc|13,cmcgo(xs)||check if conditional goto|19375
-||zrb|8,wc|6,cmpse||jump if -nofail and no cond. goto|19376
-||mnz|13,cmffc(xs)|||else set fill in flag|19377
-||mov|8,wa|21,=ocer_||and set compile error for temporary|19378
-|cmpse|mov|8,wb|22,=b_cds||set cdtyp for simple case|19383
-||ejc|||||19384
-|cmp25|mov|7,xr|3,r_ccb||point to ccblk|19397
-||mov|7,xl|13,cmlbl(xs)||get possible label pointer|19398
-||bze|7,xl|6,cmp26||skip if no label|19399
-||zer|13,cmlbl(xs)|||clear flag for next statement|19400
-||mov|13,vrlbl(xl)|7,xr||put cdblk ptr in vrblk label field|19401
-|cmp26|mov|9,(xr)|8,wb||set type word for new cdblk|19405
-||mov|13,cdfal(xr)|8,wa||set failure word|19406
-||mov|7,xl|7,xr||copy pointer to ccblk|19407
-||mov|8,wb|13,ccuse(xr)||load length gen (= new cdlen)|19408
-||mov|8,wc|13,cclen(xr)||load total ccblk length|19409
-||add|7,xl|8,wb||point past cdblk|19410
-||sub|8,wc|8,wb||get length left for chop off|19411
-||mov|9,(xl)|22,=b_cct||set type code for new ccblk at end|19412
-||mov|13,ccuse(xl)|19,*cccod||set initial code offset|19413
-||mov|3,cwcof|19,*cccod||reinitialise cwcof|19414
-||mov|13,cclen(xl)|8,wc||set new length|19415
-||mov|3,r_ccb|7,xl||set new ccblk pointer|19416
-||zer|13,ccsln(xl)|||initialize new line number|19418
-||mov|13,cdsln(xr)|3,cmpln||set line number in old block|19419
-||mov|13,cdstm(xr)|3,cmpsn||set statement number|19421
-||icv|3,cmpsn|||bump statement number|19422
-||mov|7,xl|13,cmpcd(xs)||load ptr to previous cdblk|19426
-||bze|13,cmffp(xs)|6,cmp27||jump if no failure fill in required|19427
-||mov|13,cdfal(xl)|7,xr||else set failure ptr in previous|19428
-|cmp27|mov|8,wa|13,cmsop(xs)||load success offset|19432
-||bze|8,wa|6,cmp28||jump if no fill in required|19433
-||add|7,xl|8,wa||else point to fill in location|19434
-||mov|9,(xl)|7,xr||store forward pointer|19435
-||zer|7,xl|||clear garbage xl value|19436
-||ejc|||||19437
-|cmp28|mov|13,cmffp(xs)|13,cmffc(xs)||copy failure fill in flag|19443
-||mov|13,cmsop(xs)|13,cmsoc(xs)||copy success fill in offset|19444
-||mov|13,cmpcd(xs)|7,xr||save ptr to this cdblk|19445
-||bnz|13,cmtra(xs)|6,cmp29||jump if initial entry already set|19446
-||mov|13,cmtra(xs)|7,xr||else set ptr here as default|19447
-|cmp29|blt|3,stage|18,=stgce|6,cmp01|jump if not end line just done|19451
-||bze|3,cswls|6,cmp30||skip if -nolist|19452
-||jsr|6,listr|||list last line|19453
-|cmp30|mov|7,xr|13,cmtra(xs)||load initial entry cdblk pointer|19457
-||add|7,xs|19,*cmnen||pop work locations off stack|19458
-||exi||||and return to cmpil caller|19459
-|cmp31|mov|8,wb|13,cmfgo(xs)||get fail goto|19463
-||orb|8,wb|13,cmsgo(xs)||or in success goto|19464
-||bnz|8,wb|6,cmp18||ok if non-null field|19465
-||erb|1,219|26,syntax error: empty goto field|||19466
-|cmp32|icv|8,wb|||point past ch_mn|19470
-||jsr|6,cncrd|||process control card|19471
-||zer|3,scnse|||clear start of element loc.|19472
-||brn|6,cmpce|||loop for next statement|19473
-||enp||||end procedure cmpil|19474
-||ejc|||||19475
-|cncrd|prc|25,e|1,0||entry point|19486
-||mov|3,scnpt|8,wb||offset for control card scan|19487
-||mov|8,wa|18,=ccnoc||number of chars for comparison|19488
-||ctw|8,wa|1,0||convert to word count|19489
-||mov|3,cnswc|8,wa||save word count|19490
-|cnc01|bge|3,scnpt|3,scnil|6,cnc09|return if end of image|19494
-||mov|7,xr|3,r_cim||point to image|19495
-||plc|7,xr|3,scnpt||char ptr for first char|19496
-||lch|8,wa|10,(xr)+||get first char|19497
-||flc|8,wa|||fold to upper case|19499
-||beq|8,wa|18,=ch_li|6,cnc07|special case of -inxxx|19501
-|cnc0a|mnz|3,scncc|||set flag for scane|19502
-||jsr|6,scane|||scan card name|19503
-||zer|3,scncc|||clear scane flag|19504
-||bnz|7,xl|6,cnc06||fail unless control card name|19505
-||mov|8,wa|18,=ccnoc||no. of chars to be compared|19506
-||blt|13,sclen(xr)|8,wa|6,cnc08|fail if too few chars|19508
-||mov|7,xl|7,xr||point to control card name|19512
-||zer|8,wb|||zero offset for substring|19513
-||jsr|6,sbstr|||extract substring for comparison|19514
-||mov|8,wa|13,sclen(xr)||reload length|19516
-||jsr|6,flstg|||fold to upper case|19517
-||mov|3,cnscc|7,xr||keep control card substring ptr|19519
-||mov|7,xr|21,=ccnms||point to list of standard names|19520
-||zer|8,wb|||initialise name offset|19521
-||lct|8,wc|18,=cc_nc||number of standard names|19522
-|cnc02|mov|7,xl|3,cnscc||point to name|19526
-||lct|8,wa|3,cnswc||counter for inner loop|19527
-||brn|6,cnc04|||jump into loop|19528
-|cnc03|ica|7,xr|||bump standard names ptr|19532
-||ica|7,xl|||bump name pointer|19533
-|cnc04|cne|13,schar(xl)|9,(xr)|6,cnc05|comp. up to cfp_c chars at once|19537
-||bct|8,wa|6,cnc03||loop if more words to compare|19538
-||ejc|||||19539
-||mov|7,xl|8,wb||get name offset|19545
-||bsw|7,xl|2,cc_nc|6,cnc08|switch|19547
-||iff|2,cc_ca|6,cnc37||-case|19586
-||iff|2,cc_do|6,cnc10||-double|19586
-||iff|1,2|6,cnc08|||19586
-||iff|2,cc_du|6,cnc11||-dump|19586
-||iff|2,cc_cp|6,cnc41||-copy|19586
-||iff|2,cc_ej|6,cnc12||-eject|19586
-||iff|2,cc_er|6,cnc13||-errors|19586
-||iff|2,cc_ex|6,cnc14||-execute|19586
-||iff|2,cc_fa|6,cnc15||-fail|19586
-||iff|2,cc_in|6,cnc41||-include|19586
-||iff|2,cc_ln|6,cnc44||-line|19586
-||iff|2,cc_li|6,cnc16||-list|19586
-||iff|2,cc_nr|6,cnc17||-noerrors|19586
-||iff|2,cc_nx|6,cnc18||-noexecute|19586
-||iff|2,cc_nf|6,cnc19||-nofail|19586
-||iff|2,cc_nl|6,cnc20||-nolist|19586
-||iff|2,cc_no|6,cnc21||-noopt|19586
-||iff|2,cc_np|6,cnc22||-noprint|19586
-||iff|2,cc_op|6,cnc24||-optimise|19586
-||iff|2,cc_pr|6,cnc25||-print|19586
-||iff|2,cc_si|6,cnc27||-single|19586
-||iff|2,cc_sp|6,cnc28||-space|19586
-||iff|2,cc_st|6,cnc31||-stitle|19586
-||iff|2,cc_ti|6,cnc32||-title|19586
-||iff|2,cc_tr|6,cnc36||-trace|19586
-||esw||||end switch|19586
-|cnc05|ica|7,xr|||bump standard names ptr|19590
-||bct|8,wa|6,cnc05||loop|19591
-||icv|8,wb|||bump names offset|19592
-||bct|8,wc|6,cnc02||continue if more names|19593
-||brn|6,cnc08|||ignore unrecognized control card|19595
-|cnc06|erb|1,247|26,invalid control statement|||19600
-|cnc07|lch|8,wa|10,(xr)+||get next char|19604
-||flc|8,wa|||fold to upper case|19606
-||bne|8,wa|18,=ch_ln|6,cnc0a|if not letter n|19608
-||lch|8,wa|9,(xr)||get third char|19609
-||blt|8,wa|18,=ch_d0|6,cnc0a|if not digit|19610
-||bgt|8,wa|18,=ch_d9|6,cnc0a|if not digit|19611
-||add|3,scnpt|18,=num02||bump offset past -in|19612
-||jsr|6,scane|||scan integer after -in|19613
-||mov|11,-(xs)|7,xr||stack scanned item|19614
-||jsr|6,gtsmi|||check if integer|19615
-||ppm|6,cnc06|||fail if not integer|19616
-||ppm|6,cnc06|||fail if negative or large|19617
-||mov|3,cswin|7,xr||keep integer|19618
-||ejc|||||19619
-|cnc08|mov|8,wa|3,scnpt||preserve in case xeq time compile|19625
-||jsr|6,scane|||look for comma|19626
-||beq|7,xl|18,=t_cma|6,cnc01|loop if comma found|19627
-||mov|3,scnpt|8,wa||restore scnpt in case xeq time|19628
-|cnc09|exi||||return|19632
-|cnc10|mnz|3,cswdb|||set switch|19636
-||brn|6,cnc08|||merge|19637
-|cnc11|jsr|6,sysdm|||call dumper|19643
-||brn|6,cnc09|||finished|19644
-|cnc12|bze|3,cswls|6,cnc09||return if -nolist|19648
-||jsr|6,prtps|||eject|19649
-||jsr|6,listt|||list title|19650
-||brn|6,cnc09|||finished|19651
-|cnc13|zer|3,cswer|||clear switch|19655
-||brn|6,cnc08|||merge|19656
-|cnc14|zer|3,cswex|||clear switch|19660
-||brn|6,cnc08|||merge|19661
-|cnc15|mnz|3,cswfl|||set switch|19665
-||brn|6,cnc08|||merge|19666
-|cnc16|mnz|3,cswls|||set switch|19670
-||beq|3,stage|18,=stgic|6,cnc08|done if compile time|19671
-||zer|3,lstpf|||permit listing|19675
-||jsr|6,listr|||list line|19676
-||brn|6,cnc08|||merge|19677
-||ejc|||||19678
-|cnc17|mnz|3,cswer|||set switch|19684
-||brn|6,cnc08|||merge|19685
-|cnc18|mnz|3,cswex|||set switch|19689
-||brn|6,cnc08|||merge|19690
-|cnc19|zer|3,cswfl|||clear switch|19694
-||brn|6,cnc08|||merge|19695
-|cnc20|zer|3,cswls|||clear switch|19699
-||brn|6,cnc08|||merge|19700
-|cnc21|mnz|3,cswno|||set switch|19704
-||brn|6,cnc08|||merge|19705
-|cnc22|zer|3,cswpr|||clear switch|19709
+|cdwd5|erb|1,213|26,syntax error: statement is too complicated.|||18966
+||enp||||end procedure cdwrd|18967
+||ejc|||||18968
+|cmgen|prc|25,r|1,0||entry point, recursive|18981
+||mov|7,xr|7,xl||copy cmblk pointer|18982
+||add|7,xr|8,wb||point to cmblk pointer|18983
+||mov|7,xr|9,(xr)||load cmblk pointer|18984
+||jsr|6,cdgvl|||generate code by value|18985
+||ica|8,wb|||bump offset|18986
+||exi||||return to caller|18987
+||enp||||end procedure cmgen|18988
+||ejc|||||18989
+||ejc|||||19046
+||ejc|||||19094
+|cmpil|prc|25,e|1,0||entry point|19100
+||lct|8,wb|18,=cmnen||set number of stack work locations|19101
+|cmp00|zer|11,-(xs)|||store a zero, make one entry|19105
+||bct|8,wb|6,cmp00||loop back until all set|19106
+||mov|3,cmpxs|7,xs||save stack pointer for error sec|19107
+||sss|3,cmpss|||save s-r stack pointer if any|19108
+|cmp01|mov|8,wb|3,scnpt||set scan pointer offset|19112
+||mov|3,scnse|8,wb||set start of element location|19113
+||mov|8,wa|21,=ocer_||point to compile error call|19114
+||jsr|6,cdwrd|||generate as temporary cdfal|19115
+||blt|8,wb|3,scnil|6,cmp04|jump if chars left on this image|19116
+|cmpce|zer|7,xr|||clear possible garbage xr value|19121
+||bnz|3,cnind|6,cmpc2||if within include file|19123
+||bne|3,stage|18,=stgic|6,cmp02|skip unless initial compile|19125
+|cmpc2|jsr|6,readr|||read next input image|19126
+||bze|7,xr|6,cmp09||jump if no input available|19127
+||jsr|6,nexts|||acquire next source image|19128
+||mov|3,lstsn|3,cmpsn||store stmt no for use by listr|19129
+||mov|3,cmpln|3,rdcln||store line number at start of stmt|19130
+||zer|3,scnpt|||reset scan pointer|19131
+||brn|6,cmp04|||go process image|19132
+|cmp02|mov|7,xr|3,r_cim||get current image|19137
+||mov|8,wb|3,scnpt||get current offset|19138
+||plc|7,xr|8,wb||prepare to get chars|19139
+|cmp03|bge|3,scnpt|3,scnil|6,cmp09|end loop if end of image|19143
+||lch|8,wc|10,(xr)+||get char|19144
+||icv|3,scnpt|||advance offset|19145
+||bne|8,wc|18,=ch_sm|6,cmp03|loop if not semi-colon|19146
+||ejc|||||19147
+|cmp04|mov|7,xr|3,r_cim||point to current image|19155
+||mov|8,wb|3,scnpt||load current offset|19156
+||mov|8,wa|8,wb||copy for label scan|19157
+||plc|7,xr|8,wb||point to first character|19158
+||lch|8,wc|10,(xr)+||load first character|19159
+||beq|8,wc|18,=ch_sm|6,cmp12|no label if semicolon|19160
+||beq|8,wc|18,=ch_as|6,cmpce|loop back if comment card|19161
+||beq|8,wc|18,=ch_mn|6,cmp32|jump if control card|19162
+||mov|3,r_cmp|3,r_cim||about to destroy r_cim|19163
+||mov|7,xl|20,=cmlab||point to label work string|19164
+||mov|3,r_cim|7,xl||scane is to scan work string|19165
+||psc|7,xl|||point to first character position|19166
+||sch|8,wc|10,(xl)+||store char just loaded|19167
+||mov|8,wc|18,=ch_sm||get a semicolon|19168
+||sch|8,wc|9,(xl)||store after first char|19169
+||csc|7,xl|||finished character storing|19170
+||zer|7,xl|||clear pointer|19171
+||zer|3,scnpt|||start at first character|19172
+||mov|11,-(xs)|3,scnil||preserve image length|19173
+||mov|3,scnil|18,=num02||read 2 chars at most|19174
+||jsr|6,scane|||scan first char for type|19175
+||mov|3,scnil|10,(xs)+||restore image length|19176
+||mov|8,wc|7,xl||note return code|19177
+||mov|7,xl|3,r_cmp||get old r_cim|19178
+||mov|3,r_cim|7,xl||put it back|19179
+||mov|3,scnpt|8,wb||reinstate offset|19180
+||bnz|3,scnbl|6,cmp12||blank seen - cant be label|19181
+||mov|7,xr|7,xl||point to current image|19182
+||plc|7,xr|8,wb||point to first char again|19183
+||beq|8,wc|18,=t_var|6,cmp06|ok if letter|19184
+||beq|8,wc|18,=t_con|6,cmp06|ok if digit|19185
+|cmple|mov|3,r_cim|3,r_cmp||point to bad line|19189
+||erb|1,214|26,bad label or misplaced continuation line|||19190
+|cmp05|beq|8,wc|18,=ch_sm|6,cmp07|skip if semicolon|19194
+||icv|8,wa|||bump offset|19195
+||beq|8,wa|3,scnil|6,cmp07|jump if end of image (label end)|19196
+||ejc|||||19197
+|cmp06|lch|8,wc|10,(xr)+||else load next character|19203
+||beq|8,wc|18,=ch_ht|6,cmp07|jump if horizontal tab|19205
+||bne|8,wc|18,=ch_bl|6,cmp05|loop back if non-blank|19210
+|cmp07|mov|3,scnpt|8,wa||save updated scan offset|19214
+||sub|8,wa|8,wb||get length of label|19215
+||bze|8,wa|6,cmp12||skip if label length zero|19216
+||zer|7,xr|||clear garbage xr value|19217
+||jsr|6,sbstr|||build scblk for label name|19218
+||jsr|6,gtnvr|||locate/contruct vrblk|19219
+||ppm||||dummy (impossible) error return|19220
+||mov|13,cmlbl(xs)|7,xr||store label pointer|19221
+||bnz|13,vrlen(xr)|6,cmp11||jump if not system label|19222
+||bne|13,vrsvp(xr)|21,=v_end|6,cmp11|jump if not end label|19223
+||add|3,stage|18,=stgnd||adjust stage appropriately|19227
+||jsr|6,scane|||scan out next element|19228
+||beq|7,xl|18,=t_smc|6,cmp10|jump if end of image|19229
+||bne|7,xl|18,=t_var|6,cmp08|else error if not variable|19230
+||beq|13,vrlbl(xr)|21,=stndl|6,cmp08|jump if not defined (error)|19234
+||mov|13,cmtra(xs)|13,vrlbl(xr)||else set initial entry pointer|19235
+||jsr|6,scane|||scan next element|19236
+||beq|7,xl|18,=t_smc|6,cmp10|jump if ok (end of image)|19237
+|cmp08|erb|1,215|26,syntax error: undefined or erroneous entry label|||19241
+|cmp09|zer|7,xr|||clear garbage xr value|19245
+||add|3,stage|18,=stgnd||adjust stage appropriately|19246
+||beq|3,stage|18,=stgxe|6,cmp10|jump if code call (ok)|19247
+||erb|1,216|26,syntax error: missing end line|||19248
+|cmp10|mov|8,wa|21,=ostp_||set stop call pointer|19252
+||jsr|6,cdwrd|||generate as statement call|19253
+||brn|6,cmpse|||jump to generate as failure|19254
+||ejc|||||19255
+|cmp11|bne|3,stage|18,=stgic|6,cmp12|jump if code call - redef. ok|19261
+||beq|13,vrlbl(xr)|21,=stndl|6,cmp12|else check for redefinition|19262
+||zer|13,cmlbl(xs)|||leave first label decln undisturbed|19263
+||erb|1,217|26,syntax error: duplicate label|||19264
+|cmp12|zer|8,wb|||set flag for statement body|19271
+||jsr|6,expan|||get tree for statement body|19272
+||mov|13,cmstm(xs)|7,xr||store for later use|19273
+||zer|13,cmsgo(xs)|||clear success goto pointer|19274
+||zer|13,cmfgo(xs)|||clear failure goto pointer|19275
+||zer|13,cmcgo(xs)|||clear conditional goto flag|19276
+||jsr|6,scane|||scan next element|19277
+||beq|7,xl|18,=t_col|6,cmp13|jump if colon (goto)|19278
+||bnz|3,cswno|6,cmp18||jump if not optimizing|19279
+||bnz|13,cmlbl(xs)|6,cmp18||jump if label present|19280
+||mov|7,xr|13,cmstm(xs)||load tree ptr for statement body|19281
+||mov|8,wa|9,(xr)||load type word|19282
+||beq|8,wa|22,=b_cmt|6,cmp18|jump if cmblk|19283
+||bge|8,wa|22,=b_vra|6,cmp18|jump if not icblk, scblk, or rcblk|19284
+||mov|7,xl|3,r_ccb||load ptr to ccblk|19285
+||mov|13,ccuse(xl)|19,*cccod||reset use offset in ccblk|19286
+||mov|3,cwcof|19,*cccod||and in global|19287
+||icv|3,cmpsn|||bump statement number|19288
+||brn|6,cmp01|||generate no code for statement|19289
+|cmp13|mnz|3,scngo|||set goto flag|19293
+||jsr|6,scane|||scan next element|19294
+||beq|7,xl|18,=t_smc|6,cmp31|jump if no fields left|19295
+||beq|7,xl|18,=t_sgo|6,cmp14|jump if s for success goto|19296
+||beq|7,xl|18,=t_fgo|6,cmp16|jump if f for failure goto|19297
+||mnz|3,scnrs|||set to rescan element not f,s|19301
+||jsr|6,scngf|||scan out goto field|19302
+||bnz|13,cmfgo(xs)|6,cmp17||error if fgoto already|19303
+||mov|13,cmfgo(xs)|7,xr||else set as fgoto|19304
+||brn|6,cmp15|||merge with sgoto circuit|19305
+|cmp14|jsr|6,scngf|||scan success goto field|19309
+||mov|13,cmcgo(xs)|18,=num01||set conditional goto flag|19310
+|cmp15|bnz|13,cmsgo(xs)|6,cmp17||error if sgoto already given|19314
+||mov|13,cmsgo(xs)|7,xr||else set sgoto|19315
+||brn|6,cmp13|||loop back for next goto field|19316
+|cmp16|jsr|6,scngf|||scan goto field|19320
+||mov|13,cmcgo(xs)|18,=num01||set conditonal goto flag|19321
+||bnz|13,cmfgo(xs)|6,cmp17||error if fgoto already given|19322
+||mov|13,cmfgo(xs)|7,xr||else store fgoto pointer|19323
+||brn|6,cmp13|||loop back for next field|19324
+||ejc|||||19325
+|cmp17|erb|1,218|26,syntax error: duplicated goto field|||19331
+|cmp18|zer|3,scnse|||stop positional error flags|19335
+||mov|7,xr|13,cmstm(xs)||load tree ptr for statement body|19336
+||zer|8,wb|||collectable value for wb for cdgvl|19337
+||zer|8,wc|||reset constant flag for cdgvl|19338
+||jsr|6,expap|||test for pattern match|19339
+||ppm|6,cmp19|||jump if not pattern match|19340
+||mov|13,cmopn(xr)|21,=opms_||else set pattern match pointer|19341
+||mov|13,cmtyp(xr)|18,=c_pmt|||19342
+|cmp19|jsr|6,cdgvl|||generate code for body of statement|19346
+||mov|7,xr|13,cmsgo(xs)||load sgoto pointer|19347
+||mov|8,wa|7,xr||copy it|19348
+||bze|7,xr|6,cmp21||jump if no success goto|19349
+||zer|13,cmsoc(xs)|||clear success offset fillin ptr|19350
+||bhi|7,xr|3,state|6,cmp20|jump if complex goto|19351
+||add|8,wa|19,*vrtra||point to vrtra field as required|19355
+||jsr|6,cdwrd|||generate success goto|19356
+||brn|6,cmp22|||jump to deal with fgoto|19357
+|cmp20|beq|7,xr|13,cmfgo(xs)|6,cmp22|no code if same as fgoto|19361
+||zer|8,wb|||else set ok value for cdgvl in wb|19362
+||jsr|6,cdgcg|||generate code for success goto|19363
+||brn|6,cmp22|||jump to deal with fgoto|19364
+|cmp21|mov|13,cmsoc(xs)|3,cwcof||set success fill in offset|19368
+||mov|8,wa|21,=ocer_||point to compile error call|19369
+||jsr|6,cdwrd|||generate as temporary value|19370
+||ejc|||||19371
+|cmp22|mov|7,xr|13,cmfgo(xs)||load failure goto pointer|19377
+||mov|8,wa|7,xr||copy it|19378
+||zer|13,cmffc(xs)|||set no fill in required yet|19379
+||bze|7,xr|6,cmp23||jump if no failure goto given|19380
+||add|8,wa|19,*vrtra||point to vrtra field in case|19381
+||blo|7,xr|3,state|6,cmpse|jump to gen if simple fgoto|19382
+||mov|8,wb|3,cwcof||save offset to o_gof call|19386
+||mov|8,wa|21,=ogof_||point to failure goto call|19387
+||jsr|6,cdwrd|||generate|19388
+||mov|8,wa|21,=ofif_||point to fail in fail word|19389
+||jsr|6,cdwrd|||generate|19390
+||jsr|6,cdgcg|||generate code for failure goto|19391
+||mov|8,wa|8,wb||copy offset to o_gof for cdfal|19392
+||mov|8,wb|22,=b_cdc||set complex case cdtyp|19393
+||brn|6,cmp25|||jump to build cdblk|19394
+|cmp23|mov|8,wa|21,=ounf_||load unexpected failure call in cas|19398
+||mov|8,wc|3,cswfl||get -nofail flag|19399
+||orb|8,wc|13,cmcgo(xs)||check if conditional goto|19400
+||zrb|8,wc|6,cmpse||jump if -nofail and no cond. goto|19401
+||mnz|13,cmffc(xs)|||else set fill in flag|19402
+||mov|8,wa|21,=ocer_||and set compile error for temporary|19403
+|cmpse|mov|8,wb|22,=b_cds||set cdtyp for simple case|19408
+||ejc|||||19409
+|cmp25|mov|7,xr|3,r_ccb||point to ccblk|19422
+||mov|7,xl|13,cmlbl(xs)||get possible label pointer|19423
+||bze|7,xl|6,cmp26||skip if no label|19424
+||zer|13,cmlbl(xs)|||clear flag for next statement|19425
+||mov|13,vrlbl(xl)|7,xr||put cdblk ptr in vrblk label field|19426
+|cmp26|mov|9,(xr)|8,wb||set type word for new cdblk|19430
+||mov|13,cdfal(xr)|8,wa||set failure word|19431
+||mov|7,xl|7,xr||copy pointer to ccblk|19432
+||mov|8,wb|13,ccuse(xr)||load length gen (= new cdlen)|19433
+||mov|8,wc|13,cclen(xr)||load total ccblk length|19434
+||add|7,xl|8,wb||point past cdblk|19435
+||sub|8,wc|8,wb||get length left for chop off|19436
+||mov|9,(xl)|22,=b_cct||set type code for new ccblk at end|19437
+||mov|13,ccuse(xl)|19,*cccod||set initial code offset|19438
+||mov|3,cwcof|19,*cccod||reinitialise cwcof|19439
+||mov|13,cclen(xl)|8,wc||set new length|19440
+||mov|3,r_ccb|7,xl||set new ccblk pointer|19441
+||zer|13,ccsln(xl)|||initialize new line number|19443
+||mov|13,cdsln(xr)|3,cmpln||set line number in old block|19444
+||mov|13,cdstm(xr)|3,cmpsn||set statement number|19446
+||icv|3,cmpsn|||bump statement number|19447
+||mov|7,xl|13,cmpcd(xs)||load ptr to previous cdblk|19451
+||bze|13,cmffp(xs)|6,cmp27||jump if no failure fill in required|19452
+||mov|13,cdfal(xl)|7,xr||else set failure ptr in previous|19453
+|cmp27|mov|8,wa|13,cmsop(xs)||load success offset|19457
+||bze|8,wa|6,cmp28||jump if no fill in required|19458
+||add|7,xl|8,wa||else point to fill in location|19459
+||mov|9,(xl)|7,xr||store forward pointer|19460
+||zer|7,xl|||clear garbage xl value|19461
+||ejc|||||19462
+|cmp28|mov|13,cmffp(xs)|13,cmffc(xs)||copy failure fill in flag|19468
+||mov|13,cmsop(xs)|13,cmsoc(xs)||copy success fill in offset|19469
+||mov|13,cmpcd(xs)|7,xr||save ptr to this cdblk|19470
+||bnz|13,cmtra(xs)|6,cmp29||jump if initial entry already set|19471
+||mov|13,cmtra(xs)|7,xr||else set ptr here as default|19472
+|cmp29|blt|3,stage|18,=stgce|6,cmp01|jump if not end line just done|19476
+||bze|3,cswls|6,cmp30||skip if -nolist|19477
+||jsr|6,listr|||list last line|19478
+|cmp30|mov|7,xr|13,cmtra(xs)||load initial entry cdblk pointer|19482
+||add|7,xs|19,*cmnen||pop work locations off stack|19483
+||exi||||and return to cmpil caller|19484
+|cmp31|mov|8,wb|13,cmfgo(xs)||get fail goto|19488
+||orb|8,wb|13,cmsgo(xs)||or in success goto|19489
+||bnz|8,wb|6,cmp18||ok if non-null field|19490
+||erb|1,219|26,syntax error: empty goto field|||19491
+|cmp32|icv|8,wb|||point past ch_mn|19495
+||jsr|6,cncrd|||process control card|19496
+||zer|3,scnse|||clear start of element loc.|19497
+||brn|6,cmpce|||loop for next statement|19498
+||enp||||end procedure cmpil|19499
+||ejc|||||19500
+|cncrd|prc|25,e|1,0||entry point|19511
+||mov|3,scnpt|8,wb||offset for control card scan|19512
+||mov|8,wa|18,=ccnoc||number of chars for comparison|19513
+||ctw|8,wa|1,0||convert to word count|19514
+||mov|3,cnswc|8,wa||save word count|19515
+|cnc01|bge|3,scnpt|3,scnil|6,cnc09|return if end of image|19519
+||mov|7,xr|3,r_cim||point to image|19520
+||plc|7,xr|3,scnpt||char ptr for first char|19521
+||lch|8,wa|10,(xr)+||get first char|19522
+||flc|8,wa|||fold to upper case|19524
+||beq|8,wa|18,=ch_li|6,cnc07|special case of -inxxx|19526
+|cnc0a|mnz|3,scncc|||set flag for scane|19527
+||jsr|6,scane|||scan card name|19528
+||zer|3,scncc|||clear scane flag|19529
+||bnz|7,xl|6,cnc06||fail unless control card name|19530
+||mov|8,wa|18,=ccnoc||no. of chars to be compared|19531
+||blt|13,sclen(xr)|8,wa|6,cnc08|fail if too few chars|19533
+||mov|7,xl|7,xr||point to control card name|19537
+||zer|8,wb|||zero offset for substring|19538
+||jsr|6,sbstr|||extract substring for comparison|19539
+||mov|8,wa|13,sclen(xr)||reload length|19541
+||jsr|6,flstg|||fold to upper case|19542
+||mov|3,cnscc|7,xr||keep control card substring ptr|19544
+||mov|7,xr|21,=ccnms||point to list of standard names|19545
+||zer|8,wb|||initialise name offset|19546
+||lct|8,wc|18,=cc_nc||number of standard names|19547
+|cnc02|mov|7,xl|3,cnscc||point to name|19551
+||lct|8,wa|3,cnswc||counter for inner loop|19552
+||brn|6,cnc04|||jump into loop|19553
+|cnc03|ica|7,xr|||bump standard names ptr|19557
+||ica|7,xl|||bump name pointer|19558
+|cnc04|cne|13,schar(xl)|9,(xr)|6,cnc05|comp. up to cfp_c chars at once|19562
+||bct|8,wa|6,cnc03||loop if more words to compare|19563
+||ejc|||||19564
+||mov|7,xl|8,wb||get name offset|19570
+||bsw|7,xl|2,cc_nc|6,cnc08|switch|19572
+||iff|2,cc_ca|6,cnc37||-case|19611
+||iff|2,cc_do|6,cnc10||-double|19611
+||iff|1,2|6,cnc08|||19611
+||iff|2,cc_du|6,cnc11||-dump|19611
+||iff|2,cc_cp|6,cnc41||-copy|19611
+||iff|2,cc_ej|6,cnc12||-eject|19611
+||iff|2,cc_er|6,cnc13||-errors|19611
+||iff|2,cc_ex|6,cnc14||-execute|19611
+||iff|2,cc_fa|6,cnc15||-fail|19611
+||iff|2,cc_in|6,cnc41||-include|19611
+||iff|2,cc_ln|6,cnc44||-line|19611
+||iff|2,cc_li|6,cnc16||-list|19611
+||iff|2,cc_nr|6,cnc17||-noerrors|19611
+||iff|2,cc_nx|6,cnc18||-noexecute|19611
+||iff|2,cc_nf|6,cnc19||-nofail|19611
+||iff|2,cc_nl|6,cnc20||-nolist|19611
+||iff|2,cc_no|6,cnc21||-noopt|19611
+||iff|2,cc_np|6,cnc22||-noprint|19611
+||iff|2,cc_op|6,cnc24||-optimise|19611
+||iff|2,cc_pr|6,cnc25||-print|19611
+||iff|2,cc_si|6,cnc27||-single|19611
+||iff|2,cc_sp|6,cnc28||-space|19611
+||iff|2,cc_st|6,cnc31||-stitle|19611
+||iff|2,cc_ti|6,cnc32||-title|19611
+||iff|2,cc_tr|6,cnc36||-trace|19611
+||esw||||end switch|19611
+|cnc05|ica|7,xr|||bump standard names ptr|19615
+||bct|8,wa|6,cnc05||loop|19616
+||icv|8,wb|||bump names offset|19617
+||bct|8,wc|6,cnc02||continue if more names|19618
+||brn|6,cnc08|||ignore unrecognized control card|19620
+|cnc06|erb|1,247|26,invalid control statement|||19625
+|cnc07|lch|8,wa|10,(xr)+||get next char|19629
+||flc|8,wa|||fold to upper case|19631
+||bne|8,wa|18,=ch_ln|6,cnc0a|if not letter n|19633
+||lch|8,wa|9,(xr)||get third char|19634
+||blt|8,wa|18,=ch_d0|6,cnc0a|if not digit|19635
+||bgt|8,wa|18,=ch_d9|6,cnc0a|if not digit|19636
+||add|3,scnpt|18,=num02||bump offset past -in|19637
+||jsr|6,scane|||scan integer after -in|19638
+||mov|11,-(xs)|7,xr||stack scanned item|19639
+||jsr|6,gtsmi|||check if integer|19640
+||ppm|6,cnc06|||fail if not integer|19641
+||ppm|6,cnc06|||fail if negative or large|19642
+||mov|3,cswin|7,xr||keep integer|19643
+||ejc|||||19644
+|cnc08|mov|8,wa|3,scnpt||preserve in case xeq time compile|19650
+||jsr|6,scane|||look for comma|19651
+||beq|7,xl|18,=t_cma|6,cnc01|loop if comma found|19652
+||mov|3,scnpt|8,wa||restore scnpt in case xeq time|19653
+|cnc09|exi||||return|19657
+|cnc10|mnz|3,cswdb|||set switch|19661
+||brn|6,cnc08|||merge|19662
+|cnc11|jsr|6,sysdm|||call dumper|19668
+||brn|6,cnc09|||finished|19669
+|cnc12|bze|3,cswls|6,cnc09||return if -nolist|19673
+||jsr|6,prtps|||eject|19674
+||jsr|6,listt|||list title|19675
+||brn|6,cnc09|||finished|19676
+|cnc13|zer|3,cswer|||clear switch|19680
+||brn|6,cnc08|||merge|19681
+|cnc14|zer|3,cswex|||clear switch|19685
+||brn|6,cnc08|||merge|19686
+|cnc15|mnz|3,cswfl|||set switch|19690
+||brn|6,cnc08|||merge|19691
+|cnc16|mnz|3,cswls|||set switch|19695
+||beq|3,stage|18,=stgic|6,cnc08|done if compile time|19696
+||zer|3,lstpf|||permit listing|19700
+||jsr|6,listr|||list line|19701
+||brn|6,cnc08|||merge|19702
+||ejc|||||19703
+|cnc17|mnz|3,cswer|||set switch|19709
 ||brn|6,cnc08|||merge|19710
-|cnc24|zer|3,cswno|||clear switch|19714
+|cnc18|mnz|3,cswex|||set switch|19714
 ||brn|6,cnc08|||merge|19715
-|cnc25|mnz|3,cswpr|||set switch|19719
+|cnc19|zer|3,cswfl|||clear switch|19719
 ||brn|6,cnc08|||merge|19720
-||ejc|||||19721
-|cnc27|zer|3,cswdb|||clear switch|19727
-||brn|6,cnc08|||merge|19728
-|cnc28|bze|3,cswls|6,cnc09||return if -nolist|19732
-||jsr|6,scane|||scan integer after -space|19733
-||mov|8,wc|18,=num01||1 space in case|19734
-||beq|7,xr|18,=t_smc|6,cnc29|jump if no integer|19735
-||mov|11,-(xs)|7,xr||stack it|19736
-||jsr|6,gtsmi|||check integer|19737
-||ppm|6,cnc06|||fail if not integer|19738
-||ppm|6,cnc06|||fail if negative or large|19739
-||bnz|8,wc|6,cnc29||jump if non zero|19740
-||mov|8,wc|18,=num01||else 1 space|19741
-|cnc29|add|3,lstlc|8,wc||bump line count|19745
-||lct|8,wc|8,wc||convert to loop counter|19746
-||blt|3,lstlc|3,lstnp|6,cnc30|jump if fits on page|19747
-||jsr|6,prtps|||eject|19748
-||jsr|6,listt|||list title|19749
-||brn|6,cnc09|||merge|19750
-|cnc30|jsr|6,prtnl|||print a blank|19754
-||bct|8,wc|6,cnc30||loop|19755
-||brn|6,cnc09|||merge|19756
-||ejc|||||19757
-|cnc31|mov|3,cnr_t|20,=r_stl||ptr to r_stl|19763
-||brn|6,cnc33|||merge|19764
-|cnc32|mov|3,r_stl|21,=nulls||clear subtitle|19768
-||mov|3,cnr_t|20,=r_ttl||ptr to r_ttl|19769
-|cnc33|mov|7,xr|21,=nulls||null in case needed|19773
-||mnz|3,cnttl|||set flag for next listr call|19774
-||mov|8,wb|18,=ccofs||offset to title/subtitle|19775
-||mov|8,wa|3,scnil||input image length|19776
-||blo|8,wa|8,wb|6,cnc34|jump if no chars left|19777
-||sub|8,wa|8,wb||no of chars to extract|19778
-||mov|7,xl|3,r_cim||point to image|19779
-||jsr|6,sbstr|||get title/subtitle|19780
-|cnc34|mov|7,xl|3,cnr_t||point to storage location|19784
-||mov|9,(xl)|7,xr||store title/subtitle|19785
-||beq|7,xl|20,=r_stl|6,cnc09|return if stitl|19786
-||bnz|3,precl|6,cnc09||return if extended listing|19787
-||bze|3,prich|6,cnc09||return if regular printer|19788
-||mov|7,xl|13,sclen(xr)||get length of title|19789
-||mov|8,wa|7,xl||copy it|19790
-||bze|7,xl|6,cnc35||jump if null|19791
-||add|7,xl|18,=num10||increment|19792
-||bhi|7,xl|3,prlen|6,cnc09|use default lstp0 val if too long|19793
-||add|8,wa|18,=num04||point just past title|19794
-|cnc35|mov|3,lstpo|8,wa||store offset|19798
-||brn|6,cnc09|||return|19799
-|cnc36|jsr|6,systt|||toggle switch|19805
-||brn|6,cnc08|||merge|19806
-|cnc37|jsr|6,scane|||scan integer after -case|19813
-||zer|8,wc|||get 0 in case none there|19814
-||beq|7,xl|18,=t_smc|6,cnc38|skip if no integer|19815
-||mov|11,-(xs)|7,xr||stack it|19816
-||jsr|6,gtsmi|||check integer|19817
-||ppm|6,cnc06|||fail if not integer|19818
-||ppm|6,cnc06|||fail if negative or too large|19819
-|cnc38|mov|3,kvcas|8,wc||store new case value|19820
-||brn|6,cnc09|||merge|19821
-|cnc41|mnz|3,scncc|||set flag for scane|19844
-||jsr|6,scane|||scan quoted file name|19845
-||zer|3,scncc|||clear scane flag|19846
-||bne|7,xl|18,=t_con|6,cnc06|if not constant|19847
-||bne|9,(xr)|22,=b_scl|6,cnc06|if not string constant|19848
-||mov|3,r_ifn|7,xr||save file name|19849
-||mov|7,xl|3,r_inc||examine include file name table|19850
-||zer|8,wb|||lookup by value|19851
-||jsr|6,tfind|||do lookup|19852
-||ppm||||never fails|19853
-||beq|7,xr|21,=inton|6,cnc09|ignore if already in table|19854
-||mnz|8,wb|||set for trim|19855
-||mov|7,xr|3,r_ifn||file name|19856
-||jsr|6,trimr|||remove trailing blanks|19857
-||mov|7,xl|3,r_inc||include file name table|19858
-||mnz|8,wb|||lookup by name this time|19859
-||jsr|6,tfind|||do lookup|19860
-||ppm||||never fails|19861
-||mov|13,teval(xl)|21,=inton||make table value integer 1|19862
-||icv|3,cnind|||increase nesting level|19863
-||mov|8,wa|3,cnind||load new nest level|19864
-||bgt|8,wa|18,=ccinm|6,cnc42|fail if excessive nesting|19865
-||mov|7,xl|3,r_ifa||array of nested file names|19870
-||add|8,wa|18,=vcvlb||compute offset in words|19871
-||wtb|8,wa|||convert to bytes|19872
-||add|7,xl|8,wa||point to element|19873
-||mov|9,(xl)|3,r_sfc||record current file name|19874
-||mov|7,xl|8,wa||preserve nesting byte offset|19875
-||mti|3,rdnln|||fetch source line number as integer|19876
-||jsr|6,icbld|||convert to icblk|19877
-||add|7,xl|3,r_ifl||entry in nested line number array|19878
-||mov|9,(xl)|7,xr||record in array|19879
-||mov|8,wa|3,cswin||max read length|19884
-||mov|7,xl|3,r_ifn||include file name|19885
-||jsr|6,alocs|||get buffer for complete file name|19886
-||jsr|6,sysif|||open include file|19887
-||ppm|6,cnc43|||could not open|19888
-||zer|8,wb|||do not trim trailing blanks|19893
-||jsr|6,trimr|||adjust scblk for actual length|19894
-||mov|3,r_sfc|7,xr||save ptr to file name|19895
-||mti|3,cmpsn|||current statement as integer|19896
-||jsr|6,icbld|||build icblk for stmt number|19897
-||mov|7,xl|3,r_sfn||file name table|19898
-||mnz|8,wb|||lookup statement number by name|19899
-||jsr|6,tfind|||allocate new teblk|19900
-||ppm||||always possible to allocate block|19901
-||mov|13,teval(xl)|3,r_sfc||record file name as entry value|19902
-||zer|3,rdnln|||restart line counter for new file|19906
-||beq|3,stage|18,=stgic|6,cnc09|if initial compile|19907
-||bne|3,cnind|18,=num01|6,cnc09|if not first execute-time nesting|19908
-||mov|3,r_ici|3,r_cim||remember code argument string|19912
-||mov|3,cnspt|3,scnpt||save position in string|19913
-||mov|3,cnsil|3,scnil||and length of string|19914
-||brn|6,cnc09|||all done, merge|19915
-|cnc42|erb|1,284|26,excessively nested include files|||19919
-|cnc43|mov|3,dnamp|7,xr||release allocated scblk|19923
-||erb|1,285|26,include file cannot be opened|||19924
-|cnc44|jsr|6,scane|||scan integer after -line|19931
-||bne|7,xl|18,=t_con|6,cnc06|jump if no line number|19932
-||bne|9,(xr)|22,=b_icl|6,cnc06|jump if not integer|19933
-||ldi|13,icval(xr)|||fetch integer line number|19934
-||ile|6,cnc06|||error if negative or zero|19935
-||beq|3,stage|18,=stgic|6,cnc45|skip if initial compile|19936
-||mfi|3,cmpln|||set directly for other compiles|19937
-||brn|6,cnc46|||no need to set rdnln|19938
-|cnc45|sbi|4,intv1|||adjust number by one|19939
-||mfi|3,rdnln|||save line number|19940
-|cnc46|mnz|3,scncc|||set flag for scane|19942
-||jsr|6,scane|||scan quoted file name|19943
-||zer|3,scncc|||clear scane flag|19944
-||beq|7,xl|18,=t_smc|6,cnc47|done if no file name|19945
-||bne|7,xl|18,=t_con|6,cnc06|error if not constant|19946
-||bne|9,(xr)|22,=b_scl|6,cnc06|if not string constant|19947
-||jsr|6,newfn|||record new file name|19948
-||brn|6,cnc09|||merge|19949
-|cnc47|dcv|3,scnpt|||set to rescan the terminator|19953
-||brn|6,cnc09|||merge|19954
-||enp||||end procedure cncrd|19959
-||ejc|||||19960
-|dffnc|prc|25,e|1,0||entry point|20042
-||bne|9,(xl)|22,=b_efc|6,dffn1|skip if new function not external|20045
-||icv|13,efuse(xl)|||else increment its use count|20046
-|dffn1|mov|8,wa|7,xr||save vrblk pointer|20050
-||mov|7,xr|13,vrfnc(xr)||load old function pointer|20051
-||bne|9,(xr)|22,=b_efc|6,dffn2|jump if old function not external|20052
-||mov|8,wb|13,efuse(xr)||else get use count|20053
-||dcv|8,wb|||decrement|20054
-||mov|13,efuse(xr)|8,wb||store decremented value|20055
-||bnz|8,wb|6,dffn2||jump if use count still non-zero|20056
-||jsr|6,sysul|||else call system unload function|20057
-|dffn2|mov|7,xr|8,wa||restore vrblk pointer|20061
-||mov|8,wa|7,xl||copy function block ptr|20063
-||blt|7,xr|20,=r_yyy|6,dffn3|skip checks if opsyn op definition|20064
-||bnz|13,vrlen(xr)|6,dffn3||jump if not system variable|20065
-||mov|7,xl|13,vrsvp(xr)||point to svblk|20069
-||mov|8,wb|13,svbit(xl)||load bit indicators|20070
-||anb|8,wb|4,btfnc||is it a system function|20071
-||zrb|8,wb|6,dffn3||redef ok if not|20072
-||erb|1,248|26,attempted redefinition of system function|||20073
-|dffn3|mov|13,vrfnc(xr)|8,wa||store new function pointer|20077
-||mov|7,xl|8,wa||restore function block pointer|20078
-||exi||||return to dffnc caller|20079
-||enp||||end procedure dffnc|20080
-||ejc|||||20081
-|dtach|prc|25,e|1,0||entry point|20095
-||mov|3,dtcnb|7,xl||store name base (gbcol not called)|20096
-||add|7,xl|8,wa||point to name location|20097
-||mov|3,dtcnm|7,xl||store it|20098
-|dtch1|mov|7,xr|7,xl||copy name pointer|20102
-|dtch2|mov|7,xl|9,(xl)||point to next value|20106
-||bne|9,(xl)|22,=b_trt|6,dtch6|jump at chain end|20107
-||mov|8,wa|13,trtyp(xl)||get trap block type|20108
-||beq|8,wa|18,=trtin|6,dtch3|jump if input|20109
-||beq|8,wa|18,=trtou|6,dtch3|jump if output|20110
-||add|7,xl|19,*trnxt||point to next link|20111
-||brn|6,dtch1|||loop|20112
-|dtch3|mov|9,(xr)|13,trval(xl)||delete trblk|20116
-||mov|8,wa|7,xl||dump xl ...|20117
-||mov|8,wb|7,xr||... and xr|20118
-||mov|7,xl|13,trtrf(xl)||point to trtrf trap block|20119
-||bze|7,xl|6,dtch5||jump if no iochn|20120
-||bne|9,(xl)|22,=b_trt|6,dtch5|jump if input, output, terminal|20121
-|dtch4|mov|7,xr|7,xl||remember link ptr|20125
-||mov|7,xl|13,trtrf(xl)||point to next link|20126
-||bze|7,xl|6,dtch5||jump if end of chain|20127
-||mov|8,wc|13,ionmb(xl)||get name base|20128
-||add|8,wc|13,ionmo(xl)||add offset|20129
-||bne|8,wc|3,dtcnm|6,dtch4|loop if no match|20130
-||mov|13,trtrf(xr)|13,trtrf(xl)||remove name from chain|20131
-||ejc|||||20132
-|dtch5|mov|7,xl|8,wa||recover xl ...|20138
-||mov|7,xr|8,wb||... and xr|20139
-||add|7,xl|19,*trval||point to value field|20140
-||brn|6,dtch2|||continue|20141
-|dtch6|mov|7,xr|3,dtcnb||possible vrblk ptr|20145
-||jsr|6,setvr|||reset vrblk if necessary|20146
-||exi||||return|20147
-||enp||||end procedure dtach|20148
-||ejc|||||20149
-|dtype|prc|25,e|1,0||entry point|20157
-||beq|9,(xr)|22,=b_pdt|6,dtyp1|jump if prog.defined|20158
-||mov|7,xr|9,(xr)||load type word|20159
-||lei|7,xr|||get entry point id (block code)|20160
-||wtb|7,xr|||convert to byte offset|20161
-||mov|7,xr|14,scnmt(xr)||load table entry|20162
-||exi||||exit to dtype caller|20163
-|dtyp1|mov|7,xr|13,pddfp(xr)||point to dfblk|20167
-||mov|7,xr|13,dfnam(xr)||get datatype name from dfblk|20168
-||exi||||return to dtype caller|20169
-||enp||||end procedure dtype|20170
-||ejc|||||20171
-|dumpr|prc|25,e|1,0||entry point|20192
-||bze|7,xr|6,dmp28||skip dump if argument is zero|20193
-||bgt|7,xr|18,=num03|6,dmp29|jump if core dump required|20194
-||zer|7,xl|||clear xl|20195
-||zer|8,wb|||zero move offset|20196
-||mov|3,dmarg|7,xr||save dump argument|20197
-||zer|3,dnams|||collect sediment too|20199
-||jsr|6,gbcol|||collect garbage|20201
-||jsr|6,prtpg|||eject printer|20202
-||mov|7,xr|21,=dmhdv||point to heading for variables|20203
-||jsr|6,prtst|||print it|20204
-||jsr|6,prtnl|||terminate print line|20205
-||jsr|6,prtnl|||and print a blank line|20206
-||zer|3,dmvch|||set null chain to start|20219
-||mov|8,wa|3,hshtb||point to hash table|20220
-|dmp00|mov|7,xr|8,wa||copy hash bucket pointer|20224
-||ica|8,wa|||bump pointer|20225
-||sub|7,xr|19,*vrnxt||set offset to merge|20226
-|dmp01|mov|7,xr|13,vrnxt(xr)||point to next vrblk on chain|20230
-||bze|7,xr|6,dmp09||jump if end of this hash chain|20231
-||mov|7,xl|7,xr||else copy vrblk pointer|20232
-||ejc|||||20233
-|dmp02|mov|7,xl|13,vrval(xl)||load value|20239
-||beq|3,dmarg|18,=num03|6,dmp2a|skip null value check if dump(3)|20240
-||beq|7,xl|21,=nulls|6,dmp01|loop for next vrblk if null value|20241
-|dmp2a|beq|9,(xl)|22,=b_trt|6,dmp02|loop back if value is trapped|20242
-||mov|8,wc|7,xr||save vrblk pointer|20246
-||add|7,xr|19,*vrsof||adjust ptr to be like scblk ptr|20247
-||bnz|13,sclen(xr)|6,dmp03||jump if non-system variable|20248
-||mov|7,xr|13,vrsvo(xr)||else load ptr to name in svblk|20249
-|dmp03|mov|8,wb|7,xr||save pointer to chars|20253
-||mov|3,dmpsv|8,wa||save hash bucket pointer|20254
-||mov|8,wa|20,=dmvch||point to chain head|20255
-|dmp04|mov|3,dmpch|8,wa||save chain pointer|20259
-||mov|7,xl|8,wa||copy it|20260
-||mov|7,xr|9,(xl)||load pointer to next entry|20261
-||bze|7,xr|6,dmp08||jump if end of chain to insert|20262
-||add|7,xr|19,*vrsof||else get name ptr for chained vrblk|20263
-||bnz|13,sclen(xr)|6,dmp05||jump if not system variable|20264
-||mov|7,xr|13,vrsvo(xr)||else point to name in svblk|20265
-|dmp05|mov|7,xl|8,wb||point to entering vrblk string|20275
-||mov|8,wa|13,sclen(xl)||load its length|20276
-||plc|7,xl|||point to chars of entering string|20277
-||bhi|8,wa|13,sclen(xr)|6,dmp06|jump if entering length high|20300
-||plc|7,xr|||else point to chars of old string|20301
-||cmc|6,dmp08|6,dmp07||compare, insert if new is llt old|20302
-||brn|6,dmp08|||or if leq (we had shorter length)|20303
-|dmp06|mov|8,wa|13,sclen(xr)||load shorter length|20307
-||plc|7,xr|||point to chars of old string|20308
-||cmc|6,dmp08|6,dmp07||compare, insert if new one low|20309
-||ejc|||||20310
-|dmp07|mov|7,xl|3,dmpch||copy chain pointer|20316
-||mov|8,wa|9,(xl)||move to next entry on chain|20318
-||brn|6,dmp04|||loop back|20319
-|dmp08|mov|7,xl|3,dmpch||copy chain pointer|20323
-||mov|8,wa|3,dmpsv||restore hash bucket pointer|20324
-||mov|7,xr|8,wc||restore vrblk pointer|20325
-||mov|13,vrget(xr)|9,(xl)||link vrblk to rest of chain|20326
-||mov|9,(xl)|7,xr||link vrblk into current chain loc|20327
-||brn|6,dmp01|||loop back for next vrblk|20328
-|dmp09|bne|8,wa|3,hshte|6,dmp00|loop back if more buckets to go|20332
-|dmp10|mov|7,xr|3,dmvch||load pointer to next entry on chain|20336
-||bze|7,xr|6,dmp11||jump if end of chain|20337
-||mov|3,dmvch|9,(xr)||else update chain ptr to next entry|20338
-||jsr|6,setvr|||restore vrget field|20339
-||mov|7,xl|7,xr||copy vrblk pointer (name base)|20340
-||mov|8,wa|19,*vrval||set offset for vrblk name|20341
-||jsr|6,prtnv|||print name = value|20342
-||brn|6,dmp10|||loop back till all printed|20343
-|dmp11|jsr|6,prtnl|||print blank line|20347
-||jsr|6,prtnl|||and another|20348
-||mov|7,xr|21,=dmhdk||point to keyword heading|20349
-||jsr|6,prtst|||print heading|20350
-||jsr|6,prtnl|||end line|20351
-||jsr|6,prtnl|||print one blank line|20352
-||mov|7,xl|21,=vdmkw||point to list of keyword svblk ptrs|20353
-||ejc|||||20354
-|dmp12|mov|7,xr|10,(xl)+||load next svblk ptr from table|20360
-||bze|7,xr|6,dmp13||jump if end of list|20361
-||beq|7,xr|18,=num01|6,dmp12|&compare ignored if not implemented|20363
-||mov|8,wa|18,=ch_am||load ampersand|20365
-||jsr|6,prtch|||print ampersand|20366
-||jsr|6,prtst|||print keyword name|20367
-||mov|8,wa|13,svlen(xr)||load name length from svblk|20368
-||ctb|8,wa|2,svchs||get length of name|20369
-||add|7,xr|8,wa||point to svknm field|20370
-||mov|3,dmpkn|9,(xr)||store in dummy kvblk|20371
-||mov|7,xr|21,=tmbeb||point to blank-equal-blank|20372
-||jsr|6,prtst|||print it|20373
-||mov|3,dmpsv|7,xl||save table pointer|20374
-||mov|7,xl|20,=dmpkb||point to dummy kvblk|20375
-||mov|9,(xl)|22,=b_kvt||build type word|20376
-||mov|13,kvvar(xl)|21,=trbkv||build ptr to dummy trace block|20377
-||mov|8,wa|19,*kvvar||set zero offset|20378
-||jsr|6,acess|||get keyword value|20379
-||ppm||||failure is impossible|20380
-||jsr|6,prtvl|||print keyword value|20381
-||jsr|6,prtnl|||terminate print line|20382
-||mov|7,xl|3,dmpsv||restore table pointer|20383
-||brn|6,dmp12|||loop back till all printed|20384
-|dmp13|beq|3,dmarg|18,=num01|6,dmp27|exit if partial dump complete|20388
-||mov|7,xr|3,dnamb||else point to first dynamic block|20389
-|dmp14|beq|7,xr|3,dnamp|6,dmp27|jump if end of used region|20393
-||mov|8,wa|9,(xr)||else load first word of block|20394
-||beq|8,wa|22,=b_vct|6,dmp16|jump if vector|20395
-||beq|8,wa|22,=b_art|6,dmp17|jump if array|20396
-||beq|8,wa|22,=b_pdt|6,dmp18|jump if program defined|20397
-||beq|8,wa|22,=b_tbt|6,dmp19|jump if table|20398
-|dmp15|jsr|6,blkln|||get length of block|20406
-||add|7,xr|8,wa||point past this block|20407
-||brn|6,dmp14|||loop back for next block|20408
-||ejc|||||20409
-|dmp16|mov|8,wb|19,*vcvls||set offset to first value|20415
-||brn|6,dmp19|||jump to merge|20416
-|dmp17|mov|8,wb|13,arofs(xr)||set offset to arpro field|20420
-||ica|8,wb|||bump to get offset to values|20421
-||brn|6,dmp19|||jump to merge|20422
-|dmp18|mov|8,wb|19,*pdfld||point to values, merge|20426
-|dmp19|bze|13,idval(xr)|6,dmp15||ignore block if zero id value|20430
-||jsr|6,blkln|||else get block length|20431
-||mov|7,xl|7,xr||copy block pointer|20432
-||mov|3,dmpsv|8,wa||save length|20433
-||mov|8,wa|8,wb||copy offset to first value|20434
-||jsr|6,prtnl|||print blank line|20435
-||mov|3,dmpsa|8,wa||preserve offset|20436
-||jsr|6,prtvl|||print block value (for title)|20437
-||mov|8,wa|3,dmpsa||recover offset|20438
-||jsr|6,prtnl|||end print line|20439
-||beq|9,(xr)|22,=b_tbt|6,dmp22|jump if table|20440
-||dca|8,wa|||point before first word|20441
-|dmp20|mov|7,xr|7,xl||copy block pointer|20445
-||ica|8,wa|||bump offset|20446
-||add|7,xr|8,wa||point to next value|20447
-||beq|8,wa|3,dmpsv|6,dmp14|exit if end (xr past block)|20448
-||sub|7,xr|19,*vrval||subtract offset to merge into loop|20449
-|dmp21|mov|7,xr|13,vrval(xr)||load next value|20453
-||beq|3,dmarg|18,=num03|6,dmp2b|skip null value check if dump(3)|20454
-||beq|7,xr|21,=nulls|6,dmp20|loop back if null value|20455
-|dmp2b|beq|9,(xr)|22,=b_trt|6,dmp21|loop back if trapped|20456
-||jsr|6,prtnv|||else print name = value|20457
-||brn|6,dmp20|||loop back for next field|20458
-||ejc|||||20459
-|dmp22|mov|8,wc|19,*tbbuk||set offset to first bucket|20465
-||mov|8,wa|19,*teval||set name offset for all teblks|20466
-|dmp23|mov|11,-(xs)|7,xl||save tbblk pointer|20470
-||add|7,xl|8,wc||point to next bucket header|20471
-||ica|8,wc|||bump bucket offset|20472
-||sub|7,xl|19,*tenxt||subtract offset to merge into loop|20473
-|dmp24|mov|7,xl|13,tenxt(xl)||point to next teblk|20477
-||beq|7,xl|9,(xs)|6,dmp26|jump if end of chain|20478
-||mov|7,xr|7,xl||else copy teblk pointer|20479
-|dmp25|mov|7,xr|13,teval(xr)||load next value|20483
-||beq|7,xr|21,=nulls|6,dmp24|ignore if null value|20484
-||beq|9,(xr)|22,=b_trt|6,dmp25|loop back if trapped|20485
-||mov|3,dmpsv|8,wc||else save offset pointer|20486
-||jsr|6,prtnv|||print name = value|20487
-||mov|8,wc|3,dmpsv||reload offset|20488
-||brn|6,dmp24|||loop back for next teblk|20489
-|dmp26|mov|7,xl|10,(xs)+||restore tbblk pointer|20493
-||bne|8,wc|13,tblen(xl)|6,dmp23|loop back if more buckets to go|20494
-||mov|7,xr|7,xl||else copy table pointer|20495
-||add|7,xr|8,wc||point to following block|20496
-||brn|6,dmp14|||loop back to process next block|20497
-|dmp27|jsr|6,prtpg|||eject printer|20501
-|dmp28|exi||||return to dump caller|20505
-|dmp29|jsr|6,sysdm|||call it|20509
-||brn|6,dmp28|||return|20510
-||enp||||end procedure dumpr|20546
-||ejc|||||20547
-|ermsg|prc|25,e|1,0||entry point|20555
-||mov|8,wa|3,kvert||load error code|20556
-||mov|7,xr|21,=ermms||point to error message /error/|20557
-||jsr|6,prtst|||print it|20558
-||jsr|6,ertex|||get error message text|20559
-||add|8,wa|18,=thsnd||bump error code for print|20560
-||mti|8,wa|||fail code in int acc|20561
-||mov|8,wb|3,profs||save current buffer position|20562
-||jsr|6,prtin|||print code (now have error1xxx)|20563
-||mov|7,xl|3,prbuf||point to print buffer|20564
-||psc|7,xl|8,wb||point to the 1|20565
-||mov|8,wa|18,=ch_bl||load a blank|20566
-||sch|8,wa|9,(xl)||store blank over 1 (error xxx)|20567
-||csc|7,xl|||complete store characters|20568
-||zer|7,xl|||clear garbage pointer in xl|20569
-||mov|8,wa|7,xr||keep error text|20570
-||mov|7,xr|21,=ermns||point to / -- /|20571
-||jsr|6,prtst|||print it|20572
-||mov|7,xr|8,wa||get error text again|20573
-||jsr|6,prtst|||print error message text|20574
-||jsr|6,prtis|||print line|20575
-||jsr|6,prtis|||print blank line|20576
-||exi||||return to ermsg caller|20577
-||enp||||end procedure ermsg|20578
-||ejc|||||20579
-|ertex|prc|25,e|1,0||entry point|20589
-||mov|3,ertwa|8,wa||save wa|20590
-||mov|3,ertwb|8,wb||save wb|20591
-||jsr|6,sysem|||get failure message text|20592
-||mov|7,xl|7,xr||copy pointer to it|20593
-||mov|8,wa|13,sclen(xr)||get length of string|20594
-||bze|8,wa|6,ert02||jump if null|20595
-||zer|8,wb|||offset of zero|20596
-||jsr|6,sbstr|||copy into dynamic store|20597
-||mov|3,r_etx|7,xr||store for relocation|20598
-|ert01|mov|8,wb|3,ertwb||restore wb|20602
-||mov|8,wa|3,ertwa||restore wa|20603
-||exi||||return to caller|20604
-|ert02|mov|7,xr|3,r_etx||get errtext|20608
-||brn|6,ert01|||return|20609
-||enp|||||20610
-||ejc|||||20611
-|evali|prc|25,r|1,4||entry point (recursive)|20633
-||jsr|6,evalp|||evaluate expression|20634
-||ppm|6,evli1|||jump on failure|20635
-||mov|11,-(xs)|7,xl||stack result for gtsmi|20636
-||mov|7,xl|13,pthen(xr)||load successor pointer|20637
-||mov|3,evlio|7,xr||save original node pointer|20638
-||mov|3,evlif|8,wc||zero if simple argument|20639
-||jsr|6,gtsmi|||convert arg to small integer|20640
-||ppm|6,evli2|||jump if not integer|20641
-||ppm|6,evli3|||jump if out of range|20642
-||mov|3,evliv|7,xr||store result in special dummy node|20643
-||mov|7,xr|20,=evlin||point to dummy node with result|20644
-||mov|9,(xr)|22,=p_len||dummy pattern block pcode|20645
-||mov|13,pthen(xr)|7,xl||store successor pointer|20646
-||exi|1,4|||take successful exit|20647
-|evli1|exi|1,3|||take failure return|20651
-|evli2|exi|1,1|||take non-integer error exit|20655
-|evli3|exi|1,2|||take out-of-range error exit|20659
-||enp||||end procedure evali|20660
-||ejc|||||20661
-|evalp|prc|25,r|1,1||entry point (recursive)|20692
-||mov|7,xl|13,parm1(xr)||load expression pointer|20693
-||beq|9,(xl)|22,=b_exl|6,evlp1|jump if exblk case|20694
-||mov|7,xl|13,sevar(xl)||load vrblk pointer|20701
-||mov|7,xl|13,vrval(xl)||load value of vrblk|20702
-||mov|8,wa|9,(xl)||load first word of value|20703
-||bhi|8,wa|22,=b_t__|6,evlp3|jump if not seblk, trblk or exblk|20704
-|evlp1|chk||||check for stack space|20708
-||mov|11,-(xs)|7,xr||stack node pointer|20709
-||mov|11,-(xs)|8,wb||stack cursor|20710
-||mov|11,-(xs)|3,r_pms||stack subject string pointer|20711
-||mov|11,-(xs)|3,pmssl||stack subject string length|20712
-||mov|11,-(xs)|3,pmdfl||stack dot flag|20713
-||mov|11,-(xs)|3,pmhbs||stack history stack base pointer|20714
-||mov|7,xr|13,parm1(xr)||load expression pointer|20715
-||ejc|||||20716
-|evlp2|zer|8,wb|||set flag for by value|20722
-||jsr|6,evalx|||evaluate expression|20723
-||ppm|6,evlp4|||jump on failure|20724
-||mov|8,wa|9,(xr)||else load first word of value|20725
-||blo|8,wa|22,=b_e__|6,evlp2|loop back to reevaluate expression|20726
-||mov|7,xl|7,xr||copy result pointer|20730
-||mov|3,pmhbs|10,(xs)+||restore history stack base pointer|20731
-||mov|3,pmdfl|10,(xs)+||restore dot flag|20732
-||mov|3,pmssl|10,(xs)+||restore subject string length|20733
-||mov|3,r_pms|10,(xs)+||restore subject string pointer|20734
-||mov|8,wb|10,(xs)+||restore cursor|20735
-||mov|7,xr|10,(xs)+||restore node pointer|20736
-||mov|8,wc|7,xr||non-zero for simple vrblk|20737
-||exi||||return to evalp caller|20738
-|evlp3|zer|8,wc|||simple vrblk, no side effects|20742
-||exi||||return to evalp caller|20743
-|evlp4|mov|3,pmhbs|10,(xs)+||restore history stack base pointer|20747
-||mov|3,pmdfl|10,(xs)+||restore dot flag|20748
-||mov|3,pmssl|10,(xs)+||restore subject string length|20749
-||mov|3,r_pms|10,(xs)+||restore subject string pointer|20750
-||add|7,xs|19,*num02||remove node ptr, cursor|20751
-||exi|1,1|||take failure exit|20752
-||enp||||end procedure evalp|20753
-||ejc|||||20754
-|evals|prc|25,r|1,3||entry point (recursive)|20776
-||jsr|6,evalp|||evaluate expression|20777
-||ppm|6,evls1|||jump if evaluation fails|20778
-||mov|11,-(xs)|13,pthen(xr)||save successor pointer|20779
-||mov|11,-(xs)|8,wb||save cursor|20780
-||mov|11,-(xs)|7,xl||stack result ptr for patst|20781
-||zer|8,wb|||dummy pcode for one char string|20782
-||zer|8,wc|||dummy pcode for expression arg|20783
-||mov|7,xl|22,=p_brk||appropriate pcode for our use|20784
-||jsr|6,patst|||call routine to build node|20785
-||ppm|6,evls2|||jump if not string|20786
-||mov|8,wb|10,(xs)+||restore cursor|20787
-||mov|13,pthen(xr)|10,(xs)+||store successor pointer|20788
-||exi|1,3|||take success return|20789
-|evls1|exi|1,2|||take failure return|20793
-|evls2|add|7,xs|19,*num02||pop successor and cursor|20797
-||exi|1,1|||take non-string error exit|20798
-||enp||||end procedure evals|20799
-||ejc|||||20800
-|evalx|prc|25,r|1,1||entry point, recursive|20816
-||beq|9,(xr)|22,=b_exl|6,evlx2|jump if exblk case|20817
-||mov|7,xl|13,sevar(xr)||load vrblk pointer (name base)|20821
-||mov|8,wa|19,*vrval||set name offset|20822
-||bnz|8,wb|6,evlx1||jump if called by name|20823
-||jsr|6,acess|||call routine to access value|20824
-||ppm|6,evlx9|||jump if failure on access|20825
-|evlx1|exi||||return to evalx caller|20829
-||ejc|||||20830
-|evlx2|scp|8,wc|||get code pointer|20849
-||mov|8,wa|3,r_cod||load code block pointer|20850
-||sub|8,wc|8,wa||get code pointer as offset|20851
-||mov|11,-(xs)|8,wa||stack old code block pointer|20852
-||mov|11,-(xs)|8,wc||stack relative code offset|20853
-||mov|11,-(xs)|3,flptr||stack old failure pointer|20854
-||mov|11,-(xs)|8,wb||stack name/value indicator|20855
-||mov|11,-(xs)|19,*exflc||stack new fail offset|20856
-||mov|3,gtcef|3,flptr||keep in case of error|20857
-||mov|3,r_gtc|3,r_cod||keep code block pointer similarly|20858
-||mov|3,flptr|7,xs||set new failure pointer|20859
-||mov|3,r_cod|7,xr||set new code block pointer|20860
-||mov|13,exstm(xr)|3,kvstn||remember stmnt number|20861
-||add|7,xr|19,*excod||point to first code word|20862
-||lcp|7,xr|||set code pointer|20863
-||bne|3,stage|18,=stgxt|6,evlx0|jump if not execution time|20864
-||mov|3,stage|18,=stgee||evaluating expression|20865
-|evlx0|zer|7,xl|||clear garbage xl|20869
-||lcw|7,xr|||load first code word|20870
-||bri|9,(xr)|||execute it|20871
-||ejc|||||20872
-|evlx3|mov|7,xr|10,(xs)+||load value|20878
-||bze|13,num01(xs)|6,evlx5||jump if called by value|20879
-||erb|1,249|26,expression evaluated by name returned value|||20880
-|evlx4|mov|8,wa|10,(xs)+||load name offset|20884
-||mov|7,xl|10,(xs)+||load name base|20885
-||bnz|13,num01(xs)|6,evlx5||jump if called by name|20886
-||jsr|6,acess|||else access value first|20887
-||ppm|6,evlx6|||jump if failure during access|20888
-|evlx5|zer|8,wb|||note successful|20892
-||brn|6,evlx7|||merge|20893
-|evlx6|mnz|8,wb|||note unsuccessful|20897
-|evlx7|bne|3,stage|18,=stgee|6,evlx8|skip if was not previously xt|20901
-||mov|3,stage|18,=stgxt||execute time|20902
-|evlx8|add|7,xs|19,*num02||pop name/value indicator, *exfal|20906
-||mov|3,flptr|10,(xs)+||restore old failure pointer|20907
-||mov|8,wc|10,(xs)+||load code offset|20908
-||add|8,wc|9,(xs)||make code pointer absolute|20909
-||mov|3,r_cod|10,(xs)+||restore old code block pointer|20910
-||lcp|8,wc|||restore old code pointer|20911
-||bze|8,wb|6,evlx1||jump for successful return|20912
-|evlx9|bne|3,stage|18,=stgev|6,evlxa|return failure|20916
-||exi|1,0|||no failure|20917
-|evlxa|exi|1,1|||failure|20918
-||enp||||end of procedure evalx|20919
-||ejc|||||20920
-|exbld|prc|25,e|1,0||entry point|20933
-||mov|8,wa|7,xl||copy offset to start of code|20934
-||sub|8,wa|19,*excod||calc reduction in offset in exblk|20935
-||mov|11,-(xs)|8,wa||stack for later|20936
-||mov|8,wa|3,cwcof||load final offset|20937
-||sub|8,wa|7,xl||compute length of code|20938
-||add|8,wa|19,*exsi_||add space for standard fields|20939
-||jsr|6,alloc|||allocate space for exblk|20940
-||mov|11,-(xs)|7,xr||save pointer to exblk|20941
-||mov|13,extyp(xr)|22,=b_exl||store type word|20942
-||zer|13,exstm(xr)|||zeroise stmnt number field|20943
-||mov|13,exsln(xr)|3,cmpln||set line number field|20945
-||mov|13,exlen(xr)|8,wa||store length|20947
-||mov|13,exflc(xr)|21,=ofex_||store failure word|20948
-||add|7,xr|19,*exsi_||set xr for mvw|20949
-||mov|3,cwcof|7,xl||reset offset to start of code|20950
-||add|7,xl|3,r_ccb||point to start of code|20951
-||sub|8,wa|19,*exsi_||length of code to move|20952
-||mov|11,-(xs)|8,wa||stack length of code|20953
-||mvw||||move code to exblk|20954
-||mov|8,wa|10,(xs)+||get length of code|20955
-||btw|8,wa|||convert byte count to word count|20956
-||lct|8,wa|8,wa||prepare counter for loop|20957
-||mov|7,xl|9,(xs)||copy exblk ptr, dont unstack|20958
-||add|7,xl|19,*excod||point to code itself|20959
-||mov|8,wb|13,num01(xs)||get reduction in offset|20960
-|exbl1|mov|7,xr|10,(xl)+||get next code word|20967
-||beq|7,xr|21,=osla_|6,exbl3|jump if selection found|20968
-||beq|7,xr|21,=onta_|6,exbl3|jump if negation found|20969
-||bct|8,wa|6,exbl1||loop to end of code|20970
-|exbl2|mov|7,xr|10,(xs)+||pop exblk ptr into xr|20974
-||mov|7,xl|10,(xs)+||pop reduction constant|20975
-||exi||||return to caller|20976
-||ejc|||||20977
-|exbl3|sub|10,(xl)+|8,wb||adjust offset|20986
-||bct|8,wa|6,exbl4||decrement count|20987
-|exbl4|bct|8,wa|6,exbl5||decrement count|20989
-|exbl5|mov|7,xr|10,(xl)+||get next code word|20993
-||beq|7,xr|21,=osla_|6,exbl3|jump if offset found|20994
-||beq|7,xr|21,=oslb_|6,exbl3|jump if offset found|20995
-||beq|7,xr|21,=oslc_|6,exbl3|jump if offset found|20996
-||beq|7,xr|21,=onta_|6,exbl3|jump if offset found|20997
-||bct|8,wa|6,exbl5||loop|20998
-||brn|6,exbl2|||merge to return|20999
-||enp||||end procedure exbld|21000
-||ejc|||||21001
-||ejc|||||21054
-|expan|prc|25,e|1,0||entry point|21060
-||zer|11,-(xs)|||set top of stack indicator|21061
-||zer|8,wa|||set initial state to zero|21062
-||zer|8,wc|||zero counter value|21063
-|exp01|jsr|6,scane|||scan next element|21067
-||add|7,xl|8,wa||add state to syntax code|21068
-||bsw|7,xl|2,t_nes||switch on element type/state|21069
-||iff|2,t_uo0|6,exp27||unop, s=0|21106
-||iff|2,t_uo1|6,exp27||unop, s=1|21106
-||iff|2,t_uo2|6,exp04||unop, s=2|21106
-||iff|2,t_lp0|6,exp06||left paren, s=0|21106
-||iff|2,t_lp1|6,exp06||left paren, s=1|21106
-||iff|2,t_lp2|6,exp04||left paren, s=2|21106
-||iff|2,t_lb0|6,exp08||left brkt, s=0|21106
-||iff|2,t_lb1|6,exp08||left brkt, s=1|21106
-||iff|2,t_lb2|6,exp09||left brkt, s=2|21106
-||iff|2,t_cm0|6,exp02||comma, s=0|21106
-||iff|2,t_cm1|6,exp05||comma, s=1|21106
-||iff|2,t_cm2|6,exp11||comma, s=2|21106
-||iff|2,t_fn0|6,exp10||function, s=0|21106
-||iff|2,t_fn1|6,exp10||function, s=1|21106
-||iff|2,t_fn2|6,exp04||function, s=2|21106
-||iff|2,t_va0|6,exp03||variable, s=0|21106
-||iff|2,t_va1|6,exp03||variable, state one|21106
-||iff|2,t_va2|6,exp04||variable, s=2|21106
-||iff|2,t_co0|6,exp03||constant, s=0|21106
-||iff|2,t_co1|6,exp03||constant, s=1|21106
-||iff|2,t_co2|6,exp04||constant, s=2|21106
-||iff|2,t_bo0|6,exp05||binop, s=0|21106
-||iff|2,t_bo1|6,exp05||binop, s=1|21106
-||iff|2,t_bo2|6,exp26||binop, s=2|21106
-||iff|2,t_rp0|6,exp02||right paren, s=0|21106
-||iff|2,t_rp1|6,exp05||right paren, s=1|21106
-||iff|2,t_rp2|6,exp12||right paren, s=2|21106
-||iff|2,t_rb0|6,exp02||right brkt, s=0|21106
-||iff|2,t_rb1|6,exp05||right brkt, s=1|21106
-||iff|2,t_rb2|6,exp18||right brkt, s=2|21106
-||iff|2,t_cl0|6,exp02||colon, s=0|21106
-||iff|2,t_cl1|6,exp05||colon, s=1|21106
-||iff|2,t_cl2|6,exp19||colon, s=2|21106
-||iff|2,t_sm0|6,exp02||semicolon, s=0|21106
-||iff|2,t_sm1|6,exp05||semicolon, s=1|21106
-||iff|2,t_sm2|6,exp19||semicolon, s=2|21106
-||esw||||end switch on element type/state|21106
-||ejc|||||21107
-|exp02|mnz|3,scnrs|||set to rescan element|21116
-||mov|7,xr|21,=nulls||point to null, merge|21117
-|exp03|mov|11,-(xs)|7,xr||stack pointer to operand|21123
-||mov|8,wa|18,=num02||set state 2|21124
-||brn|6,exp01|||jump for next element|21125
-|exp04|mnz|3,scnrs|||set to rescan element|21132
-||mov|7,xr|21,=opdvc||point to concat operator dv|21133
-||bze|8,wb|6,exp4a||ok if at top level|21134
-||mov|7,xr|21,=opdvp||else point to unmistakable concat.|21135
-|exp4a|bnz|3,scnbl|6,exp26||merge bop if blanks, else error|21139
-||erb|1,220|26,syntax error: missing operator|||21141
-|exp05|erb|1,221|26,syntax error: missing operand|||21149
-|exp06|mov|7,xl|18,=num04||set new level indicator|21153
-||zer|7,xr|||set zero value for cmopn|21154
-||ejc|||||21155
-|exp07|mov|11,-(xs)|7,xr||stack cmopn value|21161
-||mov|11,-(xs)|8,wc||stack old counter|21162
-||mov|11,-(xs)|8,wb||stack old level indicator|21163
-||chk||||check for stack overflow|21164
-||zer|8,wa|||set new state to zero|21165
-||mov|8,wb|7,xl||set new level indicator|21166
-||mov|8,wc|18,=num01||initialize new counter|21167
-||brn|6,exp01|||jump to scan next element|21168
-|exp08|erb|1,222|26,syntax error: invalid use of left bracket|||21174
-|exp09|mov|7,xr|10,(xs)+||load array ptr for cmopn|21180
-||mov|7,xl|18,=num03||set new level indicator|21181
-||brn|6,exp07|||jump to stack old and start new|21182
-|exp10|mov|7,xl|18,=num05||set new lev indic (xr=vrblk=cmopn)|21188
-||brn|6,exp07|||jump to stack old and start new|21189
-|exp11|icv|8,wc|||increment counter|21195
-||jsr|6,expdm|||dump operators at this level|21196
-||zer|11,-(xs)|||set new level for parameter|21197
-||zer|8,wa|||set new state|21198
-||bgt|8,wb|18,=num02|6,exp01|loop back unless outer level|21199
-||erb|1,223|26,syntax error: invalid use of comma|||21200
-||ejc|||||21201
-|exp12|beq|8,wb|18,=num01|6,exp20|end of normal goto|21210
-||beq|8,wb|18,=num05|6,exp13|end of function arguments|21211
-||beq|8,wb|18,=num04|6,exp14|end of grouping / selection|21212
-||erb|1,224|26,syntax error: unbalanced right parenthesis|||21213
-|exp13|mov|7,xl|18,=c_fnc||set cmtyp value for function|21217
-||brn|6,exp15|||jump to build cmblk|21218
-|exp14|beq|8,wc|18,=num01|6,exp17|jump if end of grouping|21222
-||mov|7,xl|18,=c_sel||else set cmtyp for selection|21223
-|exp15|jsr|6,expdm|||dump operators at this level|21228
-||mov|8,wa|8,wc||copy count|21229
-||add|8,wa|18,=cmvls||add for standard fields at start|21230
-||wtb|8,wa|||convert length to bytes|21231
-||jsr|6,alloc|||allocate space for cmblk|21232
-||mov|9,(xr)|22,=b_cmt||store type code for cmblk|21233
-||mov|13,cmtyp(xr)|7,xl||store cmblk node type indicator|21234
-||mov|13,cmlen(xr)|8,wa||store length|21235
-||add|7,xr|8,wa||point past end of block|21236
-||lct|8,wc|8,wc||set loop counter|21237
-|exp16|mov|11,-(xr)|10,(xs)+||move one operand ptr from stack|21241
-||mov|8,wb|10,(xs)+||pop to old level indicator|21242
-||bct|8,wc|6,exp16||loop till all moved|21243
-||ejc|||||21244
-||sub|7,xr|19,*cmvls||point back to start of block|21250
-||mov|8,wc|10,(xs)+||restore old counter|21251
-||mov|13,cmopn(xr)|9,(xs)||store operand ptr in cmblk|21252
-||mov|9,(xs)|7,xr||stack cmblk pointer|21253
-||mov|8,wa|18,=num02||set new state|21254
-||brn|6,exp01|||back for next element|21255
-|exp17|jsr|6,expdm|||dump operators at this level|21259
-||mov|7,xr|10,(xs)+||restore xr|21260
-||mov|8,wb|10,(xs)+||restore outer level|21261
-||mov|8,wc|10,(xs)+||restore outer count|21262
-||mov|9,(xs)|7,xr||store opnd over unused cmopn val|21263
-||mov|8,wa|18,=num02||set new state|21264
-||brn|6,exp01|||back for next ele8ent|21265
-|exp18|mov|7,xl|18,=c_arr||set cmtyp for array reference|21272
-||beq|8,wb|18,=num03|6,exp15|jump to build cmblk if end arrayref|21273
-||beq|8,wb|18,=num02|6,exp20|jump if end of direct goto|21274
-||erb|1,225|26,syntax error: unbalanced right bracket|||21275
-||ejc|||||21276
-|exp19|mnz|3,scnrs|||rescan terminator|21284
-||mov|7,xl|8,wb||copy level indicator|21285
-||bsw|7,xl|1,6||switch on level indicator|21286
-||iff|1,0|6,exp20||normal outer level|21293
-||iff|1,1|6,exp22||fail if normal goto|21293
-||iff|1,2|6,exp23||fail if direct goto|21293
-||iff|1,3|6,exp24||fail array brackets|21293
-||iff|1,4|6,exp21||fail if in grouping|21293
-||iff|1,5|6,exp21||fail function args|21293
-||esw||||end switch on level|21293
-|exp20|jsr|6,expdm|||dump remaining operators|21297
-||mov|7,xr|10,(xs)+||load tree pointer|21298
-||ica|7,xs|||pop off bottom of stack marker|21299
-||exi||||return to expan caller|21300
-|exp21|erb|1,226|26,syntax error: missing right paren|||21304
-|exp22|erb|1,227|26,syntax error: right paren missing from goto|||21308
-|exp23|erb|1,228|26,syntax error: right bracket missing from goto|||21312
-|exp24|erb|1,229|26,syntax error: missing right array bracket|||21316
-||ejc|||||21317
-|exp25|mov|3,expsv|7,xr|||21323
-||jsr|6,expop|||pop one operator|21324
-||mov|7,xr|3,expsv||restore op dv pointer and merge|21325
-|exp26|mov|7,xl|13,num01(xs)||load operator dvptr from stack|21333
-||ble|7,xl|18,=num05|6,exp27|jump if bottom of stack level|21334
-||blt|13,dvrpr(xr)|13,dvlpr(xl)|6,exp25|else pop if new prec is lo|21335
-|exp27|mov|11,-(xs)|7,xr||stack operator dvptr on stack|21344
-||chk||||check for stack overflow|21345
-||mov|8,wa|18,=num01||set new state|21346
-||bne|7,xr|21,=opdvs|6,exp01|back for next element unless =|21347
-||zer|8,wa|||set state zero|21354
-||brn|6,exp01|||jump for next element|21355
-||enp||||end procedure expan|21356
-||ejc|||||21357
-|expap|prc|25,e|1,1||entry point|21376
-||mov|11,-(xs)|7,xl||save xl|21377
-||bne|9,(xr)|22,=b_cmt|6,expp2|no match if not complex|21378
-||mov|8,wa|13,cmtyp(xr)||else load type code|21379
-||beq|8,wa|18,=c_cnc|6,expp1|concatenation is a match|21380
-||beq|8,wa|18,=c_pmt|6,expp1|binary question mark is a match|21381
-||bne|8,wa|18,=c_alt|6,expp2|else not match unless alternation|21382
-||mov|7,xl|13,cmlop(xr)||load left operand pointer|21386
-||bne|9,(xl)|22,=b_cmt|6,expp2|not match if left opnd not complex|21387
-||bne|13,cmtyp(xl)|18,=c_cnc|6,expp2|not match if left op not conc|21388
-||mov|13,cmlop(xr)|13,cmrop(xl)||xr points to (b / c)|21389
-||mov|13,cmrop(xl)|7,xr||set xl opnds to a, (b / c)|21390
-||mov|7,xr|7,xl||point to this altered node|21391
-|expp1|mov|7,xl|10,(xs)+||restore entry xl|21395
-||exi||||give pattern match return|21396
-|expp2|mov|7,xl|10,(xs)+||restore entry xl|21400
-||exi|1,1|||give non-match return|21401
-||enp||||end procedure expap|21402
-||ejc|||||21403
-|expdm|prc|25,n|1,0||entry point|21415
-||mov|3,r_exs|7,xl||save xl value|21416
-|exdm1|ble|13,num01(xs)|18,=num05|6,exdm2|jump if stack bottom (saved level|21420
-||jsr|6,expop|||else pop one operator|21421
-||brn|6,exdm1|||and loop back|21422
-|exdm2|mov|7,xl|3,r_exs||restore xl|21426
-||zer|3,r_exs|||release save location|21427
-||exi||||return to expdm caller|21428
-||enp||||end procedure expdm|21429
-||ejc|||||21430
-|expop|prc|25,n|1,0||entry point|21445
-||mov|7,xr|13,num01(xs)||load operator dv pointer|21446
-||beq|13,dvlpr(xr)|18,=lluno|6,expo2|jump if unary|21447
-||mov|8,wa|19,*cmbs_||set size of binary operator cmblk|21451
-||jsr|6,alloc|||allocate space for cmblk|21452
-||mov|13,cmrop(xr)|10,(xs)+||pop and store right operand ptr|21453
-||mov|7,xl|10,(xs)+||pop and load operator dv ptr|21454
-||mov|13,cmlop(xr)|9,(xs)||store left operand pointer|21455
-|expo1|mov|9,(xr)|22,=b_cmt||store type code for cmblk|21459
-||mov|13,cmtyp(xr)|13,dvtyp(xl)||store cmblk node type code|21460
-||mov|13,cmopn(xr)|7,xl||store dvptr (=ptr to dac o_xxx)|21461
-||mov|13,cmlen(xr)|8,wa||store cmblk length|21462
-||mov|9,(xs)|7,xr||store resulting node ptr on stack|21463
-||exi||||return to expop caller|21464
-|expo2|mov|8,wa|19,*cmus_||set size of unary operator cmblk|21468
-||jsr|6,alloc|||allocate space for cmblk|21469
-||mov|13,cmrop(xr)|10,(xs)+||pop and store operand pointer|21470
-||mov|7,xl|9,(xs)||load operator dv pointer|21471
-||brn|6,expo1|||merge back to exit|21472
-||enp||||end procedure expop|21473
-||ejc|||||21474
-|filnm|prc|25,e|1,0||entry point|21499
-||mov|11,-(xs)|8,wb||preserve wb|21500
-||bze|8,wc|6,filn3||return nulls if stno is zero|21501
-||mov|7,xl|3,r_sfn||file name table|21502
-||bze|7,xl|6,filn3||if no table|21503
-||mov|8,wb|13,tbbuk(xl)||get bucket entry|21504
-||beq|8,wb|3,r_sfn|6,filn3|jump if no teblks on chain|21505
-||mov|11,-(xs)|7,xr||preserve xr|21506
-||mov|7,xr|8,wb||previous block pointer|21507
-||mov|11,-(xs)|8,wc||preserve stmt number|21508
-|filn1|mov|7,xl|7,xr||next element to examine|21512
-||mov|7,xr|13,tesub(xl)||load subscript value (an icblk)|21513
-||ldi|13,icval(xr)|||load the statement number|21514
-||mfi|8,wc|||convert to address constant|21515
-||blt|9,(xs)|8,wc|6,filn2|compare arg with teblk stmt number|21516
-||mov|8,wb|7,xl||save previous entry pointer|21520
-||mov|7,xr|13,tenxt(xl)||point to next teblk on chain|21521
-||bne|7,xr|3,r_sfn|6,filn1|jump if there is one|21522
-|filn2|mov|7,xl|8,wb||previous teblk|21526
-||mov|7,xl|13,teval(xl)||get ptr to file name scblk|21527
-||mov|8,wc|10,(xs)+||restore stmt number|21528
-||mov|7,xr|10,(xs)+||restore xr|21529
-||mov|8,wb|10,(xs)+||restore wb|21530
-||exi|||||21531
-|filn3|mov|8,wb|10,(xs)+||restore wb|21535
-||mov|7,xl|21,=nulls||return null string|21536
-||exi|||||21537
-||enp|||||21538
-||ejc|||||21539
-|flstg|prc|25,e|1,0||entry point|21556
-||bze|3,kvcas|6,fst99||skip if &case is 0|21557
-||mov|11,-(xs)|7,xl||save xl across call|21558
-||mov|11,-(xs)|7,xr||save original scblk ptr|21559
-||jsr|6,alocs|||allocate new string block|21560
-||mov|7,xl|9,(xs)||point to original scblk|21561
-||mov|11,-(xs)|7,xr||save pointer to new scblk|21562
-||plc|7,xl|||point to original chars|21563
-||psc|7,xr|||point to new chars|21564
-||zer|11,-(xs)|||init did fold flag|21565
-||lct|8,wc|8,wc||load loop counter|21566
-|fst01|lch|8,wa|10,(xl)+||load character|21567
-||blt|8,wa|18,=ch_la|6,fst02|skip if less than lc a|21568
-||bgt|8,wa|18,=ch_l_|6,fst02|skip if greater than lc z|21569
-||flc|8,wa|||fold character to upper case|21570
-||mnz|9,(xs)|||set did fold character flag|21571
-|fst02|sch|8,wa|10,(xr)+||store (possibly folded) character|21572
-||bct|8,wc|6,fst01||loop thru entire string|21573
-||csc|7,xr|||complete store characters|21574
-||mov|7,xr|10,(xs)+||see if any change|21575
-||bnz|7,xr|6,fst10||skip if folding done (no change)|21576
-||mov|3,dnamp|10,(xs)+||do not need new scblk|21577
-||mov|7,xr|10,(xs)+||return original scblk|21578
-||brn|6,fst20|||merge below|21579
-|fst10|mov|7,xr|10,(xs)+||return new scblk|21580
-||ica|7,xs|||throw away original scblk pointer|21581
-|fst20|mov|8,wa|13,sclen(xr)||reload string length|21582
-||mov|7,xl|10,(xs)+||restore xl|21583
-|fst99|exi||||return|21584
-||enp|||||21585
-||ejc|||||21586
-||ejc|||||21641
-||ejc|||||21695
-||ejc|||||21739
-||ejc|||||21777
-|gbcol|prc|25,e|1,0||entry point|21781
-||bnz|3,dmvch|6,gbc14||fail if in mid-dump|21783
-||mnz|3,gbcfl|||note gbcol entered|21784
-||mov|3,gbsva|8,wa||save entry wa|21785
-||mov|3,gbsvb|8,wb||save entry wb|21786
-||mov|3,gbsvc|8,wc||save entry wc|21787
-||mov|11,-(xs)|7,xl||save entry xl|21788
-||scp|8,wa|||get code pointer value|21789
-||sub|8,wa|3,r_cod||make relative|21790
-||lcp|8,wa|||and restore|21791
-||bze|8,wb|6,gbc0a||check there is no move offset|21793
-||zer|3,dnams|||collect sediment if must move it|21794
-|gbc0a|mov|8,wa|3,dnamb||start of dynamic area|21795
-||add|8,wa|3,dnams||size of sediment|21796
-||mov|3,gbcsd|8,wa||first location past sediment|21797
-||mnz|7,xr|||non-zero flags start of collection|21810
-||mov|8,wa|3,dnamb||start of dynamic area|21811
-||mov|8,wb|3,dnamp||next available location|21812
-||mov|8,wc|3,dname||last available location + 1|21813
-||jsr|6,sysgc|||inform of collection|21814
-||mov|7,xr|7,xs||point to stack front|21819
-||mov|7,xl|3,stbas||point past end of stack|21820
-||bge|7,xl|7,xr|6,gbc00|ok if d-stack|21821
-||mov|7,xr|7,xl||reverse if ...|21822
-||mov|7,xl|7,xs||... u-stack|21823
-|gbc00|jsr|6,gbcpf|||process pointers on stack|21827
-||mov|7,xr|20,=r_aaa||point to start of relocatable locs|21831
-||mov|7,xl|20,=r_yyy||point past end of relocatable locs|21832
-||jsr|6,gbcpf|||process work fields|21833
-||mov|8,wa|3,hshtb||point to first hash slot pointer|21837
-|gbc01|mov|7,xl|8,wa||point to next slot|21841
-||ica|8,wa|||bump bucket pointer|21842
-||mov|3,gbcnm|8,wa||save bucket pointer|21843
-||ejc|||||21844
-|gbc02|mov|7,xr|9,(xl)||load ptr to next vrblk|21850
-||bze|7,xr|6,gbc03||jump if end of chain|21851
-||mov|7,xl|7,xr||else copy vrblk pointer|21852
-||add|7,xr|19,*vrval||point to first reloc fld|21853
-||add|7,xl|19,*vrnxt||point past last (and to link ptr)|21854
-||jsr|6,gbcpf|||process reloc fields in vrblk|21855
-||brn|6,gbc02|||loop back for next block|21856
-|gbc03|mov|8,wa|3,gbcnm||restore bucket pointer|21860
-||bne|8,wa|3,hshte|6,gbc01|loop back if more buckets to go|21861
-||ejc|||||21862
-||mov|7,xr|3,dnamb||point to first block|21891
-||zer|8,wb|||accumulate size of dead blocks|21892
-|gbc04|beq|7,xr|3,gbcsd|6,gbc4c|jump if end of sediment|21893
-||mov|8,wa|9,(xr)||else get first word|21894
-||bod|8,wa|6,gbc4b||jump if entry pointer (unused)|21896
-||dcv|8,wa|||restore entry pointer|21897
-||mov|9,(xr)|8,wa||restore first word|21903
-||jsr|6,blkln|||get length of this block|21904
-||add|7,xr|8,wa||bump actual pointer|21905
-||brn|6,gbc04|||continue scan through sediment|21906
-|gbc4b|jsr|6,blkln|||get length of this block|21910
-||add|7,xr|8,wa||bump actual pointer|21911
-||add|8,wb|8,wa||count size of unused blocks|21912
-||brn|6,gbc04|||continue scan through sediment|21913
-|gbc4c|mov|3,gbcsf|8,wb||size of sediment free space|21924
-||mov|8,wc|7,xr||set as first eventual location|21928
-||add|8,wc|3,gbsvb||add offset for eventual move up|21929
-||zer|3,gbcnm|||clear initial forward pointer|21930
-||mov|3,gbclm|20,=gbcnm||initialize ptr to last move block|21931
-||mov|3,gbcns|7,xr||initialize first address|21932
-|gbc05|beq|7,xr|3,dnamp|6,gbc07|jump if end of used region|21936
-||mov|8,wa|9,(xr)||else get first word|21937
-||bod|8,wa|6,gbc07||jump if entry pointer (unused)|21939
-|gbc06|mov|7,xl|8,wa||copy pointer|21947
-||mov|8,wa|9,(xl)||load forward pointer|21948
-||mov|9,(xl)|8,wc||relocate reference|21949
-||bev|8,wa|6,gbc06||loop back if not end of chain|21951
-||ejc|||||21956
-||mov|9,(xr)|8,wa||restore first word|21962
-||jsr|6,blkln|||get length of this block|21963
-||add|7,xr|8,wa||bump actual pointer|21964
-||add|8,wc|8,wa||bump eventual pointer|21965
-||brn|6,gbc05|||loop back for next block|21966
-|gbc07|mov|8,wa|7,xr||copy pointer past last block|21970
-||mov|7,xl|3,gbclm||point to previous move block|21971
-||sub|8,wa|13,num01(xl)||subtract starting address|21972
-||mov|13,num01(xl)|8,wa||store length of block to be moved|21973
-|gbc08|beq|7,xr|3,dnamp|6,gbc10|jump if end of used region|21977
-||mov|8,wa|9,(xr)||else load first word of next block|21978
-||bev|8,wa|6,gbc09||jump if in use|21980
-||jsr|6,blkln|||else get length of next block|21985
-||add|7,xr|8,wa||push pointer|21986
-||brn|6,gbc08|||and loop back|21987
-|gbc09|sub|7,xr|19,*num02||point 2 words behind for move block|21992
-||mov|7,xl|3,gbclm||point to previous move block|21993
-||mov|9,(xl)|7,xr||set forward ptr in previous block|21994
-||zer|9,(xr)|||zero forward ptr of new block|21995
-||mov|3,gbclm|7,xr||remember address of this block|21996
-||mov|7,xl|7,xr||copy ptr to move block|21997
-||add|7,xr|19,*num02||point back to block in use|21998
-||mov|13,num01(xl)|7,xr||store starting address|21999
-||brn|6,gbc06|||jump to process block in use|22000
-||ejc|||||22001
-|gbc10|mov|7,xr|3,gbcsd||point to storage above sediment|22011
-||add|7,xr|3,gbcns||bump past unmoved blocks at start|22015
-|gbc11|mov|7,xl|3,gbcnm||point to next move block|22019
-||bze|7,xl|6,gbc12||jump if end of chain|22020
-||mov|3,gbcnm|10,(xl)+||move pointer down chain|22021
-||mov|8,wa|10,(xl)+||get length to move|22022
-||mvw||||perform move|22023
-||brn|6,gbc11|||loop back|22024
-|gbc12|mov|3,dnamp|7,xr||set next available loc ptr|22028
-||mov|8,wb|3,gbsvb||reload move offset|22029
-||bze|8,wb|6,gbc13||jump if no move required|22030
-||mov|7,xl|7,xr||else copy old top of core|22031
-||add|7,xr|8,wb||point to new top of core|22032
-||mov|3,dnamp|7,xr||save new top of core pointer|22033
-||mov|8,wa|7,xl||copy old top|22034
-||sub|8,wa|3,dnamb||minus old bottom = length|22035
-||add|3,dnamb|8,wb||bump bottom to get new value|22036
-||mwb||||perform move (backwards)|22037
-|gbc13|zer|7,xr|||clear garbage value in xr|22041
-||mov|3,gbcfl|7,xr||note exit from gbcol|22042
-||mov|8,wa|3,dnamb||start of dynamic area|22044
-||mov|8,wb|3,dnamp||next available location|22045
-||mov|8,wc|3,dname||last available location + 1|22046
-||jsr|6,sysgc|||inform sysgc of completion|22047
-||sti|3,gbcia|||save ia|22055
-||zer|7,xr|||presume no sediment will remain|22056
-||mov|8,wb|3,gbcsf||free space in sediment|22057
-||btw|8,wb|||convert bytes to words|22058
-||mti|8,wb|||put sediment free store in ia|22059
-||mli|3,gbsed|||multiply by sediment factor|22060
-||iov|6,gb13a|||jump if overflowed|22061
-||mov|8,wb|3,dnamp||end of dynamic area in use|22062
-||sub|8,wb|3,dnamb||minus start is sediment remaining|22063
-||btw|8,wb|||convert to words|22064
-||mov|3,gbcsf|8,wb||store it|22065
-||sbi|3,gbcsf|||subtract from scaled up free store|22066
-||igt|6,gb13a|||jump if large free store in sedimnt|22067
-||mov|7,xr|3,dnamp||below threshold, return sediment|22068
-||sub|7,xr|3,dnamb||for use by caller|22069
-|gb13a|ldi|3,gbcia|||restore ia|22070
-||mov|8,wa|3,gbsva||restore wa|22072
-||mov|8,wb|3,gbsvb||restore wb|22073
-||scp|8,wc|||get code pointer|22074
-||add|8,wc|3,r_cod||make absolute again|22075
-||lcp|8,wc|||and replace absolute value|22076
-||mov|8,wc|3,gbsvc||restore wc|22077
-||mov|7,xl|10,(xs)+||restore entry xl|22078
-||icv|3,gbcnt|||increment count of collections|22079
-||exi||||exit to gbcol caller|22080
-|gbc14|icv|3,errft|||fatal error|22084
-||erb|1,250|26,insufficient memory to complete dump|||22085
-||enp||||end procedure gbcol|22086
-||ejc|||||22087
-|gbcpf|prc|25,e|1,0||entry point|22102
-||zer|11,-(xs)|||set zero to mark bottom of stack|22103
-||mov|11,-(xs)|7,xl||save end pointer|22104
-|gpf01|mov|7,xl|9,(xr)||load field contents|22114
-||mov|8,wc|7,xr||save field pointer|22115
-||blt|7,xl|3,dnamb|6,gpf2a|jump if not ptr into dynamic area|22119
-||bge|7,xl|3,dnamp|6,gpf2a|jump if not ptr into dynamic area|22120
-||mov|8,wa|9,(xl)||load ptr to chain (or entry ptr)|22125
-||blt|7,xl|3,gbcsd|6,gpf1a|do not chain if within sediment|22127
-||mov|9,(xl)|7,xr||set this field as new head of chain|22129
-||mov|9,(xr)|8,wa||set forward pointer|22130
-|gpf1a|bod|8,wa|6,gpf03||jump if not already processed|22135
-|gpf02|mov|7,xr|8,wc||restore field pointer|22143
-|gpf2a|ica|7,xr|||bump to next field|22147
-||bne|7,xr|9,(xs)|6,gpf01|loop back if more to go|22148
-||ejc|||||22149
-||mov|7,xl|10,(xs)+||restore pointer past end|22155
-||mov|7,xr|10,(xs)+||restore block pointer|22156
-||bnz|7,xr|6,gpf2a||continue loop unless outer levl|22157
-||exi||||return to caller if outer level|22158
-|gpf03|bge|7,xl|3,gbcsd|6,gpf3a|if not within sediment|22171
-||icv|9,(xl)|||mark by making entry point even|22173
-|gpf3a|mov|7,xr|7,xl||copy block pointer|22177
-||mov|7,xl|8,wa||copy first word of block|22181
-||lei|7,xl|||load entry point id (bl_xx)|22182
-||bsw|7,xl|2,bl___||switch on block type|22187
-||iff|2,bl_ar|6,gpf06||arblk|22225
-||iff|2,bl_cd|6,gpf19||cdblk|22225
-||iff|2,bl_ex|6,gpf17||exblk|22225
-||iff|2,bl_ic|6,gpf02||icblk|22225
-||iff|2,bl_nm|6,gpf10||nmblk|22225
-||iff|2,bl_p0|6,gpf10||p0blk|22225
-||iff|2,bl_p1|6,gpf12||p1blk|22225
-||iff|2,bl_p2|6,gpf12||p2blk|22225
-||iff|2,bl_rc|6,gpf02||rcblk|22225
-||iff|2,bl_sc|6,gpf02||scblk|22225
-||iff|2,bl_se|6,gpf02||seblk|22225
-||iff|2,bl_tb|6,gpf08||tbblk|22225
-||iff|2,bl_vc|6,gpf08||vcblk|22225
-||iff|2,bl_xn|6,gpf02||xnblk|22225
-||iff|2,bl_xr|6,gpf09||xrblk|22225
-||iff|2,bl_bc|6,gpf02||bcblk - dummy to fill out iffs|22225
-||iff|2,bl_pd|6,gpf13||pdblk|22225
-||iff|2,bl_tr|6,gpf16||trblk|22225
-||iff|2,bl_bf|6,gpf02||bfblk|22225
-||iff|2,bl_cc|6,gpf07||ccblk|22225
-||iff|2,bl_cm|6,gpf04||cmblk|22225
-||iff|2,bl_ct|6,gpf02||ctblk|22225
-||iff|2,bl_df|6,gpf02||dfblk|22225
-||iff|2,bl_ef|6,gpf02||efblk|22225
-||iff|2,bl_ev|6,gpf10||evblk|22225
-||iff|2,bl_ff|6,gpf11||ffblk|22225
-||iff|2,bl_kv|6,gpf02||kvblk|22225
-||iff|2,bl_pf|6,gpf14||pfblk|22225
-||iff|2,bl_te|6,gpf15||teblk|22225
-||esw||||end of jump table|22225
-||ejc|||||22226
-|gpf04|mov|8,wa|13,cmlen(xr)||load length|22232
-||mov|8,wb|19,*cmtyp||set offset|22233
-|gpf05|add|8,wa|7,xr||point past last reloc field|22242
-||add|7,xr|8,wb||point to first reloc field|22243
-||mov|11,-(xs)|8,wc||stack old field pointer|22244
-||mov|11,-(xs)|8,wa||stack new limit pointer|22245
-||chk||||check for stack overflow|22246
-||brn|6,gpf01|||if ok, back to process|22247
-|gpf06|mov|8,wa|13,arlen(xr)||load length|22251
-||mov|8,wb|13,arofs(xr)||set offset to 1st reloc fld (arpro)|22252
-||brn|6,gpf05|||all set|22253
-|gpf07|mov|8,wa|13,ccuse(xr)||set length in use|22257
-||mov|8,wb|19,*ccuse||1st word (make sure at least one)|22258
-||brn|6,gpf05|||all set|22259
-||ejc|||||22260
-|gpf19|mov|8,wa|13,cdlen(xr)||load length|22267
-||mov|8,wb|19,*cdfal||set offset|22268
-||brn|6,gpf05|||jump back|22269
-|gpf08|mov|8,wa|13,offs2(xr)||load length|22276
-||mov|8,wb|19,*offs3||set offset|22277
-||brn|6,gpf05|||jump back|22278
-|gpf09|mov|8,wa|13,xrlen(xr)||load length|22282
-||mov|8,wb|19,*xrptr||set offset|22283
-||brn|6,gpf05|||jump back|22284
-|gpf10|mov|8,wa|19,*offs2||point past second field|22288
-||mov|8,wb|19,*offs1||offset is one (only reloc fld is 2)|22289
-||brn|6,gpf05|||all set|22290
-|gpf11|mov|8,wa|19,*ffofs||set length|22294
-||mov|8,wb|19,*ffnxt||set offset|22295
-||brn|6,gpf05|||all set|22296
-|gpf12|mov|8,wa|19,*parm2||length (parm2 is non-relocatable)|22300
-||mov|8,wb|19,*pthen||set offset|22301
-||brn|6,gpf05|||all set|22302
-||ejc|||||22303
-|gpf13|mov|7,xl|13,pddfp(xr)||load ptr to dfblk|22309
-||mov|8,wa|13,dfpdl(xl)||get pdblk length|22310
-||mov|8,wb|19,*pdfld||set offset|22311
-||brn|6,gpf05|||all set|22312
-|gpf14|mov|8,wa|19,*pfarg||length past last reloc|22316
-||mov|8,wb|19,*pfcod||offset to first reloc|22317
-||brn|6,gpf05|||all set|22318
-|gpf15|mov|8,wa|19,*tesi_||set length|22322
-||mov|8,wb|19,*tesub||and offset|22323
-||brn|6,gpf05|||all set|22324
-|gpf16|mov|8,wa|19,*trsi_||set length|22328
-||mov|8,wb|19,*trval||and offset|22329
-||brn|6,gpf05|||all set|22330
-|gpf17|mov|8,wa|13,exlen(xr)||load length|22334
-||mov|8,wb|19,*exflc||set offset|22335
-||brn|6,gpf05|||jump back|22336
-||enp||||end procedure gbcpf|22346
-||ejc|||||22347
-|gtarr|prc|25,e|1,2||entry point|22363
-||mov|3,gtawa|8,wa||save wa indicator|22364
-||mov|8,wa|9,(xr)||load type word|22365
-||beq|8,wa|22,=b_art|6,gtar8|exit if already an array|22366
-||beq|8,wa|22,=b_vct|6,gtar8|exit if already an array|22367
-||bne|8,wa|22,=b_tbt|6,gta9a|else fail if not a table (sgd02)|22368
-||mov|11,-(xs)|7,xr||replace tbblk pointer on stack|22372
-||zer|7,xr|||signal first pass|22373
-||zer|8,wb|||zero non-null element count|22374
-|gtar1|mov|7,xl|9,(xs)||point to table|22384
-||add|7,xl|13,tblen(xl)||point past last bucket|22385
-||sub|7,xl|19,*tbbuk||set first bucket offset|22386
-||mov|8,wa|7,xl||copy adjusted pointer|22387
-|gtar2|mov|7,xl|8,wa||copy bucket pointer|22393
-||dca|8,wa|||decrement bucket pointer|22394
-|gtar3|mov|7,xl|13,tenxt(xl)||point to next teblk|22398
-||beq|7,xl|9,(xs)|6,gtar6|jump if chain end (tbblk ptr)|22399
-||mov|3,cnvtp|7,xl||else save teblk pointer|22400
-|gtar4|mov|7,xl|13,teval(xl)||load value|22404
-||beq|9,(xl)|22,=b_trt|6,gtar4|loop till value found|22405
-||mov|8,wc|7,xl||copy value|22406
-||mov|7,xl|3,cnvtp||restore teblk pointer|22407
-||ejc|||||22408
-||beq|8,wc|21,=nulls|6,gtar3|loop back to ignore null value|22414
-||bnz|7,xr|6,gtar5||jump if second pass|22415
-||icv|8,wb|||for the first pass, bump count|22416
-||brn|6,gtar3|||and loop back for next teblk|22417
-|gtar5|bze|3,gtawa|6,gta5a||jump if address wanted|22421
-||mov|10,(xr)+|13,tesub(xl)||store subscript name|22422
-||mov|10,(xr)+|8,wc||store value in arblk|22423
-||brn|6,gtar3|||loop back for next teblk|22424
-|gta5a|mov|10,(xr)+|7,xl||store teblk address in name|22429
-||mov|10,(xr)+|7,xl||and value slots|22430
-||brn|6,gtar3|||loop back for next teblk|22431
-|gtar6|bne|8,wa|9,(xs)|6,gtar2|loop back if more buckets to go|22435
-||bnz|7,xr|6,gtar7||else jump if second pass|22436
-||bze|8,wb|6,gtar9||fail if no non-null elements|22440
-||mov|8,wa|8,wb||else copy count|22441
-||add|8,wa|8,wb||double (two words/element)|22442
-||add|8,wa|18,=arvl2||add space for standard fields|22443
-||wtb|8,wa|||convert length to bytes|22444
-||bgt|8,wa|3,mxlen|6,gta9b|error if too long for array|22445
-||jsr|6,alloc|||else allocate space for arblk|22446
-||mov|9,(xr)|22,=b_art||store type word|22447
-||zer|13,idval(xr)|||zero id for the moment|22448
-||mov|13,arlen(xr)|8,wa||store length|22449
-||mov|13,arndm(xr)|18,=num02||set dimensions = 2|22450
-||ldi|4,intv1|||get integer one|22451
-||sti|13,arlbd(xr)|||store as lbd 1|22452
-||sti|13,arlb2(xr)|||store as lbd 2|22453
-||ldi|4,intv2|||load integer two|22454
-||sti|13,ardm2(xr)|||store as dim 2|22455
-||mti|8,wb|||get element count as integer|22456
-||sti|13,ardim(xr)|||store as dim 1|22457
-||zer|13,arpr2(xr)|||zero prototype field for now|22458
-||mov|13,arofs(xr)|19,*arpr2||set offset field (signal pass 2)|22459
-||mov|8,wb|7,xr||save arblk pointer|22460
-||add|7,xr|19,*arvl2||point to first element location|22461
-||brn|6,gtar1|||jump back to fill in elements|22462
-||ejc|||||22463
-|gtar7|mov|7,xr|8,wb||restore arblk pointer|22469
-||mov|9,(xs)|8,wb||store as result|22470
-||ldi|13,ardim(xr)|||get number of elements (nn)|22476
-||mli|4,intvh|||multiply by 100|22477
-||adi|4,intv2|||add 2 (nn02)|22478
-||jsr|6,icbld|||build integer|22479
-||mov|11,-(xs)|7,xr||store ptr for gtstg|22480
-||jsr|6,gtstg|||convert to string|22481
-||ppm||||convert fail is impossible|22482
-||mov|7,xl|7,xr||copy string pointer|22483
-||mov|7,xr|10,(xs)+||reload arblk pointer|22484
-||mov|13,arpr2(xr)|7,xl||store prototype ptr (nn02)|22485
-||sub|8,wa|18,=num02||adjust length to point to zero|22486
-||psc|7,xl|8,wa||point to zero|22487
-||mov|8,wb|18,=ch_cm||load a comma|22488
-||sch|8,wb|9,(xl)||store a comma over the zero|22489
-||csc|7,xl|||complete store characters|22490
-|gtar8|exi||||return to caller|22494
-|gtar9|mov|7,xr|10,(xs)+||restore stack for conv err (sgd02)|22498
-||exi|1,1|||return|22499
-|gta9a|exi|1,2|||return|22503
-|gta9b|erb|1,260|26,conversion array size exceeds maximum permitted|||22507
-||enp||||procedure gtarr|22508
-||ejc|||||22509
-|gtcod|prc|25,e|1,1||entry point|22523
-||beq|9,(xr)|22,=b_cds|6,gtcd1|jump if already code|22524
-||beq|9,(xr)|22,=b_cdc|6,gtcd1|jump if already code|22525
-||mov|11,-(xs)|7,xr||stack argument for gtstg|22529
-||jsr|6,gtstg|||convert argument to string|22530
-||ppm|6,gtcd2|||jump if non-convertible|22531
-||mov|3,gtcef|3,flptr||save fail ptr in case of error|22532
-||mov|3,r_gtc|3,r_cod||also save code ptr|22533
-||mov|3,r_cim|7,xr||else set image pointer|22534
-||mov|3,scnil|8,wa||set image length|22535
-||zer|3,scnpt|||set scan pointer|22536
-||mov|3,stage|18,=stgxc||set stage for execute compile|22537
-||mov|3,lstsn|3,cmpsn||in case listr called|22538
-||icv|3,cmpln|||bump line number|22540
-||jsr|6,cmpil|||compile string|22542
-||mov|3,stage|18,=stgxt||reset stage for execute time|22543
-||zer|3,r_cim|||clear image|22544
-|gtcd1|exi||||give normal gtcod return|22548
-|gtcd2|exi|1,1|||give error return|22552
-||enp||||end procedure gtcod|22553
-||ejc|||||22554
-|gtexp|prc|25,e|1,1||entry point|22571
-||blo|9,(xr)|22,=b_e__|6,gtex1|jump if already an expression|22572
-||mov|11,-(xs)|7,xr||store argument for gtstg|22573
-||jsr|6,gtstg|||convert argument to string|22574
-||ppm|6,gtex2|||jump if unconvertible|22575
-||mov|7,xl|7,xr||copy input string pointer|22583
-||plc|7,xl|8,wa||point one past the string end|22584
-||lch|7,xl|11,-(xl)||fetch the last character|22585
-||beq|7,xl|18,=ch_cl|6,gtex2|error if it is a semicolon|22586
-||beq|7,xl|18,=ch_sm|6,gtex2|or if it is a colon|22587
-||mov|3,r_cim|7,xr||set input image pointer|22591
-||zer|3,scnpt|||set scan pointer|22592
-||mov|3,scnil|8,wa||set input image length|22593
-||mov|11,-(xs)|8,wb||save value/name flag|22595
-||zer|8,wb|||set code for normal scan|22597
-||mov|3,gtcef|3,flptr||save fail ptr in case of error|22598
-||mov|3,r_gtc|3,r_cod||also save code ptr|22599
-||mov|3,stage|18,=stgev||adjust stage for compile|22600
-||mov|3,scntp|18,=t_uok||indicate unary operator acceptable|22601
-||jsr|6,expan|||build tree for expression|22602
-||zer|3,scnrs|||reset rescan flag|22603
-||mov|8,wa|10,(xs)+||restore value/name flag|22605
-||bne|3,scnpt|3,scnil|6,gtex2|error if not end of image|22607
-||zer|8,wb|||set ok value for cdgex call|22608
-||mov|7,xl|7,xr||copy tree pointer|22609
-||jsr|6,cdgex|||build expression block|22610
-||zer|3,r_cim|||clear pointer|22611
-||mov|3,stage|18,=stgxt||restore stage for execute time|22612
-|gtex1|exi||||return to gtexp caller|22616
-|gtex2|exi|1,1|||take error exit|22620
-||enp||||end procedure gtexp|22621
-||ejc|||||22622
-|gtint|prc|25,e|1,1||entry point|22637
-||beq|9,(xr)|22,=b_icl|6,gtin2|jump if already an integer|22638
-||mov|3,gtina|8,wa||else save wa|22639
-||mov|3,gtinb|8,wb||save wb|22640
-||jsr|6,gtnum|||convert to numeric|22641
-||ppm|6,gtin3|||jump if unconvertible|22642
-||beq|8,wa|22,=b_icl|6,gtin1|jump if integer|22645
-||ldr|13,rcval(xr)|||load real value|22649
-||rti|6,gtin3|||convert to integer (err if ovflow)|22650
-||jsr|6,icbld|||if ok build icblk|22651
-|gtin1|mov|8,wa|3,gtina||restore wa|22656
-||mov|8,wb|3,gtinb||restore wb|22657
-|gtin2|exi||||return to gtint caller|22661
-|gtin3|exi|1,1|||take convert error exit|22665
-||enp||||end procedure gtint|22666
-||ejc|||||22667
-|gtnum|prc|25,e|1,1||entry point|22682
-||mov|8,wa|9,(xr)||load first word of block|22683
-||beq|8,wa|22,=b_icl|6,gtn34|jump if integer (no conversion)|22684
-||beq|8,wa|22,=b_rcl|6,gtn34|jump if real (no conversion)|22687
-||mov|11,-(xs)|7,xr||stack argument in case convert err|22693
-||mov|11,-(xs)|7,xr||stack argument for gtstg|22694
-||jsr|6,gtstg|||convert argument to string|22696
-||ppm|6,gtn36|||jump if unconvertible|22700
-||ldi|4,intv0|||initialize integer result to zero|22704
-||bze|8,wa|6,gtn32||jump to exit with zero if null|22705
-||lct|8,wa|8,wa||set bct counter for following loops|22706
-||zer|3,gtnnf|||tentatively indicate result +|22707
-||sti|3,gtnex|||initialise exponent to zero|22710
-||zer|3,gtnsc|||zero scale in case real|22711
-||zer|3,gtndf|||reset flag for dec point found|22712
-||zer|3,gtnrd|||reset flag for digits found|22713
-||ldr|4,reav0|||zero real accum in case real|22714
-||plc|7,xr|||point to argument characters|22716
-|gtn01|lch|8,wb|10,(xr)+||load first character|22720
-||blt|8,wb|18,=ch_d0|6,gtn02|jump if not digit|22721
-||ble|8,wb|18,=ch_d9|6,gtn06|jump if first char is a digit|22722
-||ejc|||||22723
-|gtn02|bne|8,wb|18,=ch_bl|6,gtn03|jump if non-blank|22729
-|gtna2|bct|8,wa|6,gtn01||else decr count and loop back|22730
-||brn|6,gtn07|||jump to return zero if all blanks|22731
-|gtn03|beq|8,wb|18,=ch_pl|6,gtn04|jump if plus sign|22735
-||beq|8,wb|18,=ch_ht|6,gtna2|horizontal tab equiv to blank|22737
-||bne|8,wb|18,=ch_mn|6,gtn12|jump if not minus (may be real)|22745
-||mnz|3,gtnnf|||if minus sign, set negative flag|22747
-|gtn04|bct|8,wa|6,gtn05||jump if chars left|22751
-||brn|6,gtn36|||else error|22752
-|gtn05|lch|8,wb|10,(xr)+||load next character|22756
-||blt|8,wb|18,=ch_d0|6,gtn08|jump if not a digit|22757
-||bgt|8,wb|18,=ch_d9|6,gtn08|jump if not a digit|22758
-|gtn06|sti|3,gtnsi|||save current value|22762
-||cvm|6,gtn35|||current*10-(new dig) jump if ovflow|22766
-||mnz|3,gtnrd|||set digit read flag|22767
-||bct|8,wa|6,gtn05||else loop back if more chars|22769
-|gtn07|bnz|3,gtnnf|6,gtn32||jump if negative (all set)|22773
-||ngi||||else negate|22774
-||ino|6,gtn32|||jump if no overflow|22775
-||brn|6,gtn36|||else signal error|22776
-||ejc|||||22777
-|gtn08|beq|8,wb|18,=ch_bl|6,gtna9|jump if a blank|22784
-||beq|8,wb|18,=ch_ht|6,gtna9|jump if horizontal tab|22786
-||itr||||else convert integer to real|22794
-||ngr||||negate to get positive value|22795
-||brn|6,gtn12|||jump to try for real|22796
-|gtn09|lch|8,wb|10,(xr)+||get next char|22801
-||beq|8,wb|18,=ch_ht|6,gtna9|jump if horizontal tab|22803
-||bne|8,wb|18,=ch_bl|6,gtn36|error if non-blank|22808
-|gtna9|bct|8,wa|6,gtn09||loop back if more chars to check|22809
-||brn|6,gtn07|||return integer if all blanks|22810
-|gtn10|lch|8,wb|10,(xr)+||load next character|22816
-||blt|8,wb|18,=ch_d0|6,gtn12|jump if non-numeric|22817
-||bgt|8,wb|18,=ch_d9|6,gtn12|jump if non-numeric|22818
-|gtn11|sub|8,wb|18,=ch_d0||convert digit to number|22822
-||mlr|4,reavt|||multiply real by 10.0|22823
-||rov|6,gtn36|||convert error if overflow|22824
-||str|3,gtnsr|||save result|22825
-||mti|8,wb|||get new digit as integer|22826
-||itr||||convert new digit to real|22827
-||adr|3,gtnsr|||add to get new total|22828
-||add|3,gtnsc|3,gtndf||increment scale if after dec point|22829
-||mnz|3,gtnrd|||set digit found flag|22830
-||bct|8,wa|6,gtn10||loop back if more chars|22831
-||brn|6,gtn22|||else jump to scale|22832
-||ejc|||||22833
-|gtn12|bne|8,wb|18,=ch_dt|6,gtn13|jump if not dec point|22839
-||bnz|3,gtndf|6,gtn36||if dec point, error if one already|22840
-||mov|3,gtndf|18,=num01||else set flag for dec point|22841
-||bct|8,wa|6,gtn10||loop back if more chars|22842
-||brn|6,gtn22|||else jump to scale|22843
-|gtn13|beq|8,wb|18,=ch_le|6,gtn15|jump if e for exponent|22847
-||beq|8,wb|18,=ch_ld|6,gtn15|jump if d for exponent|22848
-||beq|8,wb|18,=ch_ue|6,gtn15|jump if e for exponent|22850
-||beq|8,wb|18,=ch_ud|6,gtn15|jump if d for exponent|22851
-|gtn14|beq|8,wb|18,=ch_bl|6,gtnb4|jump if blank|22856
-||beq|8,wb|18,=ch_ht|6,gtnb4|jump if horizontal tab|22858
-||brn|6,gtn36|||error if non-blank|22863
-|gtnb4|lch|8,wb|10,(xr)+||get next character|22865
-||bct|8,wa|6,gtn14||loop back to check if more|22866
-||brn|6,gtn22|||else jump to scale|22867
-|gtn15|zer|3,gtnes|||set exponent sign positive|22871
-||ldi|4,intv0|||initialize exponent to zero|22872
-||mnz|3,gtndf|||reset no dec point indication|22873
-||bct|8,wa|6,gtn16||jump skipping past e or d|22874
-||brn|6,gtn36|||error if null exponent|22875
-|gtn16|lch|8,wb|10,(xr)+||load first exponent character|22879
-||beq|8,wb|18,=ch_pl|6,gtn17|jump if plus sign|22880
-||bne|8,wb|18,=ch_mn|6,gtn19|else jump if not minus sign|22881
-||mnz|3,gtnes|||set sign negative if minus sign|22882
-|gtn17|bct|8,wa|6,gtn18||jump if chars left|22886
-||brn|6,gtn36|||else error|22887
-|gtn18|lch|8,wb|10,(xr)+||load next character|22891
-||ejc|||||22892
-|gtn19|blt|8,wb|18,=ch_d0|6,gtn20|jump if not digit|22898
-||bgt|8,wb|18,=ch_d9|6,gtn20|jump if not digit|22899
-||cvm|6,gtn36|||else current*10, subtract new digit|22900
-||bct|8,wa|6,gtn18||loop back if more chars|22901
-||brn|6,gtn21|||jump if exponent field is exhausted|22902
-|gtn20|beq|8,wb|18,=ch_bl|6,gtnc0|jump if blank|22906
-||beq|8,wb|18,=ch_ht|6,gtnc0|jump if horizontal tab|22908
-||brn|6,gtn36|||error if non-blank|22913
-|gtnc0|lch|8,wb|10,(xr)+||get next character|22915
-||bct|8,wa|6,gtn20||loop back till all blanks scanned|22916
-|gtn21|sti|3,gtnex|||save collected exponent|22920
-||bnz|3,gtnes|6,gtn22||jump if it was negative|22921
-||ngi||||else complement|22922
-||iov|6,gtn36|||error if overflow|22923
-||sti|3,gtnex|||and store positive exponent|22924
-|gtn22|bze|3,gtnrd|6,gtn36||error if not digits collected|22928
-||bze|3,gtndf|6,gtn36||error if no exponent or dec point|22929
-||mti|3,gtnsc|||else load scale as integer|22930
-||sbi|3,gtnex|||subtract exponent|22931
-||iov|6,gtn36|||error if overflow|22932
-||ilt|6,gtn26|||jump if we must scale up|22933
-||mfi|8,wa|6,gtn36||load scale factor, err if ovflow|22937
-|gtn23|ble|8,wa|18,=num10|6,gtn24|jump if 10 or less to go|22941
-||dvr|4,reatt|||else divide by 10**10|22942
-||sub|8,wa|18,=num10||decrement scale|22943
-||brn|6,gtn23|||and loop back|22944
-||ejc|||||22945
-|gtn24|bze|8,wa|6,gtn30||jump if scaled|22951
-||lct|8,wb|18,=cfp_r||else get indexing factor|22952
-||mov|7,xr|21,=reav1||point to powers of ten table|22953
-||wtb|8,wa|||convert remaining scale to byte ofs|22954
-|gtn25|add|7,xr|8,wa||bump pointer|22958
-||bct|8,wb|6,gtn25||once for each value word|22959
-||dvr|9,(xr)|||scale down as required|22960
-||brn|6,gtn30|||and jump|22961
-|gtn26|ngi||||get absolute value of exponent|22965
-||iov|6,gtn36|||error if overflow|22966
-||mfi|8,wa|6,gtn36||acquire scale, error if ovflow|22967
-|gtn27|ble|8,wa|18,=num10|6,gtn28|jump if 10 or less to go|22971
-||mlr|4,reatt|||else multiply by 10**10|22972
-||rov|6,gtn36|||error if overflow|22973
-||sub|8,wa|18,=num10||else decrement scale|22974
-||brn|6,gtn27|||and loop back|22975
-|gtn28|bze|8,wa|6,gtn30||jump if scaled|22979
-||lct|8,wb|18,=cfp_r||else get indexing factor|22980
-||mov|7,xr|21,=reav1||point to powers of ten table|22981
-||wtb|8,wa|||convert remaining scale to byte ofs|22982
-|gtn29|add|7,xr|8,wa||bump pointer|22986
-||bct|8,wb|6,gtn29||once for each word in value|22987
-||mlr|9,(xr)|||scale up|22988
-||rov|6,gtn36|||error if overflow|22989
-||ejc|||||22990
-|gtn30|bze|3,gtnnf|6,gtn31||jump if positive|22996
-||ngr||||else negate|22997
-|gtn31|jsr|6,rcbld|||build real block|23001
-||brn|6,gtn33|||merge to exit|23002
-|gtn32|jsr|6,icbld|||build icblk|23007
-|gtn33|mov|8,wa|9,(xr)||load first word of result block|23011
-||ica|7,xs|||pop argument off stack|23012
-|gtn34|exi||||return to gtnum caller|23016
-|gtn35|lch|8,wb|11,-(xr)||reload current character|23023
-||lch|8,wb|10,(xr)+||bump character pointer|23024
-||ldi|3,gtnsi|||reload integer so far|23025
-||itr||||convert to real|23026
-||ngr||||make value positive|23027
-||brn|6,gtn11|||merge with real circuit|23028
-|gtn36|mov|7,xr|10,(xs)+||reload original argument|23033
-||exi|1,1|||take convert-error exit|23034
-||enp||||end procedure gtnum|23035
-||ejc|||||23036
-|gtnvr|prc|25,e|1,1||entry point|23050
-||bne|9,(xr)|22,=b_nml|6,gnv02|jump if not name|23052
-||mov|7,xr|13,nmbas(xr)||else load name base if name|23053
-||blo|7,xr|3,state|6,gnv07|skip if vrblk (in static region)|23054
-|gnv01|exi|1,1|||take convert-error exit|23058
-|gnv02|mov|3,gnvsa|8,wa||save wa|23062
-||mov|3,gnvsb|8,wb||save wb|23063
-||mov|11,-(xs)|7,xr||stack argument for gtstg|23064
-||jsr|6,gtstg|||convert argument to string|23065
-||ppm|6,gnv01|||jump if conversion error|23066
-||bze|8,wa|6,gnv01||null string is an error|23067
-||jsr|6,flstg|||fold lower case to upper case|23069
-||mov|11,-(xs)|7,xl||save xl|23071
-||mov|11,-(xs)|7,xr||stack string ptr for later|23072
-||mov|8,wb|7,xr||copy string pointer|23073
-||add|8,wb|19,*schar||point to characters of string|23074
-||mov|3,gnvst|8,wb||save pointer to characters|23075
-||mov|8,wb|8,wa||copy length|23076
-||ctw|8,wb|1,0||get number of words in name|23077
-||mov|3,gnvnw|8,wb||save for later|23078
-||jsr|6,hashs|||compute hash index for string|23079
-||rmi|3,hshnb|||compute hash offset by taking mod|23080
-||mfi|8,wc|||get as offset|23081
-||wtb|8,wc|||convert offset to bytes|23082
-||add|8,wc|3,hshtb||point to proper hash chain|23083
-||sub|8,wc|19,*vrnxt||subtract offset to merge into loop|23084
-||ejc|||||23085
-|gnv03|mov|7,xl|8,wc||copy hash chain pointer|23091
-||mov|7,xl|13,vrnxt(xl)||point to next vrblk on chain|23092
-||bze|7,xl|6,gnv08||jump if end of chain|23093
-||mov|8,wc|7,xl||save pointer to this vrblk|23094
-||bnz|13,vrlen(xl)|6,gnv04||jump if not system variable|23095
-||mov|7,xl|13,vrsvp(xl)||else point to svblk|23096
-||sub|7,xl|19,*vrsof||adjust offset for merge|23097
-|gnv04|bne|8,wa|13,vrlen(xl)|6,gnv03|back for next vrblk if lengths ne|23101
-||add|7,xl|19,*vrchs||else point to chars of chain entry|23102
-||lct|8,wb|3,gnvnw||get word counter to control loop|23103
-||mov|7,xr|3,gnvst||point to chars of new name|23104
-|gnv05|cne|9,(xr)|9,(xl)|6,gnv03|jump if no match for next vrblk|23108
-||ica|7,xr|||bump new name pointer|23109
-||ica|7,xl|||bump vrblk in chain name pointer|23110
-||bct|8,wb|6,gnv05||else loop till all compared|23111
-||mov|7,xr|8,wc||we have found a match, get vrblk|23112
-|gnv06|mov|8,wa|3,gnvsa||restore wa|23116
-||mov|8,wb|3,gnvsb||restore wb|23117
-||ica|7,xs|||pop string pointer|23118
-||mov|7,xl|10,(xs)+||restore xl|23119
-|gnv07|exi||||return to gtnvr caller|23123
-|gnv08|zer|7,xr|||clear garbage xr pointer|23127
-||mov|3,gnvhe|8,wc||save ptr to end of hash chain|23128
-||bgt|8,wa|18,=num09|6,gnv14|cannot be system var if length gt 9|23129
-||mov|7,xl|8,wa||else copy length|23130
-||wtb|7,xl|||convert to byte offset|23131
-||mov|7,xl|14,vsrch(xl)||point to first svblk of this length|23132
-||ejc|||||23133
-|gnv09|mov|3,gnvsp|7,xl||save table pointer|23139
-||mov|8,wc|10,(xl)+||load svbit bit string|23140
-||mov|8,wb|10,(xl)+||load length from table entry|23141
-||bne|8,wa|8,wb|6,gnv14|jump if end of right length entries|23142
-||lct|8,wb|3,gnvnw||get word counter to control loop|23143
-||mov|7,xr|3,gnvst||point to chars of new name|23144
-|gnv10|cne|9,(xr)|9,(xl)|6,gnv11|jump if name mismatch|23148
-||ica|7,xr|||else bump new name pointer|23149
-||ica|7,xl|||bump svblk pointer|23150
-||bct|8,wb|6,gnv10||else loop until all checked|23151
-||zer|8,wc|||set vrlen value zero|23155
-||mov|8,wa|19,*vrsi_||set standard size|23156
-||brn|6,gnv15|||jump to build vrblk|23157
-|gnv11|ica|7,xl|||bump past word of chars|23161
-||bct|8,wb|6,gnv11||loop back if more to go|23162
-||rsh|8,wc|2,svnbt||remove uninteresting bits|23163
-|gnv12|mov|8,wb|4,bits1||load bit to test|23167
-||anb|8,wb|8,wc||test for word present|23168
-||zrb|8,wb|6,gnv13||jump if not present|23169
-||ica|7,xl|||else bump table pointer|23170
-|gnv13|rsh|8,wc|1,1||remove bit already processed|23174
-||nzb|8,wc|6,gnv12||loop back if more bits to test|23175
-||brn|6,gnv09|||else loop back for next svblk|23176
-|gnv14|mov|8,wc|8,wa||copy vrlen value|23180
-||mov|8,wa|18,=vrchs||load standard size -chars|23181
-||add|8,wa|3,gnvnw||adjust for chars of name|23182
-||wtb|8,wa|||convert length to bytes|23183
-||ejc|||||23184
-|gnv15|jsr|6,alost|||allocate space for vrblk (static)|23190
-||mov|8,wb|7,xr||save vrblk pointer|23191
-||mov|7,xl|21,=stnvr||point to model variable block|23192
-||mov|8,wa|19,*vrlen||set length of standard fields|23193
-||mvw||||set initial fields of new block|23194
-||mov|7,xl|3,gnvhe||load pointer to end of hash chain|23195
-||mov|13,vrnxt(xl)|8,wb||add new block to end of chain|23196
-||mov|10,(xr)+|8,wc||set vrlen field, bump ptr|23197
-||mov|8,wa|3,gnvnw||get length in words|23198
-||wtb|8,wa|||convert to length in bytes|23199
-||bze|8,wc|6,gnv16||jump if system variable|23200
-||mov|7,xl|9,(xs)||point back to string name|23204
-||add|7,xl|19,*schar||point to chars of name|23205
-||mvw||||move characters into place|23206
-||mov|7,xr|8,wb||restore vrblk pointer|23207
-||brn|6,gnv06|||jump back to exit|23208
-|gnv16|mov|7,xl|3,gnvsp||load pointer to svblk|23213
-||mov|9,(xr)|7,xl||set svblk ptr in vrblk|23214
-||mov|7,xr|8,wb||restore vrblk pointer|23215
-||mov|8,wb|13,svbit(xl)||load bit indicators|23216
-||add|7,xl|19,*svchs||point to characters of name|23217
-||add|7,xl|8,wa||point past characters|23218
-||mov|8,wc|4,btknm||load test bit|23222
-||anb|8,wc|8,wb||and to test|23223
-||zrb|8,wc|6,gnv17||jump if no keyword number|23224
-||ica|7,xl|||else bump pointer|23225
-||ejc|||||23226
-|gnv17|mov|8,wc|4,btfnc||get test bit|23232
-||anb|8,wc|8,wb||and to test|23233
-||zrb|8,wc|6,gnv18||skip if no system function|23234
-||mov|13,vrfnc(xr)|7,xl||else point vrfnc to svfnc field|23235
-||add|7,xl|19,*num02||and bump past svfnc, svnar fields|23236
-|gnv18|mov|8,wc|4,btlbl||get test bit|23240
-||anb|8,wc|8,wb||and to test|23241
-||zrb|8,wc|6,gnv19||jump if bit is off (no system labl)|23242
-||mov|13,vrlbl(xr)|7,xl||else point vrlbl to svlbl field|23243
-||ica|7,xl|||bump past svlbl field|23244
-|gnv19|mov|8,wc|4,btval||load test bit|23248
-||anb|8,wc|8,wb||and to test|23249
-||zrb|8,wc|6,gnv06||all done if no value|23250
-||mov|13,vrval(xr)|9,(xl)||else set initial value|23251
-||mov|13,vrsto(xr)|22,=b_vre||set error store access|23252
-||brn|6,gnv06|||merge back to exit to caller|23253
-||enp||||end procedure gtnvr|23254
-||ejc|||||23255
-|gtpat|prc|25,e|1,1||entry point|23270
-||bhi|9,(xr)|22,=p_aaa|6,gtpt5|jump if pattern already|23272
-||mov|3,gtpsb|8,wb||save wb|23276
-||mov|11,-(xs)|7,xr||stack argument for gtstg|23277
-||jsr|6,gtstg|||convert argument to string|23278
-||ppm|6,gtpt2|||jump if impossible|23279
-||bnz|8,wa|6,gtpt1||jump if non-null|23283
-||mov|7,xr|21,=ndnth||point to nothen node|23287
-||brn|6,gtpt4|||jump to exit|23288
-||ejc|||||23289
-|gtpt1|mov|8,wb|22,=p_str||load pcode for multi-char string|23295
-||bne|8,wa|18,=num01|6,gtpt3|jump if multi-char string|23296
-||plc|7,xr|||point to character|23300
-||lch|8,wa|9,(xr)||load character|23301
-||mov|7,xr|8,wa||set as parm1|23302
-||mov|8,wb|22,=p_ans||point to pcode for 1-char any|23303
-||brn|6,gtpt3|||jump to build node|23304
-|gtpt2|mov|8,wb|22,=p_exa||set pcode for expression in case|23308
-||blo|9,(xr)|22,=b_e__|6,gtpt3|jump to build node if expression|23309
-||exi|1,1|||take convert error exit|23313
-|gtpt3|jsr|6,pbild|||call routine to build pattern node|23317
-|gtpt4|mov|8,wb|3,gtpsb||restore wb|23321
-|gtpt5|exi||||return to gtpat caller|23325
-||enp||||end procedure gtpat|23326
-||ejc|||||23329
-|gtrea|prc|25,e|1,1||entry point|23343
-||mov|8,wa|9,(xr)||get first word of block|23344
-||beq|8,wa|22,=b_rcl|6,gtre2|jump if real|23345
-||jsr|6,gtnum|||else convert argument to numeric|23346
-||ppm|6,gtre3|||jump if unconvertible|23347
-||beq|8,wa|22,=b_rcl|6,gtre2|jump if real was returned|23348
-|gtre1|ldi|13,icval(xr)|||load integer|23352
-||itr||||convert to real|23353
-||jsr|6,rcbld|||build rcblk|23354
-|gtre2|exi||||return to gtrea caller|23358
-|gtre3|exi|1,1|||take convert error exit|23362
-||enp||||end procedure gtrea|23363
-||ejc|||||23365
-|gtsmi|prc|25,n|1,2||entry point|23385
-||mov|7,xr|10,(xs)+||load argument|23386
-||beq|9,(xr)|22,=b_icl|6,gtsm1|skip if already an integer|23387
-||jsr|6,gtint|||convert argument to integer|23391
-||ppm|6,gtsm2|||jump if convert is impossible|23392
-|gtsm1|ldi|13,icval(xr)|||load integer value|23396
-||mfi|8,wc|6,gtsm3||move as one word, jump if ovflow|23397
-||bgt|8,wc|3,mxlen|6,gtsm3|or if too large|23398
-||mov|7,xr|8,wc||copy result to xr|23399
-||exi||||return to gtsmi caller|23400
-|gtsm2|exi|1,1|||take non-integer error exit|23404
-|gtsm3|exi|1,2|||take out-of-range error exit|23408
-||enp||||end procedure gtsmi|23409
-||ejc|||||23410
-|gtstg|prc|25,n|1,1||entry point|23476
-||mov|7,xr|10,(xs)+||load argument, pop stack|23477
-||beq|9,(xr)|22,=b_scl|6,gts30|jump if already a string|23478
-|gts01|mov|11,-(xs)|7,xr||restack argument in case error|23482
-||mov|11,-(xs)|7,xl||save xl|23483
-||mov|3,gtsvb|8,wb||save wb|23484
-||mov|3,gtsvc|8,wc||save wc|23485
-||mov|8,wa|9,(xr)||load first word of block|23486
-||beq|8,wa|22,=b_icl|6,gts05|jump to convert integer|23487
-||beq|8,wa|22,=b_rcl|6,gts10|jump to convert real|23490
-||beq|8,wa|22,=b_nml|6,gts03|jump to convert name|23492
-|gts02|mov|7,xl|10,(xs)+||restore xl|23500
-||mov|7,xr|10,(xs)+||reload input argument|23501
-||exi|1,1|||take convert error exit|23502
-||ejc|||||23503
-|gts03|mov|7,xl|13,nmbas(xr)||load name base|23509
-||bhi|7,xl|3,state|6,gts02|error if not natural var (static)|23510
-||add|7,xl|19,*vrsof||else point to possible string name|23511
-||mov|8,wa|13,sclen(xl)||load length|23512
-||bnz|8,wa|6,gts04||jump if not system variable|23513
-||mov|7,xl|13,vrsvo(xl)||else point to svblk|23514
-||mov|8,wa|13,svlen(xl)||and load name length|23515
-|gts04|zer|8,wb|||set offset to zero|23519
-||jsr|6,sbstr|||use sbstr to copy string|23520
-||brn|6,gts29|||jump to exit|23521
-|gts05|ldi|13,icval(xr)|||load integer value|23525
-||mov|3,gtssf|18,=num01||set sign flag negative|23533
-||ilt|6,gts06|||skip if integer is negative|23534
-||ngi||||else negate integer|23535
-||zer|3,gtssf|||and reset negative flag|23536
-||ejc|||||23537
-|gts06|mov|7,xr|3,gtswk||point to result work area|23544
-||mov|8,wb|18,=nstmx||initialize counter to max length|23545
-||psc|7,xr|8,wb||prepare to store (right-left)|23546
-|gts07|cvd||||convert one digit into wa|23550
-||sch|8,wa|11,-(xr)||store in work area|23551
-||dcv|8,wb|||decrement counter|23552
-||ine|6,gts07|||loop if more digits to go|23553
-||csc|7,xr|||complete store characters|23554
-|gts08|mov|8,wa|18,=nstmx||get max number of characters|23560
-||sub|8,wa|8,wb||compute length of result|23561
-||mov|7,xl|8,wa||remember length for move later on|23562
-||add|8,wa|3,gtssf||add one for negative sign if needed|23563
-||jsr|6,alocs|||allocate string for result|23564
-||mov|8,wc|7,xr||save result pointer for the moment|23565
-||psc|7,xr|||point to chars of result block|23566
-||bze|3,gtssf|6,gts09||skip if positive|23567
-||mov|8,wa|18,=ch_mn||else load negative sign|23568
-||sch|8,wa|10,(xr)+||and store it|23569
-||csc|7,xr|||complete store characters|23570
-|gts09|mov|8,wa|7,xl||recall length to move|23574
-||mov|7,xl|3,gtswk||point to result work area|23575
-||plc|7,xl|8,wb||point to first result character|23576
-||mvc||||move chars to result string|23577
-||mov|7,xr|8,wc||restore result pointer|23578
-||brn|6,gts29|||jump to exit|23581
-||ejc|||||23582
-|gts10|ldr|13,rcval(xr)|||load real|23588
-||zer|3,gtssf|||reset negative flag|23600
-||req|6,gts31|||skip if zero|23601
-||rge|6,gts11|||jump if real is positive|23602
-||mov|3,gtssf|18,=num01||else set negative flag|23603
-||ngr||||and get absolute value of real|23604
-|gts11|ldi|4,intv0|||initialize exponent to zero|23608
-|gts12|str|3,gtsrs|||save real value|23612
-||sbr|4,reap1|||subtract 0.1 to compare|23613
-||rge|6,gts13|||jump if scale up not required|23614
-||ldr|3,gtsrs|||else reload value|23615
-||mlr|4,reatt|||multiply by 10**10|23616
-||sbi|4,intvt|||decrement exponent by 10|23617
-||brn|6,gts12|||loop back to test again|23618
-|gts13|ldr|3,gtsrs|||reload value|23622
-||sbr|4,reav1|||subtract 1.0|23623
-||rlt|6,gts17|||jump if no scale down required|23624
-||ldr|3,gtsrs|||else reload value|23625
-|gts14|sbr|4,reatt|||subtract 10**10 to compare|23629
-||rlt|6,gts15|||jump if large step not required|23630
-||ldr|3,gtsrs|||else restore value|23631
-||dvr|4,reatt|||divide by 10**10|23632
-||str|3,gtsrs|||store new value|23633
-||adi|4,intvt|||increment exponent by 10|23634
-||brn|6,gts14|||loop back|23635
-||ejc|||||23636
-|gts15|mov|7,xr|21,=reav1||point to powers of ten table|23643
-|gts16|ldr|3,gtsrs|||reload value|23647
-||adi|4,intv1|||increment exponent|23648
-||add|7,xr|19,*cfp_r||point to next entry in table|23649
-||sbr|9,(xr)|||subtract it to compare|23650
-||rge|6,gts16|||loop till we find a larger entry|23651
-||ldr|3,gtsrs|||then reload the value|23652
-||dvr|9,(xr)|||and complete scaling|23653
-||str|3,gtsrs|||store value|23654
-|gts17|ldr|3,gtsrs|||get value again|23658
-||adr|3,gtsrn|||add rounding factor|23659
-||str|3,gtsrs|||store result|23660
-||sbr|4,reav1|||subtract 1.0 to compare|23665
-||rlt|6,gts18|||skip if ok|23666
-||adi|4,intv1|||else increment exponent|23667
-||ldr|3,gtsrs|||reload value|23668
-||dvr|4,reavt|||divide by 10.0 to rescale|23669
-||brn|6,gts19|||jump to merge|23670
-|gts18|ldr|3,gtsrs|||reload rounded value|23674
-||ejc|||||23675
-|gts19|mov|7,xl|18,=cfp_s||set num dec digits = cfp_s|23699
-||mov|3,gtses|18,=ch_mn||set exponent sign negative|23700
-||ilt|6,gts21|||all set if exponent is negative|23701
-||mfi|8,wa|||else fetch exponent|23702
-||ble|8,wa|18,=cfp_s|6,gts20|skip if we can use special format|23703
-||mti|8,wa|||else restore exponent|23704
-||ngi||||set negative for cvd|23705
-||mov|3,gtses|18,=ch_pl||set plus sign for exponent sign|23706
-||brn|6,gts21|||jump to generate exponent|23707
-|gts20|sub|7,xl|8,wa||compute digits after decimal point|23711
-||ldi|4,intv0|||reset exponent to zero|23712
-||ejc|||||23713
-|gts21|mov|7,xr|3,gtswk||point to work area|23724
-||mov|8,wb|18,=nstmx||set character ctr to max length|23725
-||psc|7,xr|8,wb||prepare to store (right to left)|23726
-||ieq|6,gts23|||skip exponent if it is zero|23727
-|gts22|cvd||||convert a digit into wa|23731
-||sch|8,wa|11,-(xr)||store in work area|23732
-||dcv|8,wb|||decrement counter|23733
-||ine|6,gts22|||loop back if more digits to go|23734
-||mov|8,wa|3,gtses||load exponent sign|23738
-||sch|8,wa|11,-(xr)||store in work area|23739
-||mov|8,wa|18,=ch_le||get character letter e|23740
-||sch|8,wa|11,-(xr)||store in work area|23741
-||sub|8,wb|18,=num02||decrement counter for sign and e|23742
-|gts23|mlr|3,gtssc|||convert real to integer (10**cfp_s)|23746
-||rti||||get integer (overflow impossible)|23747
-||ngi||||negate as required by cvd|23748
-|gts24|bze|7,xl|6,gts27||jump if no digits left to do|23752
-||cvd||||else convert one digit|23753
-||bne|8,wa|18,=ch_d0|6,gts26|jump if not a zero|23754
-||dcv|7,xl|||decrement counter|23755
-||brn|6,gts24|||loop back for next digit|23756
-||ejc|||||23757
-|gts25|cvd||||convert a digit into wa|23763
-|gts26|sch|8,wa|11,-(xr)||store digit|23767
-||dcv|8,wb|||decrement counter|23768
-||dcv|7,xl|||decrement counter|23769
-||bnz|7,xl|6,gts25||loop back if more to go|23770
-|gts27|mov|8,wa|18,=ch_dt||load decimal point|23774
-||sch|8,wa|11,-(xr)||store in work area|23775
-||dcv|8,wb|||decrement counter|23776
-|gts28|cvd||||convert a digit into wa|23780
-||sch|8,wa|11,-(xr)||store in work area|23781
-||dcv|8,wb|||decrement counter|23782
-||ine|6,gts28|||loop back if more to go|23783
-||csc|7,xr|||complete store characters|23784
-||brn|6,gts08|||else jump back to exit|23785
-|gts29|mov|7,xl|10,(xs)+||restore xl|23791
-||ica|7,xs|||pop argument|23792
-||mov|8,wb|3,gtsvb||restore wb|23793
-||mov|8,wc|3,gtsvc||restore wc|23794
-|gts30|mov|8,wa|13,sclen(xr)||load string length|23798
-||exi||||return to caller|23799
-|gts31|mov|7,xl|21,=scre0||point to string|23805
-||mov|8,wa|18,=num02||2 chars|23806
-||zer|8,wb|||zero offset|23807
-||jsr|6,sbstr|||copy string|23808
-||brn|6,gts29|||return|23809
-||enp||||end procedure gtstg|23836
-||ejc|||||23837
-|gtvar|prc|25,e|1,1||entry point|23852
-||bne|9,(xr)|22,=b_nml|6,gtvr2|jump if not a name|23853
-||mov|8,wa|13,nmofs(xr)||else load name offset|23854
-||mov|7,xl|13,nmbas(xr)||load name base|23855
-||beq|9,(xl)|22,=b_evt|6,gtvr1|error if expression variable|23856
-||bne|9,(xl)|22,=b_kvt|6,gtvr3|all ok if not keyword variable|23857
-|gtvr1|exi|1,1|||take convert error exit|23861
-|gtvr2|mov|3,gtvrc|8,wc||save wc|23865
-||jsr|6,gtnvr|||locate vrblk if possible|23866
-||ppm|6,gtvr1|||jump if convert error|23867
-||mov|7,xl|7,xr||else copy vrblk name base|23868
-||mov|8,wa|19,*vrval||and set offset|23869
-||mov|8,wc|3,gtvrc||restore wc|23870
-|gtvr3|bhi|7,xl|3,state|6,gtvr4|all ok if not natural variable|23874
-||beq|13,vrsto(xl)|22,=b_vre|6,gtvr1|error if protected variable|23875
-|gtvr4|exi||||return to caller|23879
-||enp||||end procedure gtvar|23880
-||ejc|||||23881
-||ejc|||||23882
-|hashs|prc|25,e|1,0||entry point|23918
-||mov|8,wc|18,=e_hnw||get number of words to use|23920
-||bze|8,wc|6,hshsa||branch if one character per word|23921
-||mov|8,wc|13,sclen(xr)||load string length in characters|23922
-||mov|8,wb|8,wc||initialize with length|23923
-||bze|8,wc|6,hshs3||jump if null string|23924
-||zgb|8,wb|||correct byte ordering if necessary|23925
-||ctw|8,wc|1,0||get number of words of chars|23926
-||add|7,xr|19,*schar||point to characters of string|23927
-||blo|8,wc|18,=e_hnw|6,hshs1|use whole string if short|23928
-||mov|8,wc|18,=e_hnw||else set to involve first e_hnw wds|23929
-|hshs1|lct|8,wc|8,wc||set counter to control loop|23933
-|hshs2|xob|8,wb|10,(xr)+||exclusive or next word of chars|23937
-||bct|8,wc|6,hshs2||loop till all processed|23938
-|hshs3|zgb|8,wb|||zeroise undefined bits|23942
-||anb|8,wb|4,bitsm||ensure in range 0 to cfp_m|23943
-||mti|8,wb|||move result as integer|23944
-||zer|7,xr|||clear garbage value in xr|23945
-||exi||||return to hashs caller|23946
-|hshsa|mov|8,wc|13,sclen(xr)||load string length in characters|23950
-||mov|8,wb|8,wc||initialize with length|23951
-||bze|8,wc|6,hshs3||jump if null string|23952
-||zgb|8,wb|||correct byte ordering if necessary|23953
-||ctw|8,wc|1,0||get number of words of chars|23954
-||plc|7,xr||||23955
-||mov|11,-(xs)|7,xl||save xl|23956
-||mov|7,xl|8,wc||load length for branch|23957
-||bge|7,xl|18,=num25|6,hsh24|use first characters if longer|23958
-||bsw|7,xl|1,25||merge to compute hash|23959
-||iff|1,0|6,hsh00|||23985
-||iff|1,1|6,hsh01|||23985
-||iff|1,2|6,hsh02|||23985
-||iff|1,3|6,hsh03|||23985
-||iff|1,4|6,hsh04|||23985
-||iff|1,5|6,hsh05|||23985
-||iff|1,6|6,hsh06|||23985
-||iff|1,7|6,hsh07|||23985
-||iff|1,8|6,hsh08|||23985
-||iff|1,9|6,hsh09|||23985
-||iff|1,10|6,hsh10|||23985
-||iff|1,11|6,hsh11|||23985
-||iff|1,12|6,hsh12|||23985
-||iff|1,13|6,hsh13|||23985
-||iff|1,14|6,hsh14|||23985
-||iff|1,15|6,hsh15|||23985
-||iff|1,16|6,hsh16|||23985
-||iff|1,17|6,hsh17|||23985
-||iff|1,18|6,hsh18|||23985
-||iff|1,19|6,hsh19|||23985
-||iff|1,20|6,hsh20|||23985
-||iff|1,21|6,hsh21|||23985
-||iff|1,22|6,hsh22|||23985
-||iff|1,23|6,hsh23|||23985
-||iff|1,24|6,hsh24|||23985
-||esw|||||23985
-|hsh24|lch|8,wc|10,(xr)+||load next character|23986
-||lsh|8,wc|1,24||shift for hash|23987
-||xob|8,wb|8,wc||hash character|23988
-|hsh23|lch|8,wc|10,(xr)+||load next character|23989
-||lsh|8,wc|1,16||shift for hash|23990
-||xob|8,wb|8,wc||hash character|23991
-|hsh22|lch|8,wc|10,(xr)+||load next character|23992
-||lsh|8,wc|1,8||shift for hash|23993
-||xob|8,wb|8,wc||hash character|23994
-|hsh21|lch|8,wc|10,(xr)+||load next character|23995
-||xob|8,wb|8,wc||hash character|23996
-|hsh20|lch|8,wc|10,(xr)+||load next character|23997
-||lsh|8,wc|1,24||shift for hash|23998
-||xob|8,wb|8,wc||hash character|23999
-|hsh19|lch|8,wc|10,(xr)+||load next character|24000
-||lsh|8,wc|1,16||shift for hash|24001
-||xob|8,wb|8,wc||hash character|24002
-|hsh18|lch|8,wc|10,(xr)+||load next character|24003
-||lsh|8,wc|1,8||shift for hash|24004
-||xob|8,wb|8,wc||hash character|24005
-|hsh17|lch|8,wc|10,(xr)+||load next character|24006
-||xob|8,wb|8,wc||hash character|24007
-|hsh16|lch|8,wc|10,(xr)+||load next character|24008
-||lsh|8,wc|1,24||shift for hash|24009
-||xob|8,wb|8,wc||hash character|24010
-|hsh15|lch|8,wc|10,(xr)+||load next character|24011
-||lsh|8,wc|1,16||shift for hash|24012
+|cnc20|zer|3,cswls|||clear switch|19724
+||brn|6,cnc08|||merge|19725
+|cnc21|mnz|3,cswno|||set switch|19729
+||brn|6,cnc08|||merge|19730
+|cnc22|zer|3,cswpr|||clear switch|19734
+||brn|6,cnc08|||merge|19735
+|cnc24|zer|3,cswno|||clear switch|19739
+||brn|6,cnc08|||merge|19740
+|cnc25|mnz|3,cswpr|||set switch|19744
+||brn|6,cnc08|||merge|19745
+||ejc|||||19746
+|cnc27|zer|3,cswdb|||clear switch|19752
+||brn|6,cnc08|||merge|19753
+|cnc28|bze|3,cswls|6,cnc09||return if -nolist|19757
+||jsr|6,scane|||scan integer after -space|19758
+||mov|8,wc|18,=num01||1 space in case|19759
+||beq|7,xr|18,=t_smc|6,cnc29|jump if no integer|19760
+||mov|11,-(xs)|7,xr||stack it|19761
+||jsr|6,gtsmi|||check integer|19762
+||ppm|6,cnc06|||fail if not integer|19763
+||ppm|6,cnc06|||fail if negative or large|19764
+||bnz|8,wc|6,cnc29||jump if non zero|19765
+||mov|8,wc|18,=num01||else 1 space|19766
+|cnc29|add|3,lstlc|8,wc||bump line count|19770
+||lct|8,wc|8,wc||convert to loop counter|19771
+||blt|3,lstlc|3,lstnp|6,cnc30|jump if fits on page|19772
+||jsr|6,prtps|||eject|19773
+||jsr|6,listt|||list title|19774
+||brn|6,cnc09|||merge|19775
+|cnc30|jsr|6,prtnl|||print a blank|19779
+||bct|8,wc|6,cnc30||loop|19780
+||brn|6,cnc09|||merge|19781
+||ejc|||||19782
+|cnc31|mov|3,cnr_t|20,=r_stl||ptr to r_stl|19788
+||brn|6,cnc33|||merge|19789
+|cnc32|mov|3,r_stl|21,=nulls||clear subtitle|19793
+||mov|3,cnr_t|20,=r_ttl||ptr to r_ttl|19794
+|cnc33|mov|7,xr|21,=nulls||null in case needed|19798
+||mnz|3,cnttl|||set flag for next listr call|19799
+||mov|8,wb|18,=ccofs||offset to title/subtitle|19800
+||mov|8,wa|3,scnil||input image length|19801
+||blo|8,wa|8,wb|6,cnc34|jump if no chars left|19802
+||sub|8,wa|8,wb||no of chars to extract|19803
+||mov|7,xl|3,r_cim||point to image|19804
+||jsr|6,sbstr|||get title/subtitle|19805
+|cnc34|mov|7,xl|3,cnr_t||point to storage location|19809
+||mov|9,(xl)|7,xr||store title/subtitle|19810
+||beq|7,xl|20,=r_stl|6,cnc09|return if stitl|19811
+||bnz|3,precl|6,cnc09||return if extended listing|19812
+||bze|3,prich|6,cnc09||return if regular printer|19813
+||mov|7,xl|13,sclen(xr)||get length of title|19814
+||mov|8,wa|7,xl||copy it|19815
+||bze|7,xl|6,cnc35||jump if null|19816
+||add|7,xl|18,=num10||increment|19817
+||bhi|7,xl|3,prlen|6,cnc09|use default lstp0 val if too long|19818
+||add|8,wa|18,=num04||point just past title|19819
+|cnc35|mov|3,lstpo|8,wa||store offset|19823
+||brn|6,cnc09|||return|19824
+|cnc36|jsr|6,systt|||toggle switch|19830
+||brn|6,cnc08|||merge|19831
+|cnc37|jsr|6,scane|||scan integer after -case|19838
+||zer|8,wc|||get 0 in case none there|19839
+||beq|7,xl|18,=t_smc|6,cnc38|skip if no integer|19840
+||mov|11,-(xs)|7,xr||stack it|19841
+||jsr|6,gtsmi|||check integer|19842
+||ppm|6,cnc06|||fail if not integer|19843
+||ppm|6,cnc06|||fail if negative or too large|19844
+|cnc38|mov|3,kvcas|8,wc||store new case value|19845
+||brn|6,cnc09|||merge|19846
+|cnc41|mnz|3,scncc|||set flag for scane|19869
+||jsr|6,scane|||scan quoted file name|19870
+||zer|3,scncc|||clear scane flag|19871
+||bne|7,xl|18,=t_con|6,cnc06|if not constant|19872
+||bne|9,(xr)|22,=b_scl|6,cnc06|if not string constant|19873
+||mov|3,r_ifn|7,xr||save file name|19874
+||mov|7,xl|3,r_inc||examine include file name table|19875
+||zer|8,wb|||lookup by value|19876
+||jsr|6,tfind|||do lookup|19877
+||ppm||||never fails|19878
+||beq|7,xr|21,=inton|6,cnc09|ignore if already in table|19879
+||mnz|8,wb|||set for trim|19880
+||mov|7,xr|3,r_ifn||file name|19881
+||jsr|6,trimr|||remove trailing blanks|19882
+||mov|7,xl|3,r_inc||include file name table|19883
+||mnz|8,wb|||lookup by name this time|19884
+||jsr|6,tfind|||do lookup|19885
+||ppm||||never fails|19886
+||mov|13,teval(xl)|21,=inton||make table value integer 1|19887
+||icv|3,cnind|||increase nesting level|19888
+||mov|8,wa|3,cnind||load new nest level|19889
+||bgt|8,wa|18,=ccinm|6,cnc42|fail if excessive nesting|19890
+||mov|7,xl|3,r_ifa||array of nested file names|19895
+||add|8,wa|18,=vcvlb||compute offset in words|19896
+||wtb|8,wa|||convert to bytes|19897
+||add|7,xl|8,wa||point to element|19898
+||mov|9,(xl)|3,r_sfc||record current file name|19899
+||mov|7,xl|8,wa||preserve nesting byte offset|19900
+||mti|3,rdnln|||fetch source line number as integer|19901
+||jsr|6,icbld|||convert to icblk|19902
+||add|7,xl|3,r_ifl||entry in nested line number array|19903
+||mov|9,(xl)|7,xr||record in array|19904
+||mov|8,wa|3,cswin||max read length|19909
+||mov|7,xl|3,r_ifn||include file name|19910
+||jsr|6,alocs|||get buffer for complete file name|19911
+||jsr|6,sysif|||open include file|19912
+||ppm|6,cnc43|||could not open|19913
+||zer|8,wb|||do not trim trailing blanks|19918
+||jsr|6,trimr|||adjust scblk for actual length|19919
+||mov|3,r_sfc|7,xr||save ptr to file name|19920
+||mti|3,cmpsn|||current statement as integer|19921
+||jsr|6,icbld|||build icblk for stmt number|19922
+||mov|7,xl|3,r_sfn||file name table|19923
+||mnz|8,wb|||lookup statement number by name|19924
+||jsr|6,tfind|||allocate new teblk|19925
+||ppm||||always possible to allocate block|19926
+||mov|13,teval(xl)|3,r_sfc||record file name as entry value|19927
+||zer|3,rdnln|||restart line counter for new file|19931
+||beq|3,stage|18,=stgic|6,cnc09|if initial compile|19932
+||bne|3,cnind|18,=num01|6,cnc09|if not first execute-time nesting|19933
+||mov|3,r_ici|3,r_cim||remember code argument string|19937
+||mov|3,cnspt|3,scnpt||save position in string|19938
+||mov|3,cnsil|3,scnil||and length of string|19939
+||brn|6,cnc09|||all done, merge|19940
+|cnc42|erb|1,284|26,excessively nested include files|||19944
+|cnc43|mov|3,dnamp|7,xr||release allocated scblk|19948
+||erb|1,285|26,include file cannot be opened|||19949
+|cnc44|jsr|6,scane|||scan integer after -line|19956
+||bne|7,xl|18,=t_con|6,cnc06|jump if no line number|19957
+||bne|9,(xr)|22,=b_icl|6,cnc06|jump if not integer|19958
+||ldi|13,icval(xr)|||fetch integer line number|19959
+||ile|6,cnc06|||error if negative or zero|19960
+||beq|3,stage|18,=stgic|6,cnc45|skip if initial compile|19961
+||mfi|3,cmpln|||set directly for other compiles|19962
+||brn|6,cnc46|||no need to set rdnln|19963
+|cnc45|sbi|4,intv1|||adjust number by one|19964
+||mfi|3,rdnln|||save line number|19965
+|cnc46|mnz|3,scncc|||set flag for scane|19967
+||jsr|6,scane|||scan quoted file name|19968
+||zer|3,scncc|||clear scane flag|19969
+||beq|7,xl|18,=t_smc|6,cnc47|done if no file name|19970
+||bne|7,xl|18,=t_con|6,cnc06|error if not constant|19971
+||bne|9,(xr)|22,=b_scl|6,cnc06|if not string constant|19972
+||jsr|6,newfn|||record new file name|19973
+||brn|6,cnc09|||merge|19974
+|cnc47|dcv|3,scnpt|||set to rescan the terminator|19978
+||brn|6,cnc09|||merge|19979
+||enp||||end procedure cncrd|19984
+||ejc|||||19985
+|dffnc|prc|25,e|1,0||entry point|20067
+||bne|9,(xl)|22,=b_efc|6,dffn1|skip if new function not external|20070
+||icv|13,efuse(xl)|||else increment its use count|20071
+|dffn1|mov|8,wa|7,xr||save vrblk pointer|20075
+||mov|7,xr|13,vrfnc(xr)||load old function pointer|20076
+||bne|9,(xr)|22,=b_efc|6,dffn2|jump if old function not external|20077
+||mov|8,wb|13,efuse(xr)||else get use count|20078
+||dcv|8,wb|||decrement|20079
+||mov|13,efuse(xr)|8,wb||store decremented value|20080
+||bnz|8,wb|6,dffn2||jump if use count still non-zero|20081
+||jsr|6,sysul|||else call system unload function|20082
+|dffn2|mov|7,xr|8,wa||restore vrblk pointer|20086
+||mov|8,wa|7,xl||copy function block ptr|20088
+||blt|7,xr|20,=r_yyy|6,dffn3|skip checks if opsyn op definition|20089
+||bnz|13,vrlen(xr)|6,dffn3||jump if not system variable|20090
+||mov|7,xl|13,vrsvp(xr)||point to svblk|20094
+||mov|8,wb|13,svbit(xl)||load bit indicators|20095
+||anb|8,wb|4,btfnc||is it a system function|20096
+||zrb|8,wb|6,dffn3||redef ok if not|20097
+||erb|1,248|26,attempted redefinition of system function|||20098
+|dffn3|mov|13,vrfnc(xr)|8,wa||store new function pointer|20102
+||mov|7,xl|8,wa||restore function block pointer|20103
+||exi||||return to dffnc caller|20104
+||enp||||end procedure dffnc|20105
+||ejc|||||20106
+|dtach|prc|25,e|1,0||entry point|20120
+||mov|3,dtcnb|7,xl||store name base (gbcol not called)|20121
+||add|7,xl|8,wa||point to name location|20122
+||mov|3,dtcnm|7,xl||store it|20123
+|dtch1|mov|7,xr|7,xl||copy name pointer|20127
+|dtch2|mov|7,xl|9,(xl)||point to next value|20131
+||bne|9,(xl)|22,=b_trt|6,dtch6|jump at chain end|20132
+||mov|8,wa|13,trtyp(xl)||get trap block type|20133
+||beq|8,wa|18,=trtin|6,dtch3|jump if input|20134
+||beq|8,wa|18,=trtou|6,dtch3|jump if output|20135
+||add|7,xl|19,*trnxt||point to next link|20136
+||brn|6,dtch1|||loop|20137
+|dtch3|mov|9,(xr)|13,trval(xl)||delete trblk|20141
+||mov|8,wa|7,xl||dump xl ...|20142
+||mov|8,wb|7,xr||... and xr|20143
+||mov|7,xl|13,trtrf(xl)||point to trtrf trap block|20144
+||bze|7,xl|6,dtch5||jump if no iochn|20145
+||bne|9,(xl)|22,=b_trt|6,dtch5|jump if input, output, terminal|20146
+|dtch4|mov|7,xr|7,xl||remember link ptr|20150
+||mov|7,xl|13,trtrf(xl)||point to next link|20151
+||bze|7,xl|6,dtch5||jump if end of chain|20152
+||mov|8,wc|13,ionmb(xl)||get name base|20153
+||add|8,wc|13,ionmo(xl)||add offset|20154
+||bne|8,wc|3,dtcnm|6,dtch4|loop if no match|20155
+||mov|13,trtrf(xr)|13,trtrf(xl)||remove name from chain|20156
+||ejc|||||20157
+|dtch5|mov|7,xl|8,wa||recover xl ...|20163
+||mov|7,xr|8,wb||... and xr|20164
+||add|7,xl|19,*trval||point to value field|20165
+||brn|6,dtch2|||continue|20166
+|dtch6|mov|7,xr|3,dtcnb||possible vrblk ptr|20170
+||jsr|6,setvr|||reset vrblk if necessary|20171
+||exi||||return|20172
+||enp||||end procedure dtach|20173
+||ejc|||||20174
+|dtype|prc|25,e|1,0||entry point|20182
+||beq|9,(xr)|22,=b_pdt|6,dtyp1|jump if prog.defined|20183
+||mov|7,xr|9,(xr)||load type word|20184
+||lei|7,xr|||get entry point id (block code)|20185
+||wtb|7,xr|||convert to byte offset|20186
+||mov|7,xr|14,scnmt(xr)||load table entry|20187
+||exi||||exit to dtype caller|20188
+|dtyp1|mov|7,xr|13,pddfp(xr)||point to dfblk|20192
+||mov|7,xr|13,dfnam(xr)||get datatype name from dfblk|20193
+||exi||||return to dtype caller|20194
+||enp||||end procedure dtype|20195
+||ejc|||||20196
+|dumpr|prc|25,e|1,0||entry point|20217
+||bze|7,xr|6,dmp28||skip dump if argument is zero|20218
+||bgt|7,xr|18,=num03|6,dmp29|jump if core dump required|20219
+||zer|7,xl|||clear xl|20220
+||zer|8,wb|||zero move offset|20221
+||mov|3,dmarg|7,xr||save dump argument|20222
+||zer|3,dnams|||collect sediment too|20224
+||jsr|6,gbcol|||collect garbage|20226
+||jsr|6,prtpg|||eject printer|20227
+||mov|7,xr|21,=dmhdv||point to heading for variables|20228
+||jsr|6,prtst|||print it|20229
+||jsr|6,prtnl|||terminate print line|20230
+||jsr|6,prtnl|||and print a blank line|20231
+||zer|3,dmvch|||set null chain to start|20244
+||mov|8,wa|3,hshtb||point to hash table|20245
+|dmp00|mov|7,xr|8,wa||copy hash bucket pointer|20249
+||ica|8,wa|||bump pointer|20250
+||sub|7,xr|19,*vrnxt||set offset to merge|20251
+|dmp01|mov|7,xr|13,vrnxt(xr)||point to next vrblk on chain|20255
+||bze|7,xr|6,dmp09||jump if end of this hash chain|20256
+||mov|7,xl|7,xr||else copy vrblk pointer|20257
+||ejc|||||20258
+|dmp02|mov|7,xl|13,vrval(xl)||load value|20264
+||beq|3,dmarg|18,=num03|6,dmp2a|skip null value check if dump(3)|20265
+||beq|7,xl|21,=nulls|6,dmp01|loop for next vrblk if null value|20266
+|dmp2a|beq|9,(xl)|22,=b_trt|6,dmp02|loop back if value is trapped|20267
+||mov|8,wc|7,xr||save vrblk pointer|20271
+||add|7,xr|19,*vrsof||adjust ptr to be like scblk ptr|20272
+||bnz|13,sclen(xr)|6,dmp03||jump if non-system variable|20273
+||mov|7,xr|13,vrsvo(xr)||else load ptr to name in svblk|20274
+|dmp03|mov|8,wb|7,xr||save pointer to chars|20278
+||mov|3,dmpsv|8,wa||save hash bucket pointer|20279
+||mov|8,wa|20,=dmvch||point to chain head|20280
+|dmp04|mov|3,dmpch|8,wa||save chain pointer|20284
+||mov|7,xl|8,wa||copy it|20285
+||mov|7,xr|9,(xl)||load pointer to next entry|20286
+||bze|7,xr|6,dmp08||jump if end of chain to insert|20287
+||add|7,xr|19,*vrsof||else get name ptr for chained vrblk|20288
+||bnz|13,sclen(xr)|6,dmp05||jump if not system variable|20289
+||mov|7,xr|13,vrsvo(xr)||else point to name in svblk|20290
+|dmp05|mov|7,xl|8,wb||point to entering vrblk string|20300
+||mov|8,wa|13,sclen(xl)||load its length|20301
+||plc|7,xl|||point to chars of entering string|20302
+||bhi|8,wa|13,sclen(xr)|6,dmp06|jump if entering length high|20325
+||plc|7,xr|||else point to chars of old string|20326
+||cmc|6,dmp08|6,dmp07||compare, insert if new is llt old|20327
+||brn|6,dmp08|||or if leq (we had shorter length)|20328
+|dmp06|mov|8,wa|13,sclen(xr)||load shorter length|20332
+||plc|7,xr|||point to chars of old string|20333
+||cmc|6,dmp08|6,dmp07||compare, insert if new one low|20334
+||ejc|||||20335
+|dmp07|mov|7,xl|3,dmpch||copy chain pointer|20341
+||mov|8,wa|9,(xl)||move to next entry on chain|20343
+||brn|6,dmp04|||loop back|20344
+|dmp08|mov|7,xl|3,dmpch||copy chain pointer|20348
+||mov|8,wa|3,dmpsv||restore hash bucket pointer|20349
+||mov|7,xr|8,wc||restore vrblk pointer|20350
+||mov|13,vrget(xr)|9,(xl)||link vrblk to rest of chain|20351
+||mov|9,(xl)|7,xr||link vrblk into current chain loc|20352
+||brn|6,dmp01|||loop back for next vrblk|20353
+|dmp09|bne|8,wa|3,hshte|6,dmp00|loop back if more buckets to go|20357
+|dmp10|mov|7,xr|3,dmvch||load pointer to next entry on chain|20361
+||bze|7,xr|6,dmp11||jump if end of chain|20362
+||mov|3,dmvch|9,(xr)||else update chain ptr to next entry|20363
+||jsr|6,setvr|||restore vrget field|20364
+||mov|7,xl|7,xr||copy vrblk pointer (name base)|20365
+||mov|8,wa|19,*vrval||set offset for vrblk name|20366
+||jsr|6,prtnv|||print name = value|20367
+||brn|6,dmp10|||loop back till all printed|20368
+|dmp11|jsr|6,prtnl|||print blank line|20372
+||jsr|6,prtnl|||and another|20373
+||mov|7,xr|21,=dmhdk||point to keyword heading|20374
+||jsr|6,prtst|||print heading|20375
+||jsr|6,prtnl|||end line|20376
+||jsr|6,prtnl|||print one blank line|20377
+||mov|7,xl|21,=vdmkw||point to list of keyword svblk ptrs|20378
+||ejc|||||20379
+|dmp12|mov|7,xr|10,(xl)+||load next svblk ptr from table|20385
+||bze|7,xr|6,dmp13||jump if end of list|20386
+||beq|7,xr|18,=num01|6,dmp12|&compare ignored if not implemented|20388
+||mov|8,wa|18,=ch_am||load ampersand|20390
+||jsr|6,prtch|||print ampersand|20391
+||jsr|6,prtst|||print keyword name|20392
+||mov|8,wa|13,svlen(xr)||load name length from svblk|20393
+||ctb|8,wa|2,svchs||get length of name|20394
+||add|7,xr|8,wa||point to svknm field|20395
+||mov|3,dmpkn|9,(xr)||store in dummy kvblk|20396
+||mov|7,xr|21,=tmbeb||point to blank-equal-blank|20397
+||jsr|6,prtst|||print it|20398
+||mov|3,dmpsv|7,xl||save table pointer|20399
+||mov|7,xl|20,=dmpkb||point to dummy kvblk|20400
+||mov|9,(xl)|22,=b_kvt||build type word|20401
+||mov|13,kvvar(xl)|21,=trbkv||build ptr to dummy trace block|20402
+||mov|8,wa|19,*kvvar||set zero offset|20403
+||jsr|6,acess|||get keyword value|20404
+||ppm||||failure is impossible|20405
+||jsr|6,prtvl|||print keyword value|20406
+||jsr|6,prtnl|||terminate print line|20407
+||mov|7,xl|3,dmpsv||restore table pointer|20408
+||brn|6,dmp12|||loop back till all printed|20409
+|dmp13|beq|3,dmarg|18,=num01|6,dmp27|exit if partial dump complete|20413
+||mov|7,xr|3,dnamb||else point to first dynamic block|20414
+|dmp14|beq|7,xr|3,dnamp|6,dmp27|jump if end of used region|20418
+||mov|8,wa|9,(xr)||else load first word of block|20419
+||beq|8,wa|22,=b_vct|6,dmp16|jump if vector|20420
+||beq|8,wa|22,=b_art|6,dmp17|jump if array|20421
+||beq|8,wa|22,=b_pdt|6,dmp18|jump if program defined|20422
+||beq|8,wa|22,=b_tbt|6,dmp19|jump if table|20423
+|dmp15|jsr|6,blkln|||get length of block|20431
+||add|7,xr|8,wa||point past this block|20432
+||brn|6,dmp14|||loop back for next block|20433
+||ejc|||||20434
+|dmp16|mov|8,wb|19,*vcvls||set offset to first value|20440
+||brn|6,dmp19|||jump to merge|20441
+|dmp17|mov|8,wb|13,arofs(xr)||set offset to arpro field|20445
+||ica|8,wb|||bump to get offset to values|20446
+||brn|6,dmp19|||jump to merge|20447
+|dmp18|mov|8,wb|19,*pdfld||point to values, merge|20451
+|dmp19|bze|13,idval(xr)|6,dmp15||ignore block if zero id value|20455
+||jsr|6,blkln|||else get block length|20456
+||mov|7,xl|7,xr||copy block pointer|20457
+||mov|3,dmpsv|8,wa||save length|20458
+||mov|8,wa|8,wb||copy offset to first value|20459
+||jsr|6,prtnl|||print blank line|20460
+||mov|3,dmpsa|8,wa||preserve offset|20461
+||jsr|6,prtvl|||print block value (for title)|20462
+||mov|8,wa|3,dmpsa||recover offset|20463
+||jsr|6,prtnl|||end print line|20464
+||beq|9,(xr)|22,=b_tbt|6,dmp22|jump if table|20465
+||dca|8,wa|||point before first word|20466
+|dmp20|mov|7,xr|7,xl||copy block pointer|20470
+||ica|8,wa|||bump offset|20471
+||add|7,xr|8,wa||point to next value|20472
+||beq|8,wa|3,dmpsv|6,dmp14|exit if end (xr past block)|20473
+||sub|7,xr|19,*vrval||subtract offset to merge into loop|20474
+|dmp21|mov|7,xr|13,vrval(xr)||load next value|20478
+||beq|3,dmarg|18,=num03|6,dmp2b|skip null value check if dump(3)|20479
+||beq|7,xr|21,=nulls|6,dmp20|loop back if null value|20480
+|dmp2b|beq|9,(xr)|22,=b_trt|6,dmp21|loop back if trapped|20481
+||jsr|6,prtnv|||else print name = value|20482
+||brn|6,dmp20|||loop back for next field|20483
+||ejc|||||20484
+|dmp22|mov|8,wc|19,*tbbuk||set offset to first bucket|20490
+||mov|8,wa|19,*teval||set name offset for all teblks|20491
+|dmp23|mov|11,-(xs)|7,xl||save tbblk pointer|20495
+||add|7,xl|8,wc||point to next bucket header|20496
+||ica|8,wc|||bump bucket offset|20497
+||sub|7,xl|19,*tenxt||subtract offset to merge into loop|20498
+|dmp24|mov|7,xl|13,tenxt(xl)||point to next teblk|20502
+||beq|7,xl|9,(xs)|6,dmp26|jump if end of chain|20503
+||mov|7,xr|7,xl||else copy teblk pointer|20504
+|dmp25|mov|7,xr|13,teval(xr)||load next value|20508
+||beq|7,xr|21,=nulls|6,dmp24|ignore if null value|20509
+||beq|9,(xr)|22,=b_trt|6,dmp25|loop back if trapped|20510
+||mov|3,dmpsv|8,wc||else save offset pointer|20511
+||jsr|6,prtnv|||print name = value|20512
+||mov|8,wc|3,dmpsv||reload offset|20513
+||brn|6,dmp24|||loop back for next teblk|20514
+|dmp26|mov|7,xl|10,(xs)+||restore tbblk pointer|20518
+||bne|8,wc|13,tblen(xl)|6,dmp23|loop back if more buckets to go|20519
+||mov|7,xr|7,xl||else copy table pointer|20520
+||add|7,xr|8,wc||point to following block|20521
+||brn|6,dmp14|||loop back to process next block|20522
+|dmp27|jsr|6,prtpg|||eject printer|20526
+|dmp28|exi||||return to dump caller|20530
+|dmp29|jsr|6,sysdm|||call it|20534
+||brn|6,dmp28|||return|20535
+||enp||||end procedure dumpr|20571
+||ejc|||||20572
+|ermsg|prc|25,e|1,0||entry point|20580
+||mov|8,wa|3,kvert||load error code|20581
+||mov|7,xr|21,=ermms||point to error message /error/|20582
+||jsr|6,prtst|||print it|20583
+||jsr|6,ertex|||get error message text|20584
+||add|8,wa|18,=thsnd||bump error code for print|20585
+||mti|8,wa|||fail code in int acc|20586
+||mov|8,wb|3,profs||save current buffer position|20587
+||jsr|6,prtin|||print code (now have error1xxx)|20588
+||mov|7,xl|3,prbuf||point to print buffer|20589
+||psc|7,xl|8,wb||point to the 1|20590
+||mov|8,wa|18,=ch_bl||load a blank|20591
+||sch|8,wa|9,(xl)||store blank over 1 (error xxx)|20592
+||csc|7,xl|||complete store characters|20593
+||zer|7,xl|||clear garbage pointer in xl|20594
+||mov|8,wa|7,xr||keep error text|20595
+||mov|7,xr|21,=ermns||point to / -- /|20596
+||jsr|6,prtst|||print it|20597
+||mov|7,xr|8,wa||get error text again|20598
+||jsr|6,prtst|||print error message text|20599
+||jsr|6,prtis|||print line|20600
+||jsr|6,prtis|||print blank line|20601
+||exi||||return to ermsg caller|20602
+||enp||||end procedure ermsg|20603
+||ejc|||||20604
+|ertex|prc|25,e|1,0||entry point|20614
+||mov|3,ertwa|8,wa||save wa|20615
+||mov|3,ertwb|8,wb||save wb|20616
+||jsr|6,sysem|||get failure message text|20617
+||mov|7,xl|7,xr||copy pointer to it|20618
+||mov|8,wa|13,sclen(xr)||get length of string|20619
+||bze|8,wa|6,ert02||jump if null|20620
+||zer|8,wb|||offset of zero|20621
+||jsr|6,sbstr|||copy into dynamic store|20622
+||mov|3,r_etx|7,xr||store for relocation|20623
+|ert01|mov|8,wb|3,ertwb||restore wb|20627
+||mov|8,wa|3,ertwa||restore wa|20628
+||exi||||return to caller|20629
+|ert02|mov|7,xr|3,r_etx||get errtext|20633
+||brn|6,ert01|||return|20634
+||enp|||||20635
+||ejc|||||20636
+|evali|prc|25,r|1,4||entry point (recursive)|20658
+||jsr|6,evalp|||evaluate expression|20659
+||ppm|6,evli1|||jump on failure|20660
+||mov|11,-(xs)|7,xl||stack result for gtsmi|20661
+||mov|7,xl|13,pthen(xr)||load successor pointer|20662
+||mov|3,evlio|7,xr||save original node pointer|20663
+||mov|3,evlif|8,wc||zero if simple argument|20664
+||jsr|6,gtsmi|||convert arg to small integer|20665
+||ppm|6,evli2|||jump if not integer|20666
+||ppm|6,evli3|||jump if out of range|20667
+||mov|3,evliv|7,xr||store result in special dummy node|20668
+||mov|7,xr|20,=evlin||point to dummy node with result|20669
+||mov|9,(xr)|22,=p_len||dummy pattern block pcode|20670
+||mov|13,pthen(xr)|7,xl||store successor pointer|20671
+||exi|1,4|||take successful exit|20672
+|evli1|exi|1,3|||take failure return|20676
+|evli2|exi|1,1|||take non-integer error exit|20680
+|evli3|exi|1,2|||take out-of-range error exit|20684
+||enp||||end procedure evali|20685
+||ejc|||||20686
+|evalp|prc|25,r|1,1||entry point (recursive)|20717
+||mov|7,xl|13,parm1(xr)||load expression pointer|20718
+||beq|9,(xl)|22,=b_exl|6,evlp1|jump if exblk case|20719
+||mov|7,xl|13,sevar(xl)||load vrblk pointer|20726
+||mov|7,xl|13,vrval(xl)||load value of vrblk|20727
+||mov|8,wa|9,(xl)||load first word of value|20728
+||bhi|8,wa|22,=b_t__|6,evlp3|jump if not seblk, trblk or exblk|20729
+|evlp1|chk||||check for stack space|20733
+||mov|11,-(xs)|7,xr||stack node pointer|20734
+||mov|11,-(xs)|8,wb||stack cursor|20735
+||mov|11,-(xs)|3,r_pms||stack subject string pointer|20736
+||mov|11,-(xs)|3,pmssl||stack subject string length|20737
+||mov|11,-(xs)|3,pmdfl||stack dot flag|20738
+||mov|11,-(xs)|3,pmhbs||stack history stack base pointer|20739
+||mov|7,xr|13,parm1(xr)||load expression pointer|20740
+||ejc|||||20741
+|evlp2|zer|8,wb|||set flag for by value|20747
+||jsr|6,evalx|||evaluate expression|20748
+||ppm|6,evlp4|||jump on failure|20749
+||mov|8,wa|9,(xr)||else load first word of value|20750
+||blo|8,wa|22,=b_e__|6,evlp2|loop back to reevaluate expression|20751
+||mov|7,xl|7,xr||copy result pointer|20755
+||mov|3,pmhbs|10,(xs)+||restore history stack base pointer|20756
+||mov|3,pmdfl|10,(xs)+||restore dot flag|20757
+||mov|3,pmssl|10,(xs)+||restore subject string length|20758
+||mov|3,r_pms|10,(xs)+||restore subject string pointer|20759
+||mov|8,wb|10,(xs)+||restore cursor|20760
+||mov|7,xr|10,(xs)+||restore node pointer|20761
+||mov|8,wc|7,xr||non-zero for simple vrblk|20762
+||exi||||return to evalp caller|20763
+|evlp3|zer|8,wc|||simple vrblk, no side effects|20767
+||exi||||return to evalp caller|20768
+|evlp4|mov|3,pmhbs|10,(xs)+||restore history stack base pointer|20772
+||mov|3,pmdfl|10,(xs)+||restore dot flag|20773
+||mov|3,pmssl|10,(xs)+||restore subject string length|20774
+||mov|3,r_pms|10,(xs)+||restore subject string pointer|20775
+||add|7,xs|19,*num02||remove node ptr, cursor|20776
+||exi|1,1|||take failure exit|20777
+||enp||||end procedure evalp|20778
+||ejc|||||20779
+|evals|prc|25,r|1,3||entry point (recursive)|20801
+||jsr|6,evalp|||evaluate expression|20802
+||ppm|6,evls1|||jump if evaluation fails|20803
+||mov|11,-(xs)|13,pthen(xr)||save successor pointer|20804
+||mov|11,-(xs)|8,wb||save cursor|20805
+||mov|11,-(xs)|7,xl||stack result ptr for patst|20806
+||zer|8,wb|||dummy pcode for one char string|20807
+||zer|8,wc|||dummy pcode for expression arg|20808
+||mov|7,xl|22,=p_brk||appropriate pcode for our use|20809
+||jsr|6,patst|||call routine to build node|20810
+||ppm|6,evls2|||jump if not string|20811
+||mov|8,wb|10,(xs)+||restore cursor|20812
+||mov|13,pthen(xr)|10,(xs)+||store successor pointer|20813
+||exi|1,3|||take success return|20814
+|evls1|exi|1,2|||take failure return|20818
+|evls2|add|7,xs|19,*num02||pop successor and cursor|20822
+||exi|1,1|||take non-string error exit|20823
+||enp||||end procedure evals|20824
+||ejc|||||20825
+|evalx|prc|25,r|1,1||entry point, recursive|20841
+||beq|9,(xr)|22,=b_exl|6,evlx2|jump if exblk case|20842
+||mov|7,xl|13,sevar(xr)||load vrblk pointer (name base)|20846
+||mov|8,wa|19,*vrval||set name offset|20847
+||bnz|8,wb|6,evlx1||jump if called by name|20848
+||jsr|6,acess|||call routine to access value|20849
+||ppm|6,evlx9|||jump if failure on access|20850
+|evlx1|exi||||return to evalx caller|20854
+||ejc|||||20855
+|evlx2|scp|8,wc|||get code pointer|20874
+||mov|8,wa|3,r_cod||load code block pointer|20875
+||sub|8,wc|8,wa||get code pointer as offset|20876
+||mov|11,-(xs)|8,wa||stack old code block pointer|20877
+||mov|11,-(xs)|8,wc||stack relative code offset|20878
+||mov|11,-(xs)|3,flptr||stack old failure pointer|20879
+||mov|11,-(xs)|8,wb||stack name/value indicator|20880
+||mov|11,-(xs)|19,*exflc||stack new fail offset|20881
+||mov|3,gtcef|3,flptr||keep in case of error|20882
+||mov|3,r_gtc|3,r_cod||keep code block pointer similarly|20883
+||mov|3,flptr|7,xs||set new failure pointer|20884
+||mov|3,r_cod|7,xr||set new code block pointer|20885
+||mov|13,exstm(xr)|3,kvstn||remember stmnt number|20886
+||add|7,xr|19,*excod||point to first code word|20887
+||lcp|7,xr|||set code pointer|20888
+||bne|3,stage|18,=stgxt|6,evlx0|jump if not execution time|20889
+||mov|3,stage|18,=stgee||evaluating expression|20890
+|evlx0|zer|7,xl|||clear garbage xl|20894
+||lcw|7,xr|||load first code word|20895
+||bri|9,(xr)|||execute it|20896
+||ejc|||||20897
+|evlx3|mov|7,xr|10,(xs)+||load value|20903
+||bze|13,num01(xs)|6,evlx5||jump if called by value|20904
+||erb|1,249|26,expression evaluated by name returned value|||20905
+|evlx4|mov|8,wa|10,(xs)+||load name offset|20909
+||mov|7,xl|10,(xs)+||load name base|20910
+||bnz|13,num01(xs)|6,evlx5||jump if called by name|20911
+||jsr|6,acess|||else access value first|20912
+||ppm|6,evlx6|||jump if failure during access|20913
+|evlx5|zer|8,wb|||note successful|20917
+||brn|6,evlx7|||merge|20918
+|evlx6|mnz|8,wb|||note unsuccessful|20922
+|evlx7|bne|3,stage|18,=stgee|6,evlx8|skip if was not previously xt|20926
+||mov|3,stage|18,=stgxt||execute time|20927
+|evlx8|add|7,xs|19,*num02||pop name/value indicator, *exfal|20931
+||mov|3,flptr|10,(xs)+||restore old failure pointer|20932
+||mov|8,wc|10,(xs)+||load code offset|20933
+||add|8,wc|9,(xs)||make code pointer absolute|20934
+||mov|3,r_cod|10,(xs)+||restore old code block pointer|20935
+||lcp|8,wc|||restore old code pointer|20936
+||bze|8,wb|6,evlx1||jump for successful return|20937
+|evlx9|bne|3,stage|18,=stgev|6,evlxa|return failure|20941
+||exi|1,0|||no failure|20942
+|evlxa|exi|1,1|||failure|20943
+||enp||||end of procedure evalx|20944
+||ejc|||||20945
+|exbld|prc|25,e|1,0||entry point|20958
+||mov|8,wa|7,xl||copy offset to start of code|20959
+||sub|8,wa|19,*excod||calc reduction in offset in exblk|20960
+||mov|11,-(xs)|8,wa||stack for later|20961
+||mov|8,wa|3,cwcof||load final offset|20962
+||sub|8,wa|7,xl||compute length of code|20963
+||add|8,wa|19,*exsi_||add space for standard fields|20964
+||jsr|6,alloc|||allocate space for exblk|20965
+||mov|11,-(xs)|7,xr||save pointer to exblk|20966
+||mov|13,extyp(xr)|22,=b_exl||store type word|20967
+||zer|13,exstm(xr)|||zeroise stmnt number field|20968
+||mov|13,exsln(xr)|3,cmpln||set line number field|20970
+||mov|13,exlen(xr)|8,wa||store length|20972
+||mov|13,exflc(xr)|21,=ofex_||store failure word|20973
+||add|7,xr|19,*exsi_||set xr for mvw|20974
+||mov|3,cwcof|7,xl||reset offset to start of code|20975
+||add|7,xl|3,r_ccb||point to start of code|20976
+||sub|8,wa|19,*exsi_||length of code to move|20977
+||mov|11,-(xs)|8,wa||stack length of code|20978
+||mvw||||move code to exblk|20979
+||mov|8,wa|10,(xs)+||get length of code|20980
+||btw|8,wa|||convert byte count to word count|20981
+||lct|8,wa|8,wa||prepare counter for loop|20982
+||mov|7,xl|9,(xs)||copy exblk ptr, dont unstack|20983
+||add|7,xl|19,*excod||point to code itself|20984
+||mov|8,wb|13,num01(xs)||get reduction in offset|20985
+|exbl1|mov|7,xr|10,(xl)+||get next code word|20992
+||beq|7,xr|21,=osla_|6,exbl3|jump if selection found|20993
+||beq|7,xr|21,=onta_|6,exbl3|jump if negation found|20994
+||bct|8,wa|6,exbl1||loop to end of code|20995
+|exbl2|mov|7,xr|10,(xs)+||pop exblk ptr into xr|20999
+||mov|7,xl|10,(xs)+||pop reduction constant|21000
+||exi||||return to caller|21001
+||ejc|||||21002
+|exbl3|sub|10,(xl)+|8,wb||adjust offset|21011
+||bct|8,wa|6,exbl4||decrement count|21012
+|exbl4|bct|8,wa|6,exbl5||decrement count|21014
+|exbl5|mov|7,xr|10,(xl)+||get next code word|21018
+||beq|7,xr|21,=osla_|6,exbl3|jump if offset found|21019
+||beq|7,xr|21,=oslb_|6,exbl3|jump if offset found|21020
+||beq|7,xr|21,=oslc_|6,exbl3|jump if offset found|21021
+||beq|7,xr|21,=onta_|6,exbl3|jump if offset found|21022
+||bct|8,wa|6,exbl5||loop|21023
+||brn|6,exbl2|||merge to return|21024
+||enp||||end procedure exbld|21025
+||ejc|||||21026
+||ejc|||||21079
+|expan|prc|25,e|1,0||entry point|21085
+||zer|11,-(xs)|||set top of stack indicator|21086
+||zer|8,wa|||set initial state to zero|21087
+||zer|8,wc|||zero counter value|21088
+|exp01|jsr|6,scane|||scan next element|21092
+||add|7,xl|8,wa||add state to syntax code|21093
+||bsw|7,xl|2,t_nes||switch on element type/state|21094
+||iff|2,t_uo0|6,exp27||unop, s=0|21131
+||iff|2,t_uo1|6,exp27||unop, s=1|21131
+||iff|2,t_uo2|6,exp04||unop, s=2|21131
+||iff|2,t_lp0|6,exp06||left paren, s=0|21131
+||iff|2,t_lp1|6,exp06||left paren, s=1|21131
+||iff|2,t_lp2|6,exp04||left paren, s=2|21131
+||iff|2,t_lb0|6,exp08||left brkt, s=0|21131
+||iff|2,t_lb1|6,exp08||left brkt, s=1|21131
+||iff|2,t_lb2|6,exp09||left brkt, s=2|21131
+||iff|2,t_cm0|6,exp02||comma, s=0|21131
+||iff|2,t_cm1|6,exp05||comma, s=1|21131
+||iff|2,t_cm2|6,exp11||comma, s=2|21131
+||iff|2,t_fn0|6,exp10||function, s=0|21131
+||iff|2,t_fn1|6,exp10||function, s=1|21131
+||iff|2,t_fn2|6,exp04||function, s=2|21131
+||iff|2,t_va0|6,exp03||variable, s=0|21131
+||iff|2,t_va1|6,exp03||variable, state one|21131
+||iff|2,t_va2|6,exp04||variable, s=2|21131
+||iff|2,t_co0|6,exp03||constant, s=0|21131
+||iff|2,t_co1|6,exp03||constant, s=1|21131
+||iff|2,t_co2|6,exp04||constant, s=2|21131
+||iff|2,t_bo0|6,exp05||binop, s=0|21131
+||iff|2,t_bo1|6,exp05||binop, s=1|21131
+||iff|2,t_bo2|6,exp26||binop, s=2|21131
+||iff|2,t_rp0|6,exp02||right paren, s=0|21131
+||iff|2,t_rp1|6,exp05||right paren, s=1|21131
+||iff|2,t_rp2|6,exp12||right paren, s=2|21131
+||iff|2,t_rb0|6,exp02||right brkt, s=0|21131
+||iff|2,t_rb1|6,exp05||right brkt, s=1|21131
+||iff|2,t_rb2|6,exp18||right brkt, s=2|21131
+||iff|2,t_cl0|6,exp02||colon, s=0|21131
+||iff|2,t_cl1|6,exp05||colon, s=1|21131
+||iff|2,t_cl2|6,exp19||colon, s=2|21131
+||iff|2,t_sm0|6,exp02||semicolon, s=0|21131
+||iff|2,t_sm1|6,exp05||semicolon, s=1|21131
+||iff|2,t_sm2|6,exp19||semicolon, s=2|21131
+||esw||||end switch on element type/state|21131
+||ejc|||||21132
+|exp02|mnz|3,scnrs|||set to rescan element|21141
+||mov|7,xr|21,=nulls||point to null, merge|21142
+|exp03|mov|11,-(xs)|7,xr||stack pointer to operand|21148
+||mov|8,wa|18,=num02||set state 2|21149
+||brn|6,exp01|||jump for next element|21150
+|exp04|mnz|3,scnrs|||set to rescan element|21157
+||mov|7,xr|21,=opdvc||point to concat operator dv|21158
+||bze|8,wb|6,exp4a||ok if at top level|21159
+||mov|7,xr|21,=opdvp||else point to unmistakable concat.|21160
+|exp4a|bnz|3,scnbl|6,exp26||merge bop if blanks, else error|21164
+||erb|1,220|26,syntax error: missing operator|||21166
+|exp05|erb|1,221|26,syntax error: missing operand|||21174
+|exp06|mov|7,xl|18,=num04||set new level indicator|21178
+||zer|7,xr|||set zero value for cmopn|21179
+||ejc|||||21180
+|exp07|mov|11,-(xs)|7,xr||stack cmopn value|21186
+||mov|11,-(xs)|8,wc||stack old counter|21187
+||mov|11,-(xs)|8,wb||stack old level indicator|21188
+||chk||||check for stack overflow|21189
+||zer|8,wa|||set new state to zero|21190
+||mov|8,wb|7,xl||set new level indicator|21191
+||mov|8,wc|18,=num01||initialize new counter|21192
+||brn|6,exp01|||jump to scan next element|21193
+|exp08|erb|1,222|26,syntax error: invalid use of left bracket|||21199
+|exp09|mov|7,xr|10,(xs)+||load array ptr for cmopn|21205
+||mov|7,xl|18,=num03||set new level indicator|21206
+||brn|6,exp07|||jump to stack old and start new|21207
+|exp10|mov|7,xl|18,=num05||set new lev indic (xr=vrblk=cmopn)|21213
+||brn|6,exp07|||jump to stack old and start new|21214
+|exp11|icv|8,wc|||increment counter|21220
+||jsr|6,expdm|||dump operators at this level|21221
+||zer|11,-(xs)|||set new level for parameter|21222
+||zer|8,wa|||set new state|21223
+||bgt|8,wb|18,=num02|6,exp01|loop back unless outer level|21224
+||erb|1,223|26,syntax error: invalid use of comma|||21225
+||ejc|||||21226
+|exp12|beq|8,wb|18,=num01|6,exp20|end of normal goto|21235
+||beq|8,wb|18,=num05|6,exp13|end of function arguments|21236
+||beq|8,wb|18,=num04|6,exp14|end of grouping / selection|21237
+||erb|1,224|26,syntax error: unbalanced right parenthesis|||21238
+|exp13|mov|7,xl|18,=c_fnc||set cmtyp value for function|21242
+||brn|6,exp15|||jump to build cmblk|21243
+|exp14|beq|8,wc|18,=num01|6,exp17|jump if end of grouping|21247
+||mov|7,xl|18,=c_sel||else set cmtyp for selection|21248
+|exp15|jsr|6,expdm|||dump operators at this level|21253
+||mov|8,wa|8,wc||copy count|21254
+||add|8,wa|18,=cmvls||add for standard fields at start|21255
+||wtb|8,wa|||convert length to bytes|21256
+||jsr|6,alloc|||allocate space for cmblk|21257
+||mov|9,(xr)|22,=b_cmt||store type code for cmblk|21258
+||mov|13,cmtyp(xr)|7,xl||store cmblk node type indicator|21259
+||mov|13,cmlen(xr)|8,wa||store length|21260
+||add|7,xr|8,wa||point past end of block|21261
+||lct|8,wc|8,wc||set loop counter|21262
+|exp16|mov|11,-(xr)|10,(xs)+||move one operand ptr from stack|21266
+||mov|8,wb|10,(xs)+||pop to old level indicator|21267
+||bct|8,wc|6,exp16||loop till all moved|21268
+||ejc|||||21269
+||sub|7,xr|19,*cmvls||point back to start of block|21275
+||mov|8,wc|10,(xs)+||restore old counter|21276
+||mov|13,cmopn(xr)|9,(xs)||store operand ptr in cmblk|21277
+||mov|9,(xs)|7,xr||stack cmblk pointer|21278
+||mov|8,wa|18,=num02||set new state|21279
+||brn|6,exp01|||back for next element|21280
+|exp17|jsr|6,expdm|||dump operators at this level|21284
+||mov|7,xr|10,(xs)+||restore xr|21285
+||mov|8,wb|10,(xs)+||restore outer level|21286
+||mov|8,wc|10,(xs)+||restore outer count|21287
+||mov|9,(xs)|7,xr||store opnd over unused cmopn val|21288
+||mov|8,wa|18,=num02||set new state|21289
+||brn|6,exp01|||back for next ele8ent|21290
+|exp18|mov|7,xl|18,=c_arr||set cmtyp for array reference|21297
+||beq|8,wb|18,=num03|6,exp15|jump to build cmblk if end arrayref|21298
+||beq|8,wb|18,=num02|6,exp20|jump if end of direct goto|21299
+||erb|1,225|26,syntax error: unbalanced right bracket|||21300
+||ejc|||||21301
+|exp19|mnz|3,scnrs|||rescan terminator|21309
+||mov|7,xl|8,wb||copy level indicator|21310
+||bsw|7,xl|1,6||switch on level indicator|21311
+||iff|1,0|6,exp20||normal outer level|21318
+||iff|1,1|6,exp22||fail if normal goto|21318
+||iff|1,2|6,exp23||fail if direct goto|21318
+||iff|1,3|6,exp24||fail array brackets|21318
+||iff|1,4|6,exp21||fail if in grouping|21318
+||iff|1,5|6,exp21||fail function args|21318
+||esw||||end switch on level|21318
+|exp20|jsr|6,expdm|||dump remaining operators|21322
+||mov|7,xr|10,(xs)+||load tree pointer|21323
+||ica|7,xs|||pop off bottom of stack marker|21324
+||exi||||return to expan caller|21325
+|exp21|erb|1,226|26,syntax error: missing right paren|||21329
+|exp22|erb|1,227|26,syntax error: right paren missing from goto|||21333
+|exp23|erb|1,228|26,syntax error: right bracket missing from goto|||21337
+|exp24|erb|1,229|26,syntax error: missing right array bracket|||21341
+||ejc|||||21342
+|exp25|mov|3,expsv|7,xr|||21348
+||jsr|6,expop|||pop one operator|21349
+||mov|7,xr|3,expsv||restore op dv pointer and merge|21350
+|exp26|mov|7,xl|13,num01(xs)||load operator dvptr from stack|21358
+||ble|7,xl|18,=num05|6,exp27|jump if bottom of stack level|21359
+||blt|13,dvrpr(xr)|13,dvlpr(xl)|6,exp25|else pop if new prec is lo|21360
+|exp27|mov|11,-(xs)|7,xr||stack operator dvptr on stack|21369
+||chk||||check for stack overflow|21370
+||mov|8,wa|18,=num01||set new state|21371
+||bne|7,xr|21,=opdvs|6,exp01|back for next element unless =|21372
+||zer|8,wa|||set state zero|21379
+||brn|6,exp01|||jump for next element|21380
+||enp||||end procedure expan|21381
+||ejc|||||21382
+|expap|prc|25,e|1,1||entry point|21401
+||mov|11,-(xs)|7,xl||save xl|21402
+||bne|9,(xr)|22,=b_cmt|6,expp2|no match if not complex|21403
+||mov|8,wa|13,cmtyp(xr)||else load type code|21404
+||beq|8,wa|18,=c_cnc|6,expp1|concatenation is a match|21405
+||beq|8,wa|18,=c_pmt|6,expp1|binary question mark is a match|21406
+||bne|8,wa|18,=c_alt|6,expp2|else not match unless alternation|21407
+||mov|7,xl|13,cmlop(xr)||load left operand pointer|21411
+||bne|9,(xl)|22,=b_cmt|6,expp2|not match if left opnd not complex|21412
+||bne|13,cmtyp(xl)|18,=c_cnc|6,expp2|not match if left op not conc|21413
+||mov|13,cmlop(xr)|13,cmrop(xl)||xr points to (b / c)|21414
+||mov|13,cmrop(xl)|7,xr||set xl opnds to a, (b / c)|21415
+||mov|7,xr|7,xl||point to this altered node|21416
+|expp1|mov|7,xl|10,(xs)+||restore entry xl|21420
+||exi||||give pattern match return|21421
+|expp2|mov|7,xl|10,(xs)+||restore entry xl|21425
+||exi|1,1|||give non-match return|21426
+||enp||||end procedure expap|21427
+||ejc|||||21428
+|expdm|prc|25,n|1,0||entry point|21440
+||mov|3,r_exs|7,xl||save xl value|21441
+|exdm1|ble|13,num01(xs)|18,=num05|6,exdm2|jump if stack bottom (saved level|21445
+||jsr|6,expop|||else pop one operator|21446
+||brn|6,exdm1|||and loop back|21447
+|exdm2|mov|7,xl|3,r_exs||restore xl|21451
+||zer|3,r_exs|||release save location|21452
+||exi||||return to expdm caller|21453
+||enp||||end procedure expdm|21454
+||ejc|||||21455
+|expop|prc|25,n|1,0||entry point|21470
+||mov|7,xr|13,num01(xs)||load operator dv pointer|21471
+||beq|13,dvlpr(xr)|18,=lluno|6,expo2|jump if unary|21472
+||mov|8,wa|19,*cmbs_||set size of binary operator cmblk|21476
+||jsr|6,alloc|||allocate space for cmblk|21477
+||mov|13,cmrop(xr)|10,(xs)+||pop and store right operand ptr|21478
+||mov|7,xl|10,(xs)+||pop and load operator dv ptr|21479
+||mov|13,cmlop(xr)|9,(xs)||store left operand pointer|21480
+|expo1|mov|9,(xr)|22,=b_cmt||store type code for cmblk|21484
+||mov|13,cmtyp(xr)|13,dvtyp(xl)||store cmblk node type code|21485
+||mov|13,cmopn(xr)|7,xl||store dvptr (=ptr to dac o_xxx)|21486
+||mov|13,cmlen(xr)|8,wa||store cmblk length|21487
+||mov|9,(xs)|7,xr||store resulting node ptr on stack|21488
+||exi||||return to expop caller|21489
+|expo2|mov|8,wa|19,*cmus_||set size of unary operator cmblk|21493
+||jsr|6,alloc|||allocate space for cmblk|21494
+||mov|13,cmrop(xr)|10,(xs)+||pop and store operand pointer|21495
+||mov|7,xl|9,(xs)||load operator dv pointer|21496
+||brn|6,expo1|||merge back to exit|21497
+||enp||||end procedure expop|21498
+||ejc|||||21499
+|filnm|prc|25,e|1,0||entry point|21524
+||mov|11,-(xs)|8,wb||preserve wb|21525
+||bze|8,wc|6,filn3||return nulls if stno is zero|21526
+||mov|7,xl|3,r_sfn||file name table|21527
+||bze|7,xl|6,filn3||if no table|21528
+||mov|8,wb|13,tbbuk(xl)||get bucket entry|21529
+||beq|8,wb|3,r_sfn|6,filn3|jump if no teblks on chain|21530
+||mov|11,-(xs)|7,xr||preserve xr|21531
+||mov|7,xr|8,wb||previous block pointer|21532
+||mov|11,-(xs)|8,wc||preserve stmt number|21533
+|filn1|mov|7,xl|7,xr||next element to examine|21537
+||mov|7,xr|13,tesub(xl)||load subscript value (an icblk)|21538
+||ldi|13,icval(xr)|||load the statement number|21539
+||mfi|8,wc|||convert to address constant|21540
+||blt|9,(xs)|8,wc|6,filn2|compare arg with teblk stmt number|21541
+||mov|8,wb|7,xl||save previous entry pointer|21545
+||mov|7,xr|13,tenxt(xl)||point to next teblk on chain|21546
+||bne|7,xr|3,r_sfn|6,filn1|jump if there is one|21547
+|filn2|mov|7,xl|8,wb||previous teblk|21551
+||mov|7,xl|13,teval(xl)||get ptr to file name scblk|21552
+||mov|8,wc|10,(xs)+||restore stmt number|21553
+||mov|7,xr|10,(xs)+||restore xr|21554
+||mov|8,wb|10,(xs)+||restore wb|21555
+||exi|||||21556
+|filn3|mov|8,wb|10,(xs)+||restore wb|21560
+||mov|7,xl|21,=nulls||return null string|21561
+||exi|||||21562
+||enp|||||21563
+||ejc|||||21564
+|flstg|prc|25,e|1,0||entry point|21581
+||bze|3,kvcas|6,fst99||skip if &case is 0|21582
+||mov|11,-(xs)|7,xl||save xl across call|21583
+||mov|11,-(xs)|7,xr||save original scblk ptr|21584
+||jsr|6,alocs|||allocate new string block|21585
+||mov|7,xl|9,(xs)||point to original scblk|21586
+||mov|11,-(xs)|7,xr||save pointer to new scblk|21587
+||plc|7,xl|||point to original chars|21588
+||psc|7,xr|||point to new chars|21589
+||zer|11,-(xs)|||init did fold flag|21590
+||lct|8,wc|8,wc||load loop counter|21591
+|fst01|lch|8,wa|10,(xl)+||load character|21592
+||blt|8,wa|18,=ch_la|6,fst02|skip if less than lc a|21593
+||bgt|8,wa|18,=ch_l_|6,fst02|skip if greater than lc z|21594
+||flc|8,wa|||fold character to upper case|21595
+||mnz|9,(xs)|||set did fold character flag|21596
+|fst02|sch|8,wa|10,(xr)+||store (possibly folded) character|21597
+||bct|8,wc|6,fst01||loop thru entire string|21598
+||csc|7,xr|||complete store characters|21599
+||mov|7,xr|10,(xs)+||see if any change|21600
+||bnz|7,xr|6,fst10||skip if folding done (no change)|21601
+||mov|3,dnamp|10,(xs)+||do not need new scblk|21602
+||mov|7,xr|10,(xs)+||return original scblk|21603
+||brn|6,fst20|||merge below|21604
+|fst10|mov|7,xr|10,(xs)+||return new scblk|21605
+||ica|7,xs|||throw away original scblk pointer|21606
+|fst20|mov|8,wa|13,sclen(xr)||reload string length|21607
+||mov|7,xl|10,(xs)+||restore xl|21608
+|fst99|exi||||return|21609
+||enp|||||21610
+||ejc|||||21611
+||ejc|||||21666
+||ejc|||||21720
+||ejc|||||21764
+||ejc|||||21802
+|gbcol|prc|25,e|1,0||entry point|21806
+||bnz|3,dmvch|6,gbc14||fail if in mid-dump|21808
+||mnz|3,gbcfl|||note gbcol entered|21809
+||mov|3,gbsva|8,wa||save entry wa|21810
+||mov|3,gbsvb|8,wb||save entry wb|21811
+||mov|3,gbsvc|8,wc||save entry wc|21812
+||mov|11,-(xs)|7,xl||save entry xl|21813
+||scp|8,wa|||get code pointer value|21814
+||sub|8,wa|3,r_cod||make relative|21815
+||lcp|8,wa|||and restore|21816
+||bze|8,wb|6,gbc0a||check there is no move offset|21818
+||zer|3,dnams|||collect sediment if must move it|21819
+|gbc0a|mov|8,wa|3,dnamb||start of dynamic area|21820
+||add|8,wa|3,dnams||size of sediment|21821
+||mov|3,gbcsd|8,wa||first location past sediment|21822
+||mnz|7,xr|||non-zero flags start of collection|21835
+||mov|8,wa|3,dnamb||start of dynamic area|21836
+||mov|8,wb|3,dnamp||next available location|21837
+||mov|8,wc|3,dname||last available location + 1|21838
+||jsr|6,sysgc|||inform of collection|21839
+||mov|7,xr|7,xs||point to stack front|21844
+||mov|7,xl|3,stbas||point past end of stack|21845
+||bge|7,xl|7,xr|6,gbc00|ok if d-stack|21846
+||mov|7,xr|7,xl||reverse if ...|21847
+||mov|7,xl|7,xs||... u-stack|21848
+|gbc00|jsr|6,gbcpf|||process pointers on stack|21852
+||mov|7,xr|20,=r_aaa||point to start of relocatable locs|21856
+||mov|7,xl|20,=r_yyy||point past end of relocatable locs|21857
+||jsr|6,gbcpf|||process work fields|21858
+||mov|8,wa|3,hshtb||point to first hash slot pointer|21862
+|gbc01|mov|7,xl|8,wa||point to next slot|21866
+||ica|8,wa|||bump bucket pointer|21867
+||mov|3,gbcnm|8,wa||save bucket pointer|21868
+||ejc|||||21869
+|gbc02|mov|7,xr|9,(xl)||load ptr to next vrblk|21875
+||bze|7,xr|6,gbc03||jump if end of chain|21876
+||mov|7,xl|7,xr||else copy vrblk pointer|21877
+||add|7,xr|19,*vrval||point to first reloc fld|21878
+||add|7,xl|19,*vrnxt||point past last (and to link ptr)|21879
+||jsr|6,gbcpf|||process reloc fields in vrblk|21880
+||brn|6,gbc02|||loop back for next block|21881
+|gbc03|mov|8,wa|3,gbcnm||restore bucket pointer|21885
+||bne|8,wa|3,hshte|6,gbc01|loop back if more buckets to go|21886
+||ejc|||||21887
+||mov|7,xr|3,dnamb||point to first block|21916
+||zer|8,wb|||accumulate size of dead blocks|21917
+|gbc04|beq|7,xr|3,gbcsd|6,gbc4c|jump if end of sediment|21918
+||mov|8,wa|9,(xr)||else get first word|21919
+||bod|8,wa|6,gbc4b||jump if entry pointer (unused)|21921
+||dcv|8,wa|||restore entry pointer|21922
+||mov|9,(xr)|8,wa||restore first word|21928
+||jsr|6,blkln|||get length of this block|21929
+||add|7,xr|8,wa||bump actual pointer|21930
+||brn|6,gbc04|||continue scan through sediment|21931
+|gbc4b|jsr|6,blkln|||get length of this block|21935
+||add|7,xr|8,wa||bump actual pointer|21936
+||add|8,wb|8,wa||count size of unused blocks|21937
+||brn|6,gbc04|||continue scan through sediment|21938
+|gbc4c|mov|3,gbcsf|8,wb||size of sediment free space|21949
+||mov|8,wc|7,xr||set as first eventual location|21953
+||add|8,wc|3,gbsvb||add offset for eventual move up|21954
+||zer|3,gbcnm|||clear initial forward pointer|21955
+||mov|3,gbclm|20,=gbcnm||initialize ptr to last move block|21956
+||mov|3,gbcns|7,xr||initialize first address|21957
+|gbc05|beq|7,xr|3,dnamp|6,gbc07|jump if end of used region|21961
+||mov|8,wa|9,(xr)||else get first word|21962
+||bod|8,wa|6,gbc07||jump if entry pointer (unused)|21964
+|gbc06|mov|7,xl|8,wa||copy pointer|21972
+||mov|8,wa|9,(xl)||load forward pointer|21973
+||mov|9,(xl)|8,wc||relocate reference|21974
+||bev|8,wa|6,gbc06||loop back if not end of chain|21976
+||ejc|||||21981
+||mov|9,(xr)|8,wa||restore first word|21987
+||jsr|6,blkln|||get length of this block|21988
+||add|7,xr|8,wa||bump actual pointer|21989
+||add|8,wc|8,wa||bump eventual pointer|21990
+||brn|6,gbc05|||loop back for next block|21991
+|gbc07|mov|8,wa|7,xr||copy pointer past last block|21995
+||mov|7,xl|3,gbclm||point to previous move block|21996
+||sub|8,wa|13,num01(xl)||subtract starting address|21997
+||mov|13,num01(xl)|8,wa||store length of block to be moved|21998
+|gbc08|beq|7,xr|3,dnamp|6,gbc10|jump if end of used region|22002
+||mov|8,wa|9,(xr)||else load first word of next block|22003
+||bev|8,wa|6,gbc09||jump if in use|22005
+||jsr|6,blkln|||else get length of next block|22010
+||add|7,xr|8,wa||push pointer|22011
+||brn|6,gbc08|||and loop back|22012
+|gbc09|sub|7,xr|19,*num02||point 2 words behind for move block|22017
+||mov|7,xl|3,gbclm||point to previous move block|22018
+||mov|9,(xl)|7,xr||set forward ptr in previous block|22019
+||zer|9,(xr)|||zero forward ptr of new block|22020
+||mov|3,gbclm|7,xr||remember address of this block|22021
+||mov|7,xl|7,xr||copy ptr to move block|22022
+||add|7,xr|19,*num02||point back to block in use|22023
+||mov|13,num01(xl)|7,xr||store starting address|22024
+||brn|6,gbc06|||jump to process block in use|22025
+||ejc|||||22026
+|gbc10|mov|7,xr|3,gbcsd||point to storage above sediment|22036
+||add|7,xr|3,gbcns||bump past unmoved blocks at start|22040
+|gbc11|mov|7,xl|3,gbcnm||point to next move block|22044
+||bze|7,xl|6,gbc12||jump if end of chain|22045
+||mov|3,gbcnm|10,(xl)+||move pointer down chain|22046
+||mov|8,wa|10,(xl)+||get length to move|22047
+||mvw||||perform move|22048
+||brn|6,gbc11|||loop back|22049
+|gbc12|mov|3,dnamp|7,xr||set next available loc ptr|22053
+||mov|8,wb|3,gbsvb||reload move offset|22054
+||bze|8,wb|6,gbc13||jump if no move required|22055
+||mov|7,xl|7,xr||else copy old top of core|22056
+||add|7,xr|8,wb||point to new top of core|22057
+||mov|3,dnamp|7,xr||save new top of core pointer|22058
+||mov|8,wa|7,xl||copy old top|22059
+||sub|8,wa|3,dnamb||minus old bottom = length|22060
+||add|3,dnamb|8,wb||bump bottom to get new value|22061
+||mwb||||perform move (backwards)|22062
+|gbc13|zer|7,xr|||clear garbage value in xr|22066
+||mov|3,gbcfl|7,xr||note exit from gbcol|22067
+||mov|8,wa|3,dnamb||start of dynamic area|22069
+||mov|8,wb|3,dnamp||next available location|22070
+||mov|8,wc|3,dname||last available location + 1|22071
+||jsr|6,sysgc|||inform sysgc of completion|22072
+||sti|3,gbcia|||save ia|22080
+||zer|7,xr|||presume no sediment will remain|22081
+||mov|8,wb|3,gbcsf||free space in sediment|22082
+||btw|8,wb|||convert bytes to words|22083
+||mti|8,wb|||put sediment free store in ia|22084
+||mli|3,gbsed|||multiply by sediment factor|22085
+||iov|6,gb13a|||jump if overflowed|22086
+||mov|8,wb|3,dnamp||end of dynamic area in use|22087
+||sub|8,wb|3,dnamb||minus start is sediment remaining|22088
+||btw|8,wb|||convert to words|22089
+||mov|3,gbcsf|8,wb||store it|22090
+||sbi|3,gbcsf|||subtract from scaled up free store|22091
+||igt|6,gb13a|||jump if large free store in sedimnt|22092
+||mov|7,xr|3,dnamp||below threshold, return sediment|22093
+||sub|7,xr|3,dnamb||for use by caller|22094
+|gb13a|ldi|3,gbcia|||restore ia|22095
+||mov|8,wa|3,gbsva||restore wa|22097
+||mov|8,wb|3,gbsvb||restore wb|22098
+||scp|8,wc|||get code pointer|22099
+||add|8,wc|3,r_cod||make absolute again|22100
+||lcp|8,wc|||and replace absolute value|22101
+||mov|8,wc|3,gbsvc||restore wc|22102
+||mov|7,xl|10,(xs)+||restore entry xl|22103
+||icv|3,gbcnt|||increment count of collections|22104
+||exi||||exit to gbcol caller|22105
+|gbc14|icv|3,errft|||fatal error|22109
+||erb|1,250|26,insufficient memory to complete dump|||22110
+||enp||||end procedure gbcol|22111
+||ejc|||||22112
+|gbcpf|prc|25,e|1,0||entry point|22127
+||zer|11,-(xs)|||set zero to mark bottom of stack|22128
+||mov|11,-(xs)|7,xl||save end pointer|22129
+|gpf01|mov|7,xl|9,(xr)||load field contents|22139
+||mov|8,wc|7,xr||save field pointer|22140
+||blt|7,xl|3,dnamb|6,gpf2a|jump if not ptr into dynamic area|22144
+||bge|7,xl|3,dnamp|6,gpf2a|jump if not ptr into dynamic area|22145
+||mov|8,wa|9,(xl)||load ptr to chain (or entry ptr)|22150
+||blt|7,xl|3,gbcsd|6,gpf1a|do not chain if within sediment|22152
+||mov|9,(xl)|7,xr||set this field as new head of chain|22154
+||mov|9,(xr)|8,wa||set forward pointer|22155
+|gpf1a|bod|8,wa|6,gpf03||jump if not already processed|22160
+|gpf02|mov|7,xr|8,wc||restore field pointer|22168
+|gpf2a|ica|7,xr|||bump to next field|22172
+||bne|7,xr|9,(xs)|6,gpf01|loop back if more to go|22173
+||ejc|||||22174
+||mov|7,xl|10,(xs)+||restore pointer past end|22180
+||mov|7,xr|10,(xs)+||restore block pointer|22181
+||bnz|7,xr|6,gpf2a||continue loop unless outer levl|22182
+||exi||||return to caller if outer level|22183
+|gpf03|bge|7,xl|3,gbcsd|6,gpf3a|if not within sediment|22196
+||icv|9,(xl)|||mark by making entry point even|22198
+|gpf3a|mov|7,xr|7,xl||copy block pointer|22202
+||mov|7,xl|8,wa||copy first word of block|22206
+||lei|7,xl|||load entry point id (bl_xx)|22207
+||bsw|7,xl|2,bl___||switch on block type|22212
+||iff|2,bl_ar|6,gpf06||arblk|22250
+||iff|2,bl_cd|6,gpf19||cdblk|22250
+||iff|2,bl_ex|6,gpf17||exblk|22250
+||iff|2,bl_ic|6,gpf02||icblk|22250
+||iff|2,bl_nm|6,gpf10||nmblk|22250
+||iff|2,bl_p0|6,gpf10||p0blk|22250
+||iff|2,bl_p1|6,gpf12||p1blk|22250
+||iff|2,bl_p2|6,gpf12||p2blk|22250
+||iff|2,bl_rc|6,gpf02||rcblk|22250
+||iff|2,bl_sc|6,gpf02||scblk|22250
+||iff|2,bl_se|6,gpf02||seblk|22250
+||iff|2,bl_tb|6,gpf08||tbblk|22250
+||iff|2,bl_vc|6,gpf08||vcblk|22250
+||iff|2,bl_xn|6,gpf02||xnblk|22250
+||iff|2,bl_xr|6,gpf09||xrblk|22250
+||iff|2,bl_bc|6,gpf02||bcblk - dummy to fill out iffs|22250
+||iff|2,bl_pd|6,gpf13||pdblk|22250
+||iff|2,bl_tr|6,gpf16||trblk|22250
+||iff|2,bl_bf|6,gpf02||bfblk|22250
+||iff|2,bl_cc|6,gpf07||ccblk|22250
+||iff|2,bl_cm|6,gpf04||cmblk|22250
+||iff|2,bl_ct|6,gpf02||ctblk|22250
+||iff|2,bl_df|6,gpf02||dfblk|22250
+||iff|2,bl_ef|6,gpf02||efblk|22250
+||iff|2,bl_ev|6,gpf10||evblk|22250
+||iff|2,bl_ff|6,gpf11||ffblk|22250
+||iff|2,bl_kv|6,gpf02||kvblk|22250
+||iff|2,bl_pf|6,gpf14||pfblk|22250
+||iff|2,bl_te|6,gpf15||teblk|22250
+||esw||||end of jump table|22250
+||ejc|||||22251
+|gpf04|mov|8,wa|13,cmlen(xr)||load length|22257
+||mov|8,wb|19,*cmtyp||set offset|22258
+|gpf05|add|8,wa|7,xr||point past last reloc field|22267
+||add|7,xr|8,wb||point to first reloc field|22268
+||mov|11,-(xs)|8,wc||stack old field pointer|22269
+||mov|11,-(xs)|8,wa||stack new limit pointer|22270
+||chk||||check for stack overflow|22271
+||brn|6,gpf01|||if ok, back to process|22272
+|gpf06|mov|8,wa|13,arlen(xr)||load length|22276
+||mov|8,wb|13,arofs(xr)||set offset to 1st reloc fld (arpro)|22277
+||brn|6,gpf05|||all set|22278
+|gpf07|mov|8,wa|13,ccuse(xr)||set length in use|22282
+||mov|8,wb|19,*ccuse||1st word (make sure at least one)|22283
+||brn|6,gpf05|||all set|22284
+||ejc|||||22285
+|gpf19|mov|8,wa|13,cdlen(xr)||load length|22292
+||mov|8,wb|19,*cdfal||set offset|22293
+||brn|6,gpf05|||jump back|22294
+|gpf08|mov|8,wa|13,offs2(xr)||load length|22301
+||mov|8,wb|19,*offs3||set offset|22302
+||brn|6,gpf05|||jump back|22303
+|gpf09|mov|8,wa|13,xrlen(xr)||load length|22307
+||mov|8,wb|19,*xrptr||set offset|22308
+||brn|6,gpf05|||jump back|22309
+|gpf10|mov|8,wa|19,*offs2||point past second field|22313
+||mov|8,wb|19,*offs1||offset is one (only reloc fld is 2)|22314
+||brn|6,gpf05|||all set|22315
+|gpf11|mov|8,wa|19,*ffofs||set length|22319
+||mov|8,wb|19,*ffnxt||set offset|22320
+||brn|6,gpf05|||all set|22321
+|gpf12|mov|8,wa|19,*parm2||length (parm2 is non-relocatable)|22325
+||mov|8,wb|19,*pthen||set offset|22326
+||brn|6,gpf05|||all set|22327
+||ejc|||||22328
+|gpf13|mov|7,xl|13,pddfp(xr)||load ptr to dfblk|22334
+||mov|8,wa|13,dfpdl(xl)||get pdblk length|22335
+||mov|8,wb|19,*pdfld||set offset|22336
+||brn|6,gpf05|||all set|22337
+|gpf14|mov|8,wa|19,*pfarg||length past last reloc|22341
+||mov|8,wb|19,*pfcod||offset to first reloc|22342
+||brn|6,gpf05|||all set|22343
+|gpf15|mov|8,wa|19,*tesi_||set length|22347
+||mov|8,wb|19,*tesub||and offset|22348
+||brn|6,gpf05|||all set|22349
+|gpf16|mov|8,wa|19,*trsi_||set length|22353
+||mov|8,wb|19,*trval||and offset|22354
+||brn|6,gpf05|||all set|22355
+|gpf17|mov|8,wa|13,exlen(xr)||load length|22359
+||mov|8,wb|19,*exflc||set offset|22360
+||brn|6,gpf05|||jump back|22361
+||enp||||end procedure gbcpf|22371
+||ejc|||||22372
+|gtarr|prc|25,e|1,2||entry point|22388
+||mov|3,gtawa|8,wa||save wa indicator|22389
+||mov|8,wa|9,(xr)||load type word|22390
+||beq|8,wa|22,=b_art|6,gtar8|exit if already an array|22391
+||beq|8,wa|22,=b_vct|6,gtar8|exit if already an array|22392
+||bne|8,wa|22,=b_tbt|6,gta9a|else fail if not a table (sgd02)|22393
+||mov|11,-(xs)|7,xr||replace tbblk pointer on stack|22397
+||zer|7,xr|||signal first pass|22398
+||zer|8,wb|||zero non-null element count|22399
+|gtar1|mov|7,xl|9,(xs)||point to table|22409
+||add|7,xl|13,tblen(xl)||point past last bucket|22410
+||sub|7,xl|19,*tbbuk||set first bucket offset|22411
+||mov|8,wa|7,xl||copy adjusted pointer|22412
+|gtar2|mov|7,xl|8,wa||copy bucket pointer|22418
+||dca|8,wa|||decrement bucket pointer|22419
+|gtar3|mov|7,xl|13,tenxt(xl)||point to next teblk|22423
+||beq|7,xl|9,(xs)|6,gtar6|jump if chain end (tbblk ptr)|22424
+||mov|3,cnvtp|7,xl||else save teblk pointer|22425
+|gtar4|mov|7,xl|13,teval(xl)||load value|22429
+||beq|9,(xl)|22,=b_trt|6,gtar4|loop till value found|22430
+||mov|8,wc|7,xl||copy value|22431
+||mov|7,xl|3,cnvtp||restore teblk pointer|22432
+||ejc|||||22433
+||beq|8,wc|21,=nulls|6,gtar3|loop back to ignore null value|22439
+||bnz|7,xr|6,gtar5||jump if second pass|22440
+||icv|8,wb|||for the first pass, bump count|22441
+||brn|6,gtar3|||and loop back for next teblk|22442
+|gtar5|bze|3,gtawa|6,gta5a||jump if address wanted|22446
+||mov|10,(xr)+|13,tesub(xl)||store subscript name|22447
+||mov|10,(xr)+|8,wc||store value in arblk|22448
+||brn|6,gtar3|||loop back for next teblk|22449
+|gta5a|mov|10,(xr)+|7,xl||store teblk address in name|22454
+||mov|10,(xr)+|7,xl||and value slots|22455
+||brn|6,gtar3|||loop back for next teblk|22456
+|gtar6|bne|8,wa|9,(xs)|6,gtar2|loop back if more buckets to go|22460
+||bnz|7,xr|6,gtar7||else jump if second pass|22461
+||bze|8,wb|6,gtar9||fail if no non-null elements|22465
+||mov|8,wa|8,wb||else copy count|22466
+||add|8,wa|8,wb||double (two words/element)|22467
+||add|8,wa|18,=arvl2||add space for standard fields|22468
+||wtb|8,wa|||convert length to bytes|22469
+||bgt|8,wa|3,mxlen|6,gta9b|error if too long for array|22470
+||jsr|6,alloc|||else allocate space for arblk|22471
+||mov|9,(xr)|22,=b_art||store type word|22472
+||zer|13,idval(xr)|||zero id for the moment|22473
+||mov|13,arlen(xr)|8,wa||store length|22474
+||mov|13,arndm(xr)|18,=num02||set dimensions = 2|22475
+||ldi|4,intv1|||get integer one|22476
+||sti|13,arlbd(xr)|||store as lbd 1|22477
+||sti|13,arlb2(xr)|||store as lbd 2|22478
+||ldi|4,intv2|||load integer two|22479
+||sti|13,ardm2(xr)|||store as dim 2|22480
+||mti|8,wb|||get element count as integer|22481
+||sti|13,ardim(xr)|||store as dim 1|22482
+||zer|13,arpr2(xr)|||zero prototype field for now|22483
+||mov|13,arofs(xr)|19,*arpr2||set offset field (signal pass 2)|22484
+||mov|8,wb|7,xr||save arblk pointer|22485
+||add|7,xr|19,*arvl2||point to first element location|22486
+||brn|6,gtar1|||jump back to fill in elements|22487
+||ejc|||||22488
+|gtar7|mov|7,xr|8,wb||restore arblk pointer|22494
+||mov|9,(xs)|8,wb||store as result|22495
+||ldi|13,ardim(xr)|||get number of elements (nn)|22501
+||mli|4,intvh|||multiply by 100|22502
+||adi|4,intv2|||add 2 (nn02)|22503
+||jsr|6,icbld|||build integer|22504
+||mov|11,-(xs)|7,xr||store ptr for gtstg|22505
+||jsr|6,gtstg|||convert to string|22506
+||ppm||||convert fail is impossible|22507
+||mov|7,xl|7,xr||copy string pointer|22508
+||mov|7,xr|10,(xs)+||reload arblk pointer|22509
+||mov|13,arpr2(xr)|7,xl||store prototype ptr (nn02)|22510
+||sub|8,wa|18,=num02||adjust length to point to zero|22511
+||psc|7,xl|8,wa||point to zero|22512
+||mov|8,wb|18,=ch_cm||load a comma|22513
+||sch|8,wb|9,(xl)||store a comma over the zero|22514
+||csc|7,xl|||complete store characters|22515
+|gtar8|exi||||return to caller|22519
+|gtar9|mov|7,xr|10,(xs)+||restore stack for conv err (sgd02)|22523
+||exi|1,1|||return|22524
+|gta9a|exi|1,2|||return|22528
+|gta9b|erb|1,260|26,conversion array size exceeds maximum permitted|||22532
+||enp||||procedure gtarr|22533
+||ejc|||||22534
+|gtcod|prc|25,e|1,1||entry point|22548
+||beq|9,(xr)|22,=b_cds|6,gtcd1|jump if already code|22549
+||beq|9,(xr)|22,=b_cdc|6,gtcd1|jump if already code|22550
+||mov|11,-(xs)|7,xr||stack argument for gtstg|22554
+||jsr|6,gtstg|||convert argument to string|22555
+||ppm|6,gtcd2|||jump if non-convertible|22556
+||mov|3,gtcef|3,flptr||save fail ptr in case of error|22557
+||mov|3,r_gtc|3,r_cod||also save code ptr|22558
+||mov|3,r_cim|7,xr||else set image pointer|22559
+||mov|3,scnil|8,wa||set image length|22560
+||zer|3,scnpt|||set scan pointer|22561
+||mov|3,stage|18,=stgxc||set stage for execute compile|22562
+||mov|3,lstsn|3,cmpsn||in case listr called|22563
+||icv|3,cmpln|||bump line number|22565
+||jsr|6,cmpil|||compile string|22567
+||mov|3,stage|18,=stgxt||reset stage for execute time|22568
+||zer|3,r_cim|||clear image|22569
+|gtcd1|exi||||give normal gtcod return|22573
+|gtcd2|exi|1,1|||give error return|22577
+||enp||||end procedure gtcod|22578
+||ejc|||||22579
+|gtexp|prc|25,e|1,1||entry point|22596
+||blo|9,(xr)|22,=b_e__|6,gtex1|jump if already an expression|22597
+||mov|11,-(xs)|7,xr||store argument for gtstg|22598
+||jsr|6,gtstg|||convert argument to string|22599
+||ppm|6,gtex2|||jump if unconvertible|22600
+||mov|7,xl|7,xr||copy input string pointer|22608
+||plc|7,xl|8,wa||point one past the string end|22609
+||lch|7,xl|11,-(xl)||fetch the last character|22610
+||beq|7,xl|18,=ch_cl|6,gtex2|error if it is a semicolon|22611
+||beq|7,xl|18,=ch_sm|6,gtex2|or if it is a colon|22612
+||mov|3,r_cim|7,xr||set input image pointer|22616
+||zer|3,scnpt|||set scan pointer|22617
+||mov|3,scnil|8,wa||set input image length|22618
+||mov|11,-(xs)|8,wb||save value/name flag|22620
+||zer|8,wb|||set code for normal scan|22622
+||mov|3,gtcef|3,flptr||save fail ptr in case of error|22623
+||mov|3,r_gtc|3,r_cod||also save code ptr|22624
+||mov|3,stage|18,=stgev||adjust stage for compile|22625
+||mov|3,scntp|18,=t_uok||indicate unary operator acceptable|22626
+||jsr|6,expan|||build tree for expression|22627
+||zer|3,scnrs|||reset rescan flag|22628
+||mov|8,wa|10,(xs)+||restore value/name flag|22630
+||bne|3,scnpt|3,scnil|6,gtex2|error if not end of image|22632
+||zer|8,wb|||set ok value for cdgex call|22633
+||mov|7,xl|7,xr||copy tree pointer|22634
+||jsr|6,cdgex|||build expression block|22635
+||zer|3,r_cim|||clear pointer|22636
+||mov|3,stage|18,=stgxt||restore stage for execute time|22637
+|gtex1|exi||||return to gtexp caller|22641
+|gtex2|exi|1,1|||take error exit|22645
+||enp||||end procedure gtexp|22646
+||ejc|||||22647
+|gtint|prc|25,e|1,1||entry point|22662
+||beq|9,(xr)|22,=b_icl|6,gtin2|jump if already an integer|22663
+||mov|3,gtina|8,wa||else save wa|22664
+||mov|3,gtinb|8,wb||save wb|22665
+||jsr|6,gtnum|||convert to numeric|22666
+||ppm|6,gtin3|||jump if unconvertible|22667
+||beq|8,wa|22,=b_icl|6,gtin1|jump if integer|22670
+||ldr|13,rcval(xr)|||load real value|22674
+||rti|6,gtin3|||convert to integer (err if ovflow)|22675
+||jsr|6,icbld|||if ok build icblk|22676
+|gtin1|mov|8,wa|3,gtina||restore wa|22681
+||mov|8,wb|3,gtinb||restore wb|22682
+|gtin2|exi||||return to gtint caller|22686
+|gtin3|exi|1,1|||take convert error exit|22690
+||enp||||end procedure gtint|22691
+||ejc|||||22692
+|gtnum|prc|25,e|1,1||entry point|22707
+||mov|8,wa|9,(xr)||load first word of block|22708
+||beq|8,wa|22,=b_icl|6,gtn34|jump if integer (no conversion)|22709
+||beq|8,wa|22,=b_rcl|6,gtn34|jump if real (no conversion)|22712
+||mov|11,-(xs)|7,xr||stack argument in case convert err|22718
+||mov|11,-(xs)|7,xr||stack argument for gtstg|22719
+||jsr|6,gtstg|||convert argument to string|22721
+||ppm|6,gtn36|||jump if unconvertible|22725
+||ldi|4,intv0|||initialize integer result to zero|22729
+||bze|8,wa|6,gtn32||jump to exit with zero if null|22730
+||lct|8,wa|8,wa||set bct counter for following loops|22731
+||zer|3,gtnnf|||tentatively indicate result +|22732
+||sti|3,gtnex|||initialise exponent to zero|22735
+||zer|3,gtnsc|||zero scale in case real|22736
+||zer|3,gtndf|||reset flag for dec point found|22737
+||zer|3,gtnrd|||reset flag for digits found|22738
+||ldr|4,reav0|||zero real accum in case real|22739
+||plc|7,xr|||point to argument characters|22741
+|gtn01|lch|8,wb|10,(xr)+||load first character|22745
+||blt|8,wb|18,=ch_d0|6,gtn02|jump if not digit|22746
+||ble|8,wb|18,=ch_d9|6,gtn06|jump if first char is a digit|22747
+||ejc|||||22748
+|gtn02|bne|8,wb|18,=ch_bl|6,gtn03|jump if non-blank|22754
+|gtna2|bct|8,wa|6,gtn01||else decr count and loop back|22755
+||brn|6,gtn07|||jump to return zero if all blanks|22756
+|gtn03|beq|8,wb|18,=ch_pl|6,gtn04|jump if plus sign|22760
+||beq|8,wb|18,=ch_ht|6,gtna2|horizontal tab equiv to blank|22762
+||bne|8,wb|18,=ch_mn|6,gtn12|jump if not minus (may be real)|22770
+||mnz|3,gtnnf|||if minus sign, set negative flag|22772
+|gtn04|bct|8,wa|6,gtn05||jump if chars left|22776
+||brn|6,gtn36|||else error|22777
+|gtn05|lch|8,wb|10,(xr)+||load next character|22781
+||blt|8,wb|18,=ch_d0|6,gtn08|jump if not a digit|22782
+||bgt|8,wb|18,=ch_d9|6,gtn08|jump if not a digit|22783
+|gtn06|sti|3,gtnsi|||save current value|22787
+||cvm|6,gtn35|||current*10-(new dig) jump if ovflow|22791
+||mnz|3,gtnrd|||set digit read flag|22792
+||bct|8,wa|6,gtn05||else loop back if more chars|22794
+|gtn07|bnz|3,gtnnf|6,gtn32||jump if negative (all set)|22798
+||ngi||||else negate|22799
+||ino|6,gtn32|||jump if no overflow|22800
+||brn|6,gtn36|||else signal error|22801
+||ejc|||||22802
+|gtn08|beq|8,wb|18,=ch_bl|6,gtna9|jump if a blank|22809
+||beq|8,wb|18,=ch_ht|6,gtna9|jump if horizontal tab|22811
+||itr||||else convert integer to real|22819
+||ngr||||negate to get positive value|22820
+||brn|6,gtn12|||jump to try for real|22821
+|gtn09|lch|8,wb|10,(xr)+||get next char|22826
+||beq|8,wb|18,=ch_ht|6,gtna9|jump if horizontal tab|22828
+||bne|8,wb|18,=ch_bl|6,gtn36|error if non-blank|22833
+|gtna9|bct|8,wa|6,gtn09||loop back if more chars to check|22834
+||brn|6,gtn07|||return integer if all blanks|22835
+|gtn10|lch|8,wb|10,(xr)+||load next character|22841
+||blt|8,wb|18,=ch_d0|6,gtn12|jump if non-numeric|22842
+||bgt|8,wb|18,=ch_d9|6,gtn12|jump if non-numeric|22843
+|gtn11|sub|8,wb|18,=ch_d0||convert digit to number|22847
+||mlr|4,reavt|||multiply real by 10.0|22848
+||rov|6,gtn36|||convert error if overflow|22849
+||str|3,gtnsr|||save result|22850
+||mti|8,wb|||get new digit as integer|22851
+||itr||||convert new digit to real|22852
+||adr|3,gtnsr|||add to get new total|22853
+||add|3,gtnsc|3,gtndf||increment scale if after dec point|22854
+||mnz|3,gtnrd|||set digit found flag|22855
+||bct|8,wa|6,gtn10||loop back if more chars|22856
+||brn|6,gtn22|||else jump to scale|22857
+||ejc|||||22858
+|gtn12|bne|8,wb|18,=ch_dt|6,gtn13|jump if not dec point|22864
+||bnz|3,gtndf|6,gtn36||if dec point, error if one already|22865
+||mov|3,gtndf|18,=num01||else set flag for dec point|22866
+||bct|8,wa|6,gtn10||loop back if more chars|22867
+||brn|6,gtn22|||else jump to scale|22868
+|gtn13|beq|8,wb|18,=ch_le|6,gtn15|jump if e for exponent|22872
+||beq|8,wb|18,=ch_ld|6,gtn15|jump if d for exponent|22873
+||beq|8,wb|18,=ch_ue|6,gtn15|jump if e for exponent|22875
+||beq|8,wb|18,=ch_ud|6,gtn15|jump if d for exponent|22876
+|gtn14|beq|8,wb|18,=ch_bl|6,gtnb4|jump if blank|22881
+||beq|8,wb|18,=ch_ht|6,gtnb4|jump if horizontal tab|22883
+||brn|6,gtn36|||error if non-blank|22888
+|gtnb4|lch|8,wb|10,(xr)+||get next character|22890
+||bct|8,wa|6,gtn14||loop back to check if more|22891
+||brn|6,gtn22|||else jump to scale|22892
+|gtn15|zer|3,gtnes|||set exponent sign positive|22896
+||ldi|4,intv0|||initialize exponent to zero|22897
+||mnz|3,gtndf|||reset no dec point indication|22898
+||bct|8,wa|6,gtn16||jump skipping past e or d|22899
+||brn|6,gtn36|||error if null exponent|22900
+|gtn16|lch|8,wb|10,(xr)+||load first exponent character|22904
+||beq|8,wb|18,=ch_pl|6,gtn17|jump if plus sign|22905
+||bne|8,wb|18,=ch_mn|6,gtn19|else jump if not minus sign|22906
+||mnz|3,gtnes|||set sign negative if minus sign|22907
+|gtn17|bct|8,wa|6,gtn18||jump if chars left|22911
+||brn|6,gtn36|||else error|22912
+|gtn18|lch|8,wb|10,(xr)+||load next character|22916
+||ejc|||||22917
+|gtn19|blt|8,wb|18,=ch_d0|6,gtn20|jump if not digit|22923
+||bgt|8,wb|18,=ch_d9|6,gtn20|jump if not digit|22924
+||cvm|6,gtn36|||else current*10, subtract new digit|22925
+||bct|8,wa|6,gtn18||loop back if more chars|22926
+||brn|6,gtn21|||jump if exponent field is exhausted|22927
+|gtn20|beq|8,wb|18,=ch_bl|6,gtnc0|jump if blank|22931
+||beq|8,wb|18,=ch_ht|6,gtnc0|jump if horizontal tab|22933
+||brn|6,gtn36|||error if non-blank|22938
+|gtnc0|lch|8,wb|10,(xr)+||get next character|22940
+||bct|8,wa|6,gtn20||loop back till all blanks scanned|22941
+|gtn21|sti|3,gtnex|||save collected exponent|22945
+||bnz|3,gtnes|6,gtn22||jump if it was negative|22946
+||ngi||||else complement|22947
+||iov|6,gtn36|||error if overflow|22948
+||sti|3,gtnex|||and store positive exponent|22949
+|gtn22|bze|3,gtnrd|6,gtn36||error if not digits collected|22953
+||bze|3,gtndf|6,gtn36||error if no exponent or dec point|22954
+||mti|3,gtnsc|||else load scale as integer|22955
+||sbi|3,gtnex|||subtract exponent|22956
+||iov|6,gtn36|||error if overflow|22957
+||ilt|6,gtn26|||jump if we must scale up|22958
+||mfi|8,wa|6,gtn36||load scale factor, err if ovflow|22962
+|gtn23|ble|8,wa|18,=num10|6,gtn24|jump if 10 or less to go|22966
+||dvr|4,reatt|||else divide by 10**10|22967
+||sub|8,wa|18,=num10||decrement scale|22968
+||brn|6,gtn23|||and loop back|22969
+||ejc|||||22970
+|gtn24|bze|8,wa|6,gtn30||jump if scaled|22976
+||lct|8,wb|18,=cfp_r||else get indexing factor|22977
+||mov|7,xr|21,=reav1||point to powers of ten table|22978
+||wtb|8,wa|||convert remaining scale to byte ofs|22979
+|gtn25|add|7,xr|8,wa||bump pointer|22983
+||bct|8,wb|6,gtn25||once for each value word|22984
+||dvr|9,(xr)|||scale down as required|22985
+||brn|6,gtn30|||and jump|22986
+|gtn26|ngi||||get absolute value of exponent|22990
+||iov|6,gtn36|||error if overflow|22991
+||mfi|8,wa|6,gtn36||acquire scale, error if ovflow|22992
+|gtn27|ble|8,wa|18,=num10|6,gtn28|jump if 10 or less to go|22996
+||mlr|4,reatt|||else multiply by 10**10|22997
+||rov|6,gtn36|||error if overflow|22998
+||sub|8,wa|18,=num10||else decrement scale|22999
+||brn|6,gtn27|||and loop back|23000
+|gtn28|bze|8,wa|6,gtn30||jump if scaled|23004
+||lct|8,wb|18,=cfp_r||else get indexing factor|23005
+||mov|7,xr|21,=reav1||point to powers of ten table|23006
+||wtb|8,wa|||convert remaining scale to byte ofs|23007
+|gtn29|add|7,xr|8,wa||bump pointer|23011
+||bct|8,wb|6,gtn29||once for each word in value|23012
+||mlr|9,(xr)|||scale up|23013
+||rov|6,gtn36|||error if overflow|23014
+||ejc|||||23015
+|gtn30|bze|3,gtnnf|6,gtn31||jump if positive|23021
+||ngr||||else negate|23022
+|gtn31|jsr|6,rcbld|||build real block|23026
+||brn|6,gtn33|||merge to exit|23027
+|gtn32|jsr|6,icbld|||build icblk|23032
+|gtn33|mov|8,wa|9,(xr)||load first word of result block|23036
+||ica|7,xs|||pop argument off stack|23037
+|gtn34|exi||||return to gtnum caller|23041
+|gtn35|lch|8,wb|11,-(xr)||reload current character|23048
+||lch|8,wb|10,(xr)+||bump character pointer|23049
+||ldi|3,gtnsi|||reload integer so far|23050
+||itr||||convert to real|23051
+||ngr||||make value positive|23052
+||brn|6,gtn11|||merge with real circuit|23053
+|gtn36|mov|7,xr|10,(xs)+||reload original argument|23058
+||exi|1,1|||take convert-error exit|23059
+||enp||||end procedure gtnum|23060
+||ejc|||||23061
+|gtnvr|prc|25,e|1,1||entry point|23075
+||bne|9,(xr)|22,=b_nml|6,gnv02|jump if not name|23077
+||mov|7,xr|13,nmbas(xr)||else load name base if name|23078
+||blo|7,xr|3,state|6,gnv07|skip if vrblk (in static region)|23079
+|gnv01|exi|1,1|||take convert-error exit|23083
+|gnv02|mov|3,gnvsa|8,wa||save wa|23087
+||mov|3,gnvsb|8,wb||save wb|23088
+||mov|11,-(xs)|7,xr||stack argument for gtstg|23089
+||jsr|6,gtstg|||convert argument to string|23090
+||ppm|6,gnv01|||jump if conversion error|23091
+||bze|8,wa|6,gnv01||null string is an error|23092
+||jsr|6,flstg|||fold lower case to upper case|23094
+||mov|11,-(xs)|7,xl||save xl|23096
+||mov|11,-(xs)|7,xr||stack string ptr for later|23097
+||mov|8,wb|7,xr||copy string pointer|23098
+||add|8,wb|19,*schar||point to characters of string|23099
+||mov|3,gnvst|8,wb||save pointer to characters|23100
+||mov|8,wb|8,wa||copy length|23101
+||ctw|8,wb|1,0||get number of words in name|23102
+||mov|3,gnvnw|8,wb||save for later|23103
+||jsr|6,hashs|||compute hash index for string|23104
+||rmi|3,hshnb|||compute hash offset by taking mod|23105
+||mfi|8,wc|||get as offset|23106
+||wtb|8,wc|||convert offset to bytes|23107
+||add|8,wc|3,hshtb||point to proper hash chain|23108
+||sub|8,wc|19,*vrnxt||subtract offset to merge into loop|23109
+||ejc|||||23110
+|gnv03|mov|7,xl|8,wc||copy hash chain pointer|23116
+||mov|7,xl|13,vrnxt(xl)||point to next vrblk on chain|23117
+||bze|7,xl|6,gnv08||jump if end of chain|23118
+||mov|8,wc|7,xl||save pointer to this vrblk|23119
+||bnz|13,vrlen(xl)|6,gnv04||jump if not system variable|23120
+||mov|7,xl|13,vrsvp(xl)||else point to svblk|23121
+||sub|7,xl|19,*vrsof||adjust offset for merge|23122
+|gnv04|bne|8,wa|13,vrlen(xl)|6,gnv03|back for next vrblk if lengths ne|23126
+||add|7,xl|19,*vrchs||else point to chars of chain entry|23127
+||lct|8,wb|3,gnvnw||get word counter to control loop|23128
+||mov|7,xr|3,gnvst||point to chars of new name|23129
+|gnv05|cne|9,(xr)|9,(xl)|6,gnv03|jump if no match for next vrblk|23133
+||ica|7,xr|||bump new name pointer|23134
+||ica|7,xl|||bump vrblk in chain name pointer|23135
+||bct|8,wb|6,gnv05||else loop till all compared|23136
+||mov|7,xr|8,wc||we have found a match, get vrblk|23137
+|gnv06|mov|8,wa|3,gnvsa||restore wa|23141
+||mov|8,wb|3,gnvsb||restore wb|23142
+||ica|7,xs|||pop string pointer|23143
+||mov|7,xl|10,(xs)+||restore xl|23144
+|gnv07|exi||||return to gtnvr caller|23148
+|gnv08|zer|7,xr|||clear garbage xr pointer|23152
+||mov|3,gnvhe|8,wc||save ptr to end of hash chain|23153
+||bgt|8,wa|18,=num09|6,gnv14|cannot be system var if length gt 9|23154
+||mov|7,xl|8,wa||else copy length|23155
+||wtb|7,xl|||convert to byte offset|23156
+||mov|7,xl|14,vsrch(xl)||point to first svblk of this length|23157
+||ejc|||||23158
+|gnv09|mov|3,gnvsp|7,xl||save table pointer|23164
+||mov|8,wc|10,(xl)+||load svbit bit string|23165
+||mov|8,wb|10,(xl)+||load length from table entry|23166
+||bne|8,wa|8,wb|6,gnv14|jump if end of right length entries|23167
+||lct|8,wb|3,gnvnw||get word counter to control loop|23168
+||mov|7,xr|3,gnvst||point to chars of new name|23169
+|gnv10|cne|9,(xr)|9,(xl)|6,gnv11|jump if name mismatch|23173
+||ica|7,xr|||else bump new name pointer|23174
+||ica|7,xl|||bump svblk pointer|23175
+||bct|8,wb|6,gnv10||else loop until all checked|23176
+||zer|8,wc|||set vrlen value zero|23180
+||mov|8,wa|19,*vrsi_||set standard size|23181
+||brn|6,gnv15|||jump to build vrblk|23182
+|gnv11|ica|7,xl|||bump past word of chars|23186
+||bct|8,wb|6,gnv11||loop back if more to go|23187
+||rsh|8,wc|2,svnbt||remove uninteresting bits|23188
+|gnv12|mov|8,wb|4,bits1||load bit to test|23192
+||anb|8,wb|8,wc||test for word present|23193
+||zrb|8,wb|6,gnv13||jump if not present|23194
+||ica|7,xl|||else bump table pointer|23195
+|gnv13|rsh|8,wc|1,1||remove bit already processed|23199
+||nzb|8,wc|6,gnv12||loop back if more bits to test|23200
+||brn|6,gnv09|||else loop back for next svblk|23201
+|gnv14|mov|8,wc|8,wa||copy vrlen value|23205
+||mov|8,wa|18,=vrchs||load standard size -chars|23206
+||add|8,wa|3,gnvnw||adjust for chars of name|23207
+||wtb|8,wa|||convert length to bytes|23208
+||ejc|||||23209
+|gnv15|jsr|6,alost|||allocate space for vrblk (static)|23215
+||mov|8,wb|7,xr||save vrblk pointer|23216
+||mov|7,xl|21,=stnvr||point to model variable block|23217
+||mov|8,wa|19,*vrlen||set length of standard fields|23218
+||mvw||||set initial fields of new block|23219
+||mov|7,xl|3,gnvhe||load pointer to end of hash chain|23220
+||mov|13,vrnxt(xl)|8,wb||add new block to end of chain|23221
+||mov|10,(xr)+|8,wc||set vrlen field, bump ptr|23222
+||mov|8,wa|3,gnvnw||get length in words|23223
+||wtb|8,wa|||convert to length in bytes|23224
+||bze|8,wc|6,gnv16||jump if system variable|23225
+||mov|7,xl|9,(xs)||point back to string name|23229
+||add|7,xl|19,*schar||point to chars of name|23230
+||mvw||||move characters into place|23231
+||mov|7,xr|8,wb||restore vrblk pointer|23232
+||brn|6,gnv06|||jump back to exit|23233
+|gnv16|mov|7,xl|3,gnvsp||load pointer to svblk|23238
+||mov|9,(xr)|7,xl||set svblk ptr in vrblk|23239
+||mov|7,xr|8,wb||restore vrblk pointer|23240
+||mov|8,wb|13,svbit(xl)||load bit indicators|23241
+||add|7,xl|19,*svchs||point to characters of name|23242
+||add|7,xl|8,wa||point past characters|23243
+||mov|8,wc|4,btknm||load test bit|23247
+||anb|8,wc|8,wb||and to test|23248
+||zrb|8,wc|6,gnv17||jump if no keyword number|23249
+||ica|7,xl|||else bump pointer|23250
+||ejc|||||23251
+|gnv17|mov|8,wc|4,btfnc||get test bit|23257
+||anb|8,wc|8,wb||and to test|23258
+||zrb|8,wc|6,gnv18||skip if no system function|23259
+||mov|13,vrfnc(xr)|7,xl||else point vrfnc to svfnc field|23260
+||add|7,xl|19,*num02||and bump past svfnc, svnar fields|23261
+|gnv18|mov|8,wc|4,btlbl||get test bit|23265
+||anb|8,wc|8,wb||and to test|23266
+||zrb|8,wc|6,gnv19||jump if bit is off (no system labl)|23267
+||mov|13,vrlbl(xr)|7,xl||else point vrlbl to svlbl field|23268
+||ica|7,xl|||bump past svlbl field|23269
+|gnv19|mov|8,wc|4,btval||load test bit|23273
+||anb|8,wc|8,wb||and to test|23274
+||zrb|8,wc|6,gnv06||all done if no value|23275
+||mov|13,vrval(xr)|9,(xl)||else set initial value|23276
+||mov|13,vrsto(xr)|22,=b_vre||set error store access|23277
+||brn|6,gnv06|||merge back to exit to caller|23278
+||enp||||end procedure gtnvr|23279
+||ejc|||||23280
+|gtpat|prc|25,e|1,1||entry point|23295
+||bhi|9,(xr)|22,=p_aaa|6,gtpt5|jump if pattern already|23297
+||mov|3,gtpsb|8,wb||save wb|23301
+||mov|11,-(xs)|7,xr||stack argument for gtstg|23302
+||jsr|6,gtstg|||convert argument to string|23303
+||ppm|6,gtpt2|||jump if impossible|23304
+||bnz|8,wa|6,gtpt1||jump if non-null|23308
+||mov|7,xr|21,=ndnth||point to nothen node|23312
+||brn|6,gtpt4|||jump to exit|23313
+||ejc|||||23314
+|gtpt1|mov|8,wb|22,=p_str||load pcode for multi-char string|23320
+||bne|8,wa|18,=num01|6,gtpt3|jump if multi-char string|23321
+||plc|7,xr|||point to character|23325
+||lch|8,wa|9,(xr)||load character|23326
+||mov|7,xr|8,wa||set as parm1|23327
+||mov|8,wb|22,=p_ans||point to pcode for 1-char any|23328
+||brn|6,gtpt3|||jump to build node|23329
+|gtpt2|mov|8,wb|22,=p_exa||set pcode for expression in case|23333
+||blo|9,(xr)|22,=b_e__|6,gtpt3|jump to build node if expression|23334
+||exi|1,1|||take convert error exit|23338
+|gtpt3|jsr|6,pbild|||call routine to build pattern node|23342
+|gtpt4|mov|8,wb|3,gtpsb||restore wb|23346
+|gtpt5|exi||||return to gtpat caller|23350
+||enp||||end procedure gtpat|23351
+||ejc|||||23354
+|gtrea|prc|25,e|1,1||entry point|23368
+||mov|8,wa|9,(xr)||get first word of block|23369
+||beq|8,wa|22,=b_rcl|6,gtre2|jump if real|23370
+||jsr|6,gtnum|||else convert argument to numeric|23371
+||ppm|6,gtre3|||jump if unconvertible|23372
+||beq|8,wa|22,=b_rcl|6,gtre2|jump if real was returned|23373
+|gtre1|ldi|13,icval(xr)|||load integer|23377
+||itr||||convert to real|23378
+||jsr|6,rcbld|||build rcblk|23379
+|gtre2|exi||||return to gtrea caller|23383
+|gtre3|exi|1,1|||take convert error exit|23387
+||enp||||end procedure gtrea|23388
+||ejc|||||23390
+|gtsmi|prc|25,n|1,2||entry point|23410
+||mov|7,xr|10,(xs)+||load argument|23411
+||beq|9,(xr)|22,=b_icl|6,gtsm1|skip if already an integer|23412
+||jsr|6,gtint|||convert argument to integer|23416
+||ppm|6,gtsm2|||jump if convert is impossible|23417
+|gtsm1|ldi|13,icval(xr)|||load integer value|23421
+||mfi|8,wc|6,gtsm3||move as one word, jump if ovflow|23422
+||bgt|8,wc|3,mxlen|6,gtsm3|or if too large|23423
+||mov|7,xr|8,wc||copy result to xr|23424
+||exi||||return to gtsmi caller|23425
+|gtsm2|exi|1,1|||take non-integer error exit|23429
+|gtsm3|exi|1,2|||take out-of-range error exit|23433
+||enp||||end procedure gtsmi|23434
+||ejc|||||23435
+|gtstg|prc|25,n|1,1||entry point|23501
+||mov|7,xr|10,(xs)+||load argument, pop stack|23502
+||beq|9,(xr)|22,=b_scl|6,gts30|jump if already a string|23503
+|gts01|mov|11,-(xs)|7,xr||restack argument in case error|23507
+||mov|11,-(xs)|7,xl||save xl|23508
+||mov|3,gtsvb|8,wb||save wb|23509
+||mov|3,gtsvc|8,wc||save wc|23510
+||mov|8,wa|9,(xr)||load first word of block|23511
+||beq|8,wa|22,=b_icl|6,gts05|jump to convert integer|23512
+||beq|8,wa|22,=b_rcl|6,gts10|jump to convert real|23515
+||beq|8,wa|22,=b_nml|6,gts03|jump to convert name|23517
+|gts02|mov|7,xl|10,(xs)+||restore xl|23525
+||mov|7,xr|10,(xs)+||reload input argument|23526
+||exi|1,1|||take convert error exit|23527
+||ejc|||||23528
+|gts03|mov|7,xl|13,nmbas(xr)||load name base|23534
+||bhi|7,xl|3,state|6,gts02|error if not natural var (static)|23535
+||add|7,xl|19,*vrsof||else point to possible string name|23536
+||mov|8,wa|13,sclen(xl)||load length|23537
+||bnz|8,wa|6,gts04||jump if not system variable|23538
+||mov|7,xl|13,vrsvo(xl)||else point to svblk|23539
+||mov|8,wa|13,svlen(xl)||and load name length|23540
+|gts04|zer|8,wb|||set offset to zero|23544
+||jsr|6,sbstr|||use sbstr to copy string|23545
+||brn|6,gts29|||jump to exit|23546
+|gts05|ldi|13,icval(xr)|||load integer value|23550
+||mov|3,gtssf|18,=num01||set sign flag negative|23558
+||ilt|6,gts06|||skip if integer is negative|23559
+||ngi||||else negate integer|23560
+||zer|3,gtssf|||and reset negative flag|23561
+||ejc|||||23562
+|gts06|mov|7,xr|3,gtswk||point to result work area|23569
+||mov|8,wb|18,=nstmx||initialize counter to max length|23570
+||psc|7,xr|8,wb||prepare to store (right-left)|23571
+|gts07|cvd||||convert one digit into wa|23575
+||sch|8,wa|11,-(xr)||store in work area|23576
+||dcv|8,wb|||decrement counter|23577
+||ine|6,gts07|||loop if more digits to go|23578
+||csc|7,xr|||complete store characters|23579
+|gts08|mov|8,wa|18,=nstmx||get max number of characters|23585
+||sub|8,wa|8,wb||compute length of result|23586
+||mov|7,xl|8,wa||remember length for move later on|23587
+||add|8,wa|3,gtssf||add one for negative sign if needed|23588
+||jsr|6,alocs|||allocate string for result|23589
+||mov|8,wc|7,xr||save result pointer for the moment|23590
+||psc|7,xr|||point to chars of result block|23591
+||bze|3,gtssf|6,gts09||skip if positive|23592
+||mov|8,wa|18,=ch_mn||else load negative sign|23593
+||sch|8,wa|10,(xr)+||and store it|23594
+||csc|7,xr|||complete store characters|23595
+|gts09|mov|8,wa|7,xl||recall length to move|23599
+||mov|7,xl|3,gtswk||point to result work area|23600
+||plc|7,xl|8,wb||point to first result character|23601
+||mvc||||move chars to result string|23602
+||mov|7,xr|8,wc||restore result pointer|23603
+||brn|6,gts29|||jump to exit|23606
+||ejc|||||23607
+|gts10|ldr|13,rcval(xr)|||load real|23613
+||zer|3,gtssf|||reset negative flag|23625
+||req|6,gts31|||skip if zero|23626
+||rge|6,gts11|||jump if real is positive|23627
+||mov|3,gtssf|18,=num01||else set negative flag|23628
+||ngr||||and get absolute value of real|23629
+|gts11|ldi|4,intv0|||initialize exponent to zero|23633
+|gts12|str|3,gtsrs|||save real value|23637
+||sbr|4,reap1|||subtract 0.1 to compare|23638
+||rge|6,gts13|||jump if scale up not required|23639
+||ldr|3,gtsrs|||else reload value|23640
+||mlr|4,reatt|||multiply by 10**10|23641
+||sbi|4,intvt|||decrement exponent by 10|23642
+||brn|6,gts12|||loop back to test again|23643
+|gts13|ldr|3,gtsrs|||reload value|23647
+||sbr|4,reav1|||subtract 1.0|23648
+||rlt|6,gts17|||jump if no scale down required|23649
+||ldr|3,gtsrs|||else reload value|23650
+|gts14|sbr|4,reatt|||subtract 10**10 to compare|23654
+||rlt|6,gts15|||jump if large step not required|23655
+||ldr|3,gtsrs|||else restore value|23656
+||dvr|4,reatt|||divide by 10**10|23657
+||str|3,gtsrs|||store new value|23658
+||adi|4,intvt|||increment exponent by 10|23659
+||brn|6,gts14|||loop back|23660
+||ejc|||||23661
+|gts15|mov|7,xr|21,=reav1||point to powers of ten table|23668
+|gts16|ldr|3,gtsrs|||reload value|23672
+||adi|4,intv1|||increment exponent|23673
+||add|7,xr|19,*cfp_r||point to next entry in table|23674
+||sbr|9,(xr)|||subtract it to compare|23675
+||rge|6,gts16|||loop till we find a larger entry|23676
+||ldr|3,gtsrs|||then reload the value|23677
+||dvr|9,(xr)|||and complete scaling|23678
+||str|3,gtsrs|||store value|23679
+|gts17|ldr|3,gtsrs|||get value again|23683
+||adr|3,gtsrn|||add rounding factor|23684
+||str|3,gtsrs|||store result|23685
+||sbr|4,reav1|||subtract 1.0 to compare|23690
+||rlt|6,gts18|||skip if ok|23691
+||adi|4,intv1|||else increment exponent|23692
+||ldr|3,gtsrs|||reload value|23693
+||dvr|4,reavt|||divide by 10.0 to rescale|23694
+||brn|6,gts19|||jump to merge|23695
+|gts18|ldr|3,gtsrs|||reload rounded value|23699
+||ejc|||||23700
+|gts19|mov|7,xl|18,=cfp_s||set num dec digits = cfp_s|23724
+||mov|3,gtses|18,=ch_mn||set exponent sign negative|23725
+||ilt|6,gts21|||all set if exponent is negative|23726
+||mfi|8,wa|||else fetch exponent|23727
+||ble|8,wa|18,=cfp_s|6,gts20|skip if we can use special format|23728
+||mti|8,wa|||else restore exponent|23729
+||ngi||||set negative for cvd|23730
+||mov|3,gtses|18,=ch_pl||set plus sign for exponent sign|23731
+||brn|6,gts21|||jump to generate exponent|23732
+|gts20|sub|7,xl|8,wa||compute digits after decimal point|23736
+||ldi|4,intv0|||reset exponent to zero|23737
+||ejc|||||23738
+|gts21|mov|7,xr|3,gtswk||point to work area|23749
+||mov|8,wb|18,=nstmx||set character ctr to max length|23750
+||psc|7,xr|8,wb||prepare to store (right to left)|23751
+||ieq|6,gts23|||skip exponent if it is zero|23752
+|gts22|cvd||||convert a digit into wa|23756
+||sch|8,wa|11,-(xr)||store in work area|23757
+||dcv|8,wb|||decrement counter|23758
+||ine|6,gts22|||loop back if more digits to go|23759
+||mov|8,wa|3,gtses||load exponent sign|23763
+||sch|8,wa|11,-(xr)||store in work area|23764
+||mov|8,wa|18,=ch_le||get character letter e|23765
+||sch|8,wa|11,-(xr)||store in work area|23766
+||sub|8,wb|18,=num02||decrement counter for sign and e|23767
+|gts23|mlr|3,gtssc|||convert real to integer (10**cfp_s)|23771
+||rti||||get integer (overflow impossible)|23772
+||ngi||||negate as required by cvd|23773
+|gts24|bze|7,xl|6,gts27||jump if no digits left to do|23777
+||cvd||||else convert one digit|23778
+||bne|8,wa|18,=ch_d0|6,gts26|jump if not a zero|23779
+||dcv|7,xl|||decrement counter|23780
+||brn|6,gts24|||loop back for next digit|23781
+||ejc|||||23782
+|gts25|cvd||||convert a digit into wa|23788
+|gts26|sch|8,wa|11,-(xr)||store digit|23792
+||dcv|8,wb|||decrement counter|23793
+||dcv|7,xl|||decrement counter|23794
+||bnz|7,xl|6,gts25||loop back if more to go|23795
+|gts27|mov|8,wa|18,=ch_dt||load decimal point|23799
+||sch|8,wa|11,-(xr)||store in work area|23800
+||dcv|8,wb|||decrement counter|23801
+|gts28|cvd||||convert a digit into wa|23805
+||sch|8,wa|11,-(xr)||store in work area|23806
+||dcv|8,wb|||decrement counter|23807
+||ine|6,gts28|||loop back if more to go|23808
+||csc|7,xr|||complete store characters|23809
+||brn|6,gts08|||else jump back to exit|23810
+|gts29|mov|7,xl|10,(xs)+||restore xl|23816
+||ica|7,xs|||pop argument|23817
+||mov|8,wb|3,gtsvb||restore wb|23818
+||mov|8,wc|3,gtsvc||restore wc|23819
+|gts30|mov|8,wa|13,sclen(xr)||load string length|23823
+||exi||||return to caller|23824
+|gts31|mov|7,xl|21,=scre0||point to string|23830
+||mov|8,wa|18,=num02||2 chars|23831
+||zer|8,wb|||zero offset|23832
+||jsr|6,sbstr|||copy string|23833
+||brn|6,gts29|||return|23834
+||enp||||end procedure gtstg|23861
+||ejc|||||23862
+|gtvar|prc|25,e|1,1||entry point|23877
+||bne|9,(xr)|22,=b_nml|6,gtvr2|jump if not a name|23878
+||mov|8,wa|13,nmofs(xr)||else load name offset|23879
+||mov|7,xl|13,nmbas(xr)||load name base|23880
+||beq|9,(xl)|22,=b_evt|6,gtvr1|error if expression variable|23881
+||bne|9,(xl)|22,=b_kvt|6,gtvr3|all ok if not keyword variable|23882
+|gtvr1|exi|1,1|||take convert error exit|23886
+|gtvr2|mov|3,gtvrc|8,wc||save wc|23890
+||jsr|6,gtnvr|||locate vrblk if possible|23891
+||ppm|6,gtvr1|||jump if convert error|23892
+||mov|7,xl|7,xr||else copy vrblk name base|23893
+||mov|8,wa|19,*vrval||and set offset|23894
+||mov|8,wc|3,gtvrc||restore wc|23895
+|gtvr3|bhi|7,xl|3,state|6,gtvr4|all ok if not natural variable|23899
+||beq|13,vrsto(xl)|22,=b_vre|6,gtvr1|error if protected variable|23900
+|gtvr4|exi||||return to caller|23904
+||enp||||end procedure gtvar|23905
+||ejc|||||23906
+||ejc|||||23907
+|hashs|prc|25,e|1,0||entry point|23943
+||mov|8,wc|18,=e_hnw||get number of words to use|23945
+||bze|8,wc|6,hshsa||branch if one character per word|23946
+||mov|8,wc|13,sclen(xr)||load string length in characters|23947
+||mov|8,wb|8,wc||initialize with length|23948
+||bze|8,wc|6,hshs3||jump if null string|23949
+||zgb|8,wb|||correct byte ordering if necessary|23950
+||ctw|8,wc|1,0||get number of words of chars|23951
+||add|7,xr|19,*schar||point to characters of string|23952
+||blo|8,wc|18,=e_hnw|6,hshs1|use whole string if short|23953
+||mov|8,wc|18,=e_hnw||else set to involve first e_hnw wds|23954
+|hshs1|lct|8,wc|8,wc||set counter to control loop|23958
+|hshs2|xob|8,wb|10,(xr)+||exclusive or next word of chars|23962
+||bct|8,wc|6,hshs2||loop till all processed|23963
+|hshs3|zgb|8,wb|||zeroise undefined bits|23967
+||anb|8,wb|4,bitsm||ensure in range 0 to cfp_m|23968
+||mti|8,wb|||move result as integer|23969
+||zer|7,xr|||clear garbage value in xr|23970
+||exi||||return to hashs caller|23971
+|hshsa|mov|8,wc|13,sclen(xr)||load string length in characters|23975
+||mov|8,wb|8,wc||initialize with length|23976
+||bze|8,wc|6,hshs3||jump if null string|23977
+||zgb|8,wb|||correct byte ordering if necessary|23978
+||ctw|8,wc|1,0||get number of words of chars|23979
+||plc|7,xr||||23980
+||mov|11,-(xs)|7,xl||save xl|23981
+||mov|7,xl|8,wc||load length for branch|23982
+||bge|7,xl|18,=num25|6,hsh24|use first characters if longer|23983
+||bsw|7,xl|1,25||merge to compute hash|23984
+||iff|1,0|6,hsh00|||24010
+||iff|1,1|6,hsh01|||24010
+||iff|1,2|6,hsh02|||24010
+||iff|1,3|6,hsh03|||24010
+||iff|1,4|6,hsh04|||24010
+||iff|1,5|6,hsh05|||24010
+||iff|1,6|6,hsh06|||24010
+||iff|1,7|6,hsh07|||24010
+||iff|1,8|6,hsh08|||24010
+||iff|1,9|6,hsh09|||24010
+||iff|1,10|6,hsh10|||24010
+||iff|1,11|6,hsh11|||24010
+||iff|1,12|6,hsh12|||24010
+||iff|1,13|6,hsh13|||24010
+||iff|1,14|6,hsh14|||24010
+||iff|1,15|6,hsh15|||24010
+||iff|1,16|6,hsh16|||24010
+||iff|1,17|6,hsh17|||24010
+||iff|1,18|6,hsh18|||24010
+||iff|1,19|6,hsh19|||24010
+||iff|1,20|6,hsh20|||24010
+||iff|1,21|6,hsh21|||24010
+||iff|1,22|6,hsh22|||24010
+||iff|1,23|6,hsh23|||24010
+||iff|1,24|6,hsh24|||24010
+||esw|||||24010
+|hsh24|lch|8,wc|10,(xr)+||load next character|24011
+||lsh|8,wc|1,24||shift for hash|24012
 ||xob|8,wb|8,wc||hash character|24013
-|hsh14|lch|8,wc|10,(xr)+||load next character|24014
-||lsh|8,wc|1,8||shift for hash|24015
+|hsh23|lch|8,wc|10,(xr)+||load next character|24014
+||lsh|8,wc|1,16||shift for hash|24015
 ||xob|8,wb|8,wc||hash character|24016
-|hsh13|lch|8,wc|10,(xr)+||load next character|24017
-||xob|8,wb|8,wc||hash character|24018
-|hsh12|lch|8,wc|10,(xr)+||load next character|24019
-||lsh|8,wc|1,24||shift for hash|24020
+|hsh22|lch|8,wc|10,(xr)+||load next character|24017
+||lsh|8,wc|1,8||shift for hash|24018
+||xob|8,wb|8,wc||hash character|24019
+|hsh21|lch|8,wc|10,(xr)+||load next character|24020
 ||xob|8,wb|8,wc||hash character|24021
-|hsh11|lch|8,wc|10,(xr)+||load next character|24022
-||lsh|8,wc|1,16||shift for hash|24023
+|hsh20|lch|8,wc|10,(xr)+||load next character|24022
+||lsh|8,wc|1,24||shift for hash|24023
 ||xob|8,wb|8,wc||hash character|24024
-|hsh10|lch|8,wc|10,(xr)+||load next character|24025
-||lsh|8,wc|1,8||shift for hash|24026
+|hsh19|lch|8,wc|10,(xr)+||load next character|24025
+||lsh|8,wc|1,16||shift for hash|24026
 ||xob|8,wb|8,wc||hash character|24027
-|hsh09|lch|8,wc|10,(xr)+||load next character|24028
-||xob|8,wb|8,wc||hash character|24029
-|hsh08|lch|8,wc|10,(xr)+||load next character|24030
-||lsh|8,wc|1,24||shift for hash|24031
+|hsh18|lch|8,wc|10,(xr)+||load next character|24028
+||lsh|8,wc|1,8||shift for hash|24029
+||xob|8,wb|8,wc||hash character|24030
+|hsh17|lch|8,wc|10,(xr)+||load next character|24031
 ||xob|8,wb|8,wc||hash character|24032
-|hsh07|lch|8,wc|10,(xr)+||load next character|24033
-||lsh|8,wc|1,16||shift for hash|24034
+|hsh16|lch|8,wc|10,(xr)+||load next character|24033
+||lsh|8,wc|1,24||shift for hash|24034
 ||xob|8,wb|8,wc||hash character|24035
-|hsh06|lch|8,wc|10,(xr)+||load next character|24036
-||lsh|8,wc|1,8||shift for hash|24037
+|hsh15|lch|8,wc|10,(xr)+||load next character|24036
+||lsh|8,wc|1,16||shift for hash|24037
 ||xob|8,wb|8,wc||hash character|24038
-|hsh05|lch|8,wc|10,(xr)+||load next character|24039
-||xob|8,wb|8,wc||hash character|24040
-|hsh04|lch|8,wc|10,(xr)+||load next character|24041
-||lsh|8,wc|1,24||shift for hash|24042
+|hsh14|lch|8,wc|10,(xr)+||load next character|24039
+||lsh|8,wc|1,8||shift for hash|24040
+||xob|8,wb|8,wc||hash character|24041
+|hsh13|lch|8,wc|10,(xr)+||load next character|24042
 ||xob|8,wb|8,wc||hash character|24043
-|hsh03|lch|8,wc|10,(xr)+||load next character|24044
-||lsh|8,wc|1,16||shift for hash|24045
+|hsh12|lch|8,wc|10,(xr)+||load next character|24044
+||lsh|8,wc|1,24||shift for hash|24045
 ||xob|8,wb|8,wc||hash character|24046
-|hsh02|lch|8,wc|10,(xr)+||load next character|24047
-||lsh|8,wc|1,8||shift for hash|24048
+|hsh11|lch|8,wc|10,(xr)+||load next character|24047
+||lsh|8,wc|1,16||shift for hash|24048
 ||xob|8,wb|8,wc||hash character|24049
-|hsh01|lch|8,wc|10,(xr)+||load next character|24050
-||xob|8,wb|8,wc||hash character|24051
-|hsh00|mov|7,xl|10,(xs)+||restore xl|24052
-||brn|6,hshs3|||merge to complete hash|24053
-||enp||||end procedure hashs|24054
-|icbld|prc|25,e|1,0||entry point|24063
-||mfi|7,xr|6,icbl1||copy small integers|24065
-||ble|7,xr|18,=num02|6,icbl3|jump if 0,1 or 2|24066
-|icbl1|mov|7,xr|3,dnamp||load pointer to next available loc|24070
-||add|7,xr|19,*icsi_||point past new icblk|24071
-||blo|7,xr|3,dname|6,icbl2|jump if there is room|24072
-||mov|8,wa|19,*icsi_||else load length of icblk|24073
-||jsr|6,alloc|||use standard allocator to get block|24074
-||add|7,xr|8,wa||point past block to merge|24075
-|icbl2|mov|3,dnamp|7,xr||set new pointer|24079
-||sub|7,xr|19,*icsi_||point back to start of block|24080
-||mov|9,(xr)|22,=b_icl||store type word|24081
-||sti|13,icval(xr)|||store integer value in icblk|24082
-||exi||||return to icbld caller|24083
-|icbl3|wtb|7,xr|||convert integer to offset|24087
-||mov|7,xr|14,intab(xr)||point to pre-built icblk|24088
-||exi||||return|24089
-||enp||||end procedure icbld|24090
-||ejc|||||24091
-|ident|prc|25,e|1,1||entry point|24105
-||beq|7,xr|7,xl|6,iden7|jump if same pointer (ident)|24106
-||mov|8,wc|9,(xr)||else load arg 1 type word|24107
-||bne|8,wc|9,(xl)|6,iden1|differ if arg 2 type word differ|24109
-||beq|8,wc|22,=b_scl|6,iden2|jump if strings|24113
-||beq|8,wc|22,=b_icl|6,iden4|jump if integers|24114
-||beq|8,wc|22,=b_rcl|6,iden5|jump if reals|24117
-||beq|8,wc|22,=b_nml|6,iden6|jump if names|24119
-|iden1|exi||||take differ exit|24162
-|iden2|mov|8,wc|13,sclen(xr)||load arg 1 length|24166
-||bne|8,wc|13,sclen(xl)|6,iden1|differ if lengths differ|24167
-|idn2a|add|7,xr|19,*schar||point to chars of arg 1|24171
-||add|7,xl|19,*schar||point to chars of arg 2|24172
-||ctw|8,wc|1,0||get number of words in strings|24173
-||lct|8,wc|8,wc||set loop counter|24174
-|iden3|cne|9,(xr)|9,(xl)|6,iden8|differ if chars do not match|24179
-||ica|7,xr|||else bump arg one pointer|24180
-||ica|7,xl|||bump arg two pointer|24181
-||bct|8,wc|6,iden3||loop back till all checked|24182
-||ejc|||||24183
-||zer|7,xl|||clear garbage value in xl|24189
-||zer|7,xr|||clear garbage value in xr|24190
-||exi|1,1|||take ident exit|24191
-|iden4|ldi|13,icval(xr)|||load arg 1|24195
-||sbi|13,icval(xl)|||subtract arg 2 to compare|24196
-||iov|6,iden1|||differ if overflow|24197
-||ine|6,iden1|||differ if result is not zero|24198
-||exi|1,1|||take ident exit|24199
-|iden5|ldr|13,rcval(xr)|||load arg 1|24205
-||sbr|13,rcval(xl)|||subtract arg 2 to compare|24206
-||rov|6,iden1|||differ if overflow|24207
-||rne|6,iden1|||differ if result is not zero|24208
-||exi|1,1|||take ident exit|24209
-|iden6|bne|13,nmofs(xr)|13,nmofs(xl)|6,iden1|differ if different offset|24214
-||bne|13,nmbas(xr)|13,nmbas(xl)|6,iden1|differ if different base|24215
-|iden7|exi|1,1|||take ident exit|24219
-|iden8|zer|7,xr|||clear garbage ptr in xr|24223
-||zer|7,xl|||clear garbage ptr in xl|24224
-||exi||||return to caller (differ)|24225
-||enp||||end procedure ident|24226
-||ejc|||||24227
-|inout|prc|25,e|1,0||entry point|24242
-||mov|11,-(xs)|8,wb||stack trblk type|24243
-||mov|8,wa|13,sclen(xl)||get name length|24244
-||zer|8,wb|||point to start of name|24245
-||jsr|6,sbstr|||build a proper scblk|24246
-||jsr|6,gtnvr|||build vrblk|24247
-||ppm||||no error return|24248
-||mov|8,wc|7,xr||save vrblk pointer|24249
-||mov|8,wb|10,(xs)+||get trter field|24250
-||zer|7,xl|||zero trfpt|24251
-||jsr|6,trbld|||build trblk|24252
-||mov|7,xl|8,wc||recall vrblk pointer|24253
-||mov|13,trter(xr)|13,vrsvp(xl)||store svblk pointer|24254
-||mov|13,vrval(xl)|7,xr||store trblk ptr in vrblk|24255
-||mov|13,vrget(xl)|22,=b_vra||set trapped access|24256
-||mov|13,vrsto(xl)|22,=b_vrv||set trapped store|24257
-||exi||||return to caller|24258
-||enp||||end procedure inout|24259
-||ejc|||||24260
-|insta|prc|25,e|1,0||entry point|24439
-||mov|8,wc|3,prlen||no. of chars in print bfr|24444
-||mov|3,prbuf|7,xr||print bfr is put at static start|24445
-||mov|10,(xr)+|22,=b_scl||store string type code|24446
-||mov|10,(xr)+|8,wc||and string length|24447
-||ctw|8,wc|1,0||get number of words in buffer|24448
-||mov|3,prlnw|8,wc||store for buffer clear|24449
-||lct|8,wc|8,wc||words to clear|24450
-|inst1|mov|10,(xr)+|4,nullw||store blank|24454
-||bct|8,wc|6,inst1||loop|24455
-||mov|8,wa|18,=nstmx||get max num chars in output number|24459
-||ctb|8,wa|2,scsi_||no of bytes needed|24460
-||mov|3,gtswk|7,xr||store bfr adrs|24461
-||add|7,xr|8,wa||bump for work bfr|24462
-||mov|3,kvalp|7,xr||save alphabet pointer|24466
-||mov|9,(xr)|22,=b_scl||string blk type|24467
-||mov|8,wc|18,=cfp_a||no of chars in alphabet|24468
-||mov|13,sclen(xr)|8,wc||store as string length|24469
-||mov|8,wb|8,wc||copy char count|24470
-||ctb|8,wb|2,scsi_||no. of bytes needed|24471
-||add|8,wb|7,xr||current end address for static|24472
-||mov|8,wa|8,wb||save adrs past alphabet string|24473
-||lct|8,wc|8,wc||loop counter|24474
-||psc|7,xr|||point to chars of string|24475
-||zer|8,wb|||set initial character value|24476
-|inst2|sch|8,wb|10,(xr)+||store next code|24480
-||icv|8,wb|||bump code value|24481
-||bct|8,wc|6,inst2||loop till all stored|24482
-||csc|7,xr|||complete store characters|24483
-||mov|7,xr|8,wa||return current static ptr|24484
-||exi||||return to caller|24485
-||enp||||end procedure insta|24486
-||ejc|||||24487
-|iofcb|prc|25,n|1,3||entry point|24505
-||jsr|6,gtstg|||get arg as string|24507
-||ppm|6,iofc2|||fail|24508
-||mov|7,xl|7,xr||copy string ptr|24509
-||jsr|6,gtnvr|||get as natural variable|24510
-||ppm|6,iofc3|||fail if null|24511
-||mov|8,wb|7,xl||copy string pointer again|24512
-||mov|7,xl|7,xr||copy vrblk ptr for return|24513
-||zer|8,wa|||in case no trblk found|24514
-|iofc1|mov|7,xr|13,vrval(xr)||get possible trblk ptr|24518
-||bne|9,(xr)|22,=b_trt|6,iofc4|fail if end of chain|24519
-||bne|13,trtyp(xr)|18,=trtfc|6,iofc1|loop if not file arg trblk|24520
-||mov|8,wa|13,trfpt(xr)||get fcblk ptr|24521
-||mov|7,xr|8,wb||copy arg|24522
-||exi||||return|24523
-|iofc2|exi|1,1|||fail|24527
-|iofc3|exi|1,2|||null arg return|24531
-|iofc4|exi|1,3|||file not found return|24535
-||enp||||end procedure iofcb|24536
-||ejc|||||24537
-|ioppf|prc|25,n|1,0||entry point|24550
-||zer|8,wb|||to count fields extracted|24551
-|iopp1|mov|7,xl|18,=iodel||get delimiter|24555
-||mov|8,wc|7,xl||copy it|24556
-||zer|8,wa|||retain leading blanks in filearg2|24557
-||jsr|6,xscan|||get next field|24558
-||mov|11,-(xs)|7,xr||stack it|24559
-||icv|8,wb|||increment count|24560
-||bnz|8,wa|6,iopp1||loop|24561
-||mov|8,wc|8,wb||count of fields|24562
-||mov|8,wb|3,ioptt||i/o marker|24563
-||mov|8,wa|3,r_iof||fcblk ptr or 0|24564
-||mov|7,xr|3,r_io2||file arg2 ptr|24565
-||mov|7,xl|3,r_io1||filearg1|24566
-||exi||||return|24567
-||enp||||end procedure ioppf|24568
-||ejc|||||24569
-||ejc|||||24625
-|ioput|prc|25,n|1,7||entry point|24649
-||zer|3,r_iot|||in case no trtrf block used|24650
-||zer|3,r_iof|||in case no fcblk alocated|24651
-||zer|3,r_iop|||in case sysio fails|24652
-||mov|3,ioptt|8,wb||store i/o trace type|24653
-||jsr|6,xscni|||prepare to scan filearg2|24654
-||ppm|6,iop13|||fail|24655
-||ppm|6,iopa0|||null file arg2|24656
-|iopa0|mov|3,r_io2|7,xr||keep file arg2|24658
-||mov|7,xl|8,wa||copy length|24659
-||jsr|6,gtstg|||convert filearg1 to string|24660
-||ppm|6,iop14|||fail|24661
-||mov|3,r_io1|7,xr||keep filearg1 ptr|24662
-||jsr|6,gtnvr|||convert to natural variable|24663
-||ppm|6,iop00|||jump if null|24664
-||brn|6,iop04|||jump to process non-null args|24665
-|iop00|bze|7,xl|6,iop01||skip if both args null|24669
-||jsr|6,ioppf|||process filearg2|24670
-||jsr|6,sysfc|||call for filearg2 check|24671
-||ppm|6,iop16|||fail|24672
-||ppm|6,iop26|||fail|24673
-||brn|6,iop11|||complete file association|24674
-||ejc|||||24675
-|iop01|mov|8,wb|3,ioptt||get trace type|24681
-||mov|7,xr|3,r_iot||get 0 or trtrf ptr|24682
-||jsr|6,trbld|||build trblk|24683
-||mov|8,wc|7,xr||copy trblk pointer|24684
-||mov|7,xr|10,(xs)+||get variable from stack|24685
-||mov|11,-(xs)|8,wc||make trblk collectable|24686
-||jsr|6,gtvar|||point to variable|24687
-||ppm|6,iop15|||fail|24688
-||mov|8,wc|10,(xs)+||recover trblk pointer|24689
-||mov|3,r_ion|7,xl||save name pointer|24690
-||mov|7,xr|7,xl||copy name pointer|24691
-||add|7,xr|8,wa||point to variable|24692
-||sub|7,xr|19,*vrval||subtract offset,merge into loop|24693
-|iop02|mov|7,xl|7,xr||copy blk ptr|24697
-||mov|7,xr|13,vrval(xr)||load ptr to next trblk|24698
-||bne|9,(xr)|22,=b_trt|6,iop03|jump if not trapped|24699
-||bne|13,trtyp(xr)|3,ioptt|6,iop02|loop if not same assocn|24700
-||mov|7,xr|13,trnxt(xr)||get value and delete old trblk|24701
-|iop03|mov|13,vrval(xl)|8,wc||link to this trblk|24707
-||mov|7,xl|8,wc||copy pointer|24708
-||mov|13,trnxt(xl)|7,xr||store value in trblk|24709
-||mov|7,xr|3,r_ion||restore possible vrblk pointer|24710
-||mov|8,wb|8,wa||keep offset to name|24711
-||jsr|6,setvr|||if vrblk, set vrget,vrsto|24712
-||mov|7,xr|3,r_iot||get 0 or trtrf ptr|24713
-||bnz|7,xr|6,iop19||jump if trtrf block exists|24714
-||exi||||return to caller|24715
-|iop04|zer|8,wa|||in case no fcblk found|24720
-||ejc|||||24721
-|iop05|mov|8,wb|7,xr||remember blk ptr|24727
-||mov|7,xr|13,vrval(xr)||chain along|24728
-||bne|9,(xr)|22,=b_trt|6,iop06|jump if end of trblk chain|24729
-||bne|13,trtyp(xr)|18,=trtfc|6,iop05|loop if more to go|24730
-||mov|3,r_iot|7,xr||point to file arg1 trblk|24731
-||mov|8,wa|13,trfpt(xr)||get fcblk ptr from trblk|24732
-|iop06|mov|3,r_iof|8,wa||keep possible fcblk ptr|24738
-||mov|3,r_iop|8,wb||keep preceding blk ptr|24739
-||jsr|6,ioppf|||process filearg2|24740
-||jsr|6,sysfc|||see if fcblk required|24741
-||ppm|6,iop16|||fail|24742
-||ppm|6,iop26|||fail|24743
-||bze|8,wa|6,iop12||skip if no new fcblk wanted|24744
-||blt|8,wc|18,=num02|6,iop6a|jump if fcblk in dynamic|24745
-||jsr|6,alost|||get it in static|24746
-||brn|6,iop6b|||skip|24747
-|iop6a|jsr|6,alloc|||get space for fcblk|24751
-|iop6b|mov|7,xl|7,xr||point to fcblk|24755
-||mov|8,wb|8,wa||copy its length|24756
-||btw|8,wb|||get count as words (sgd apr80)|24757
-||lct|8,wb|8,wb||loop counter|24758
-|iop07|zer|10,(xr)+|||clear a word|24762
-||bct|8,wb|6,iop07||loop|24763
-||beq|8,wc|18,=num02|6,iop09|skip if in static - dont set fields|24764
-||mov|9,(xl)|22,=b_xnt||store xnblk code in case|24765
-||mov|13,num01(xl)|8,wa||store length|24766
-||bnz|8,wc|6,iop09||jump if xnblk wanted|24767
-||mov|9,(xl)|22,=b_xrt||xrblk code requested|24768
-||ejc|||||24770
-|iop09|mov|7,xr|3,r_iot||get possible trblk ptr|24775
-||mov|3,r_iof|7,xl||store fcblk ptr|24776
-||bnz|7,xr|6,iop10||jump if trblk already found|24777
-||mov|8,wb|18,=trtfc||trtyp for fcblk trap blk|24781
-||jsr|6,trbld|||make the block|24782
-||mov|3,r_iot|7,xr||copy trtrf ptr|24783
-||mov|7,xl|3,r_iop||point to preceding blk|24784
-||mov|13,vrval(xr)|13,vrval(xl)||copy value field to trblk|24785
-||mov|13,vrval(xl)|7,xr||link new trblk into chain|24786
-||mov|7,xr|7,xl||point to predecessor blk|24787
-||jsr|6,setvr|||set trace intercepts|24788
-||mov|7,xr|13,vrval(xr)||recover trblk ptr|24789
-||brn|6,iop1a|||store fcblk ptr|24790
-|iop10|zer|3,r_iop|||do not release if sysio fails|24794
-|iop1a|mov|13,trfpt(xr)|3,r_iof||store fcblk ptr|24798
-|iop11|mov|8,wa|3,r_iof||copy fcblk ptr or 0|24802
-||mov|8,wb|3,ioptt||get input/output flag|24803
-||mov|7,xr|3,r_io2||get file arg2|24804
-||mov|7,xl|3,r_io1||get file arg1|24805
-||jsr|6,sysio|||associate to the file|24806
-||ppm|6,iop17|||fail|24807
-||ppm|6,iop18|||fail|24808
-||bnz|3,r_iot|6,iop01||not std input if non-null trtrf blk|24809
-||bnz|3,ioptt|6,iop01||jump if output|24810
-||bze|8,wc|6,iop01||no change to standard read length|24811
-||mov|3,cswin|8,wc||store new read length for std file|24812
-||brn|6,iop01|||merge to finish the task|24813
-|iop12|bnz|7,xl|6,iop09||jump if private fcblk|24817
-||brn|6,iop11|||finish the association|24818
-|iop13|exi|1,1|||3rd arg not a string|24822
-|iop14|exi|1,2|||2nd arg unsuitable|24823
-|iop15|ica|7,xs|||discard trblk pointer|24824
-||exi|1,3|||1st arg unsuitable|24825
-|iop16|exi|1,4|||file spec wrong|24826
-|iop26|exi|1,7|||fcblk in use|24827
-|iop17|mov|7,xr|3,r_iop||is there a trblk to release|24831
-||bze|7,xr|6,iopa7||if not|24832
-||mov|7,xl|13,vrval(xr)||point to trblk|24833
-||mov|13,vrval(xr)|13,vrval(xl)||unsplice it|24834
-||jsr|6,setvr|||adjust trace intercepts|24835
-|iopa7|exi|1,5|||i/o file does not exist|24836
-|iop18|mov|7,xr|3,r_iop||is there a trblk to release|24840
-||bze|7,xr|6,iopa7||if not|24841
-||mov|7,xl|13,vrval(xr)||point to trblk|24842
-||mov|13,vrval(xr)|13,vrval(xl)||unsplice it|24843
-||jsr|6,setvr|||adjust trace intercepts|24844
-|iopa8|exi|1,6|||i/o file cannot be read/written|24845
-||ejc|||||24846
-|iop19|mov|8,wc|3,r_ion||wc = name base, wb = name offset|24853
-|iop20|mov|7,xr|13,trtrf(xr)||next link of chain|24857
-||bze|7,xr|6,iop21||not found|24858
-||bne|8,wc|13,ionmb(xr)|6,iop20|no match|24859
-||beq|8,wb|13,ionmo(xr)|6,iop22|exit if matched|24860
-||brn|6,iop20|||loop|24861
-|iop21|mov|8,wa|19,*num05||space needed|24865
-||jsr|6,alloc|||get it|24866
-||mov|9,(xr)|22,=b_xrt||store xrblk code|24867
-||mov|13,num01(xr)|8,wa||store length|24868
-||mov|13,ionmb(xr)|8,wc||store name base|24869
-||mov|13,ionmo(xr)|8,wb||store name offset|24870
-||mov|7,xl|3,r_iot||point to trtrf blk|24871
-||mov|8,wa|13,trtrf(xl)||get ptr field contents|24872
-||mov|13,trtrf(xl)|7,xr||store ptr to new block|24873
-||mov|13,trtrf(xr)|8,wa||complete the linking|24874
-|iop22|bze|3,r_iof|6,iop25||skip if no fcblk|24878
-||mov|7,xl|3,r_fcb||ptr to head of existing chain|24879
-|iop23|bze|7,xl|6,iop24||not on if end of chain|24883
-||beq|13,num03(xl)|3,r_iof|6,iop25|dont duplicate if find it|24884
-||mov|7,xl|13,num02(xl)||get next link|24885
-||brn|6,iop23|||loop|24886
-|iop24|mov|8,wa|19,*num04||space needed|24890
+|hsh10|lch|8,wc|10,(xr)+||load next character|24050
+||lsh|8,wc|1,8||shift for hash|24051
+||xob|8,wb|8,wc||hash character|24052
+|hsh09|lch|8,wc|10,(xr)+||load next character|24053
+||xob|8,wb|8,wc||hash character|24054
+|hsh08|lch|8,wc|10,(xr)+||load next character|24055
+||lsh|8,wc|1,24||shift for hash|24056
+||xob|8,wb|8,wc||hash character|24057
+|hsh07|lch|8,wc|10,(xr)+||load next character|24058
+||lsh|8,wc|1,16||shift for hash|24059
+||xob|8,wb|8,wc||hash character|24060
+|hsh06|lch|8,wc|10,(xr)+||load next character|24061
+||lsh|8,wc|1,8||shift for hash|24062
+||xob|8,wb|8,wc||hash character|24063
+|hsh05|lch|8,wc|10,(xr)+||load next character|24064
+||xob|8,wb|8,wc||hash character|24065
+|hsh04|lch|8,wc|10,(xr)+||load next character|24066
+||lsh|8,wc|1,24||shift for hash|24067
+||xob|8,wb|8,wc||hash character|24068
+|hsh03|lch|8,wc|10,(xr)+||load next character|24069
+||lsh|8,wc|1,16||shift for hash|24070
+||xob|8,wb|8,wc||hash character|24071
+|hsh02|lch|8,wc|10,(xr)+||load next character|24072
+||lsh|8,wc|1,8||shift for hash|24073
+||xob|8,wb|8,wc||hash character|24074
+|hsh01|lch|8,wc|10,(xr)+||load next character|24075
+||xob|8,wb|8,wc||hash character|24076
+|hsh00|mov|7,xl|10,(xs)+||restore xl|24077
+||brn|6,hshs3|||merge to complete hash|24078
+||enp||||end procedure hashs|24079
+|icbld|prc|25,e|1,0||entry point|24088
+||mfi|7,xr|6,icbl1||copy small integers|24090
+||ble|7,xr|18,=num02|6,icbl3|jump if 0,1 or 2|24091
+|icbl1|mov|7,xr|3,dnamp||load pointer to next available loc|24095
+||add|7,xr|19,*icsi_||point past new icblk|24096
+||blo|7,xr|3,dname|6,icbl2|jump if there is room|24097
+||mov|8,wa|19,*icsi_||else load length of icblk|24098
+||jsr|6,alloc|||use standard allocator to get block|24099
+||add|7,xr|8,wa||point past block to merge|24100
+|icbl2|mov|3,dnamp|7,xr||set new pointer|24104
+||sub|7,xr|19,*icsi_||point back to start of block|24105
+||mov|9,(xr)|22,=b_icl||store type word|24106
+||sti|13,icval(xr)|||store integer value in icblk|24107
+||exi||||return to icbld caller|24108
+|icbl3|wtb|7,xr|||convert integer to offset|24112
+||mov|7,xr|14,intab(xr)||point to pre-built icblk|24113
+||exi||||return|24114
+||enp||||end procedure icbld|24115
+||ejc|||||24116
+|ident|prc|25,e|1,1||entry point|24130
+||beq|7,xr|7,xl|6,iden7|jump if same pointer (ident)|24131
+||mov|8,wc|9,(xr)||else load arg 1 type word|24132
+||bne|8,wc|9,(xl)|6,iden1|differ if arg 2 type word differ|24134
+||beq|8,wc|22,=b_scl|6,iden2|jump if strings|24138
+||beq|8,wc|22,=b_icl|6,iden4|jump if integers|24139
+||beq|8,wc|22,=b_rcl|6,iden5|jump if reals|24142
+||beq|8,wc|22,=b_nml|6,iden6|jump if names|24144
+|iden1|exi||||take differ exit|24187
+|iden2|mov|8,wc|13,sclen(xr)||load arg 1 length|24191
+||bne|8,wc|13,sclen(xl)|6,iden1|differ if lengths differ|24192
+|idn2a|add|7,xr|19,*schar||point to chars of arg 1|24196
+||add|7,xl|19,*schar||point to chars of arg 2|24197
+||ctw|8,wc|1,0||get number of words in strings|24198
+||lct|8,wc|8,wc||set loop counter|24199
+|iden3|cne|9,(xr)|9,(xl)|6,iden8|differ if chars do not match|24204
+||ica|7,xr|||else bump arg one pointer|24205
+||ica|7,xl|||bump arg two pointer|24206
+||bct|8,wc|6,iden3||loop back till all checked|24207
+||ejc|||||24208
+||zer|7,xl|||clear garbage value in xl|24214
+||zer|7,xr|||clear garbage value in xr|24215
+||exi|1,1|||take ident exit|24216
+|iden4|ldi|13,icval(xr)|||load arg 1|24220
+||sbi|13,icval(xl)|||subtract arg 2 to compare|24221
+||iov|6,iden1|||differ if overflow|24222
+||ine|6,iden1|||differ if result is not zero|24223
+||exi|1,1|||take ident exit|24224
+|iden5|ldr|13,rcval(xr)|||load arg 1|24230
+||sbr|13,rcval(xl)|||subtract arg 2 to compare|24231
+||rov|6,iden1|||differ if overflow|24232
+||rne|6,iden1|||differ if result is not zero|24233
+||exi|1,1|||take ident exit|24234
+|iden6|bne|13,nmofs(xr)|13,nmofs(xl)|6,iden1|differ if different offset|24239
+||bne|13,nmbas(xr)|13,nmbas(xl)|6,iden1|differ if different base|24240
+|iden7|exi|1,1|||take ident exit|24244
+|iden8|zer|7,xr|||clear garbage ptr in xr|24248
+||zer|7,xl|||clear garbage ptr in xl|24249
+||exi||||return to caller (differ)|24250
+||enp||||end procedure ident|24251
+||ejc|||||24252
+|inout|prc|25,e|1,0||entry point|24267
+||mov|11,-(xs)|8,wb||stack trblk type|24268
+||mov|8,wa|13,sclen(xl)||get name length|24269
+||zer|8,wb|||point to start of name|24270
+||jsr|6,sbstr|||build a proper scblk|24271
+||jsr|6,gtnvr|||build vrblk|24272
+||ppm||||no error return|24273
+||mov|8,wc|7,xr||save vrblk pointer|24274
+||mov|8,wb|10,(xs)+||get trter field|24275
+||zer|7,xl|||zero trfpt|24276
+||jsr|6,trbld|||build trblk|24277
+||mov|7,xl|8,wc||recall vrblk pointer|24278
+||mov|13,trter(xr)|13,vrsvp(xl)||store svblk pointer|24279
+||mov|13,vrval(xl)|7,xr||store trblk ptr in vrblk|24280
+||mov|13,vrget(xl)|22,=b_vra||set trapped access|24281
+||mov|13,vrsto(xl)|22,=b_vrv||set trapped store|24282
+||exi||||return to caller|24283
+||enp||||end procedure inout|24284
+||ejc|||||24285
+|insta|prc|25,e|1,0||entry point|24464
+||mov|8,wc|3,prlen||no. of chars in print bfr|24469
+||mov|3,prbuf|7,xr||print bfr is put at static start|24470
+||mov|10,(xr)+|22,=b_scl||store string type code|24471
+||mov|10,(xr)+|8,wc||and string length|24472
+||ctw|8,wc|1,0||get number of words in buffer|24473
+||mov|3,prlnw|8,wc||store for buffer clear|24474
+||lct|8,wc|8,wc||words to clear|24475
+|inst1|mov|10,(xr)+|4,nullw||store blank|24479
+||bct|8,wc|6,inst1||loop|24480
+||mov|8,wa|18,=nstmx||get max num chars in output number|24484
+||ctb|8,wa|2,scsi_||no of bytes needed|24485
+||mov|3,gtswk|7,xr||store bfr adrs|24486
+||add|7,xr|8,wa||bump for work bfr|24487
+||mov|3,kvalp|7,xr||save alphabet pointer|24491
+||mov|9,(xr)|22,=b_scl||string blk type|24492
+||mov|8,wc|18,=cfp_a||no of chars in alphabet|24493
+||mov|13,sclen(xr)|8,wc||store as string length|24494
+||mov|8,wb|8,wc||copy char count|24495
+||ctb|8,wb|2,scsi_||no. of bytes needed|24496
+||add|8,wb|7,xr||current end address for static|24497
+||mov|8,wa|8,wb||save adrs past alphabet string|24498
+||lct|8,wc|8,wc||loop counter|24499
+||psc|7,xr|||point to chars of string|24500
+||zer|8,wb|||set initial character value|24501
+|inst2|sch|8,wb|10,(xr)+||store next code|24505
+||icv|8,wb|||bump code value|24506
+||bct|8,wc|6,inst2||loop till all stored|24507
+||csc|7,xr|||complete store characters|24508
+||mov|7,xr|8,wa||return current static ptr|24509
+||exi||||return to caller|24510
+||enp||||end procedure insta|24511
+||ejc|||||24512
+|iofcb|prc|25,n|1,3||entry point|24530
+||jsr|6,gtstg|||get arg as string|24532
+||ppm|6,iofc2|||fail|24533
+||mov|7,xl|7,xr||copy string ptr|24534
+||jsr|6,gtnvr|||get as natural variable|24535
+||ppm|6,iofc3|||fail if null|24536
+||mov|8,wb|7,xl||copy string pointer again|24537
+||mov|7,xl|7,xr||copy vrblk ptr for return|24538
+||zer|8,wa|||in case no trblk found|24539
+|iofc1|mov|7,xr|13,vrval(xr)||get possible trblk ptr|24543
+||bne|9,(xr)|22,=b_trt|6,iofc4|fail if end of chain|24544
+||bne|13,trtyp(xr)|18,=trtfc|6,iofc1|loop if not file arg trblk|24545
+||mov|8,wa|13,trfpt(xr)||get fcblk ptr|24546
+||mov|7,xr|8,wb||copy arg|24547
+||exi||||return|24548
+|iofc2|exi|1,1|||fail|24552
+|iofc3|exi|1,2|||null arg return|24556
+|iofc4|exi|1,3|||file not found return|24560
+||enp||||end procedure iofcb|24561
+||ejc|||||24562
+|ioppf|prc|25,n|1,0||entry point|24575
+||zer|8,wb|||to count fields extracted|24576
+|iopp1|mov|7,xl|18,=iodel||get delimiter|24580
+||mov|8,wc|7,xl||copy it|24581
+||zer|8,wa|||retain leading blanks in filearg2|24582
+||jsr|6,xscan|||get next field|24583
+||mov|11,-(xs)|7,xr||stack it|24584
+||icv|8,wb|||increment count|24585
+||bnz|8,wa|6,iopp1||loop|24586
+||mov|8,wc|8,wb||count of fields|24587
+||mov|8,wb|3,ioptt||i/o marker|24588
+||mov|8,wa|3,r_iof||fcblk ptr or 0|24589
+||mov|7,xr|3,r_io2||file arg2 ptr|24590
+||mov|7,xl|3,r_io1||filearg1|24591
+||exi||||return|24592
+||enp||||end procedure ioppf|24593
+||ejc|||||24594
+||ejc|||||24650
+|ioput|prc|25,n|1,7||entry point|24674
+||zer|3,r_iot|||in case no trtrf block used|24675
+||zer|3,r_iof|||in case no fcblk alocated|24676
+||zer|3,r_iop|||in case sysio fails|24677
+||mov|3,ioptt|8,wb||store i/o trace type|24678
+||jsr|6,xscni|||prepare to scan filearg2|24679
+||ppm|6,iop13|||fail|24680
+||ppm|6,iopa0|||null file arg2|24681
+|iopa0|mov|3,r_io2|7,xr||keep file arg2|24683
+||mov|7,xl|8,wa||copy length|24684
+||jsr|6,gtstg|||convert filearg1 to string|24685
+||ppm|6,iop14|||fail|24686
+||mov|3,r_io1|7,xr||keep filearg1 ptr|24687
+||jsr|6,gtnvr|||convert to natural variable|24688
+||ppm|6,iop00|||jump if null|24689
+||brn|6,iop04|||jump to process non-null args|24690
+|iop00|bze|7,xl|6,iop01||skip if both args null|24694
+||jsr|6,ioppf|||process filearg2|24695
+||jsr|6,sysfc|||call for filearg2 check|24696
+||ppm|6,iop16|||fail|24697
+||ppm|6,iop26|||fail|24698
+||brn|6,iop11|||complete file association|24699
+||ejc|||||24700
+|iop01|mov|8,wb|3,ioptt||get trace type|24706
+||mov|7,xr|3,r_iot||get 0 or trtrf ptr|24707
+||jsr|6,trbld|||build trblk|24708
+||mov|8,wc|7,xr||copy trblk pointer|24709
+||mov|7,xr|10,(xs)+||get variable from stack|24710
+||mov|11,-(xs)|8,wc||make trblk collectable|24711
+||jsr|6,gtvar|||point to variable|24712
+||ppm|6,iop15|||fail|24713
+||mov|8,wc|10,(xs)+||recover trblk pointer|24714
+||mov|3,r_ion|7,xl||save name pointer|24715
+||mov|7,xr|7,xl||copy name pointer|24716
+||add|7,xr|8,wa||point to variable|24717
+||sub|7,xr|19,*vrval||subtract offset,merge into loop|24718
+|iop02|mov|7,xl|7,xr||copy blk ptr|24722
+||mov|7,xr|13,vrval(xr)||load ptr to next trblk|24723
+||bne|9,(xr)|22,=b_trt|6,iop03|jump if not trapped|24724
+||bne|13,trtyp(xr)|3,ioptt|6,iop02|loop if not same assocn|24725
+||mov|7,xr|13,trnxt(xr)||get value and delete old trblk|24726
+|iop03|mov|13,vrval(xl)|8,wc||link to this trblk|24732
+||mov|7,xl|8,wc||copy pointer|24733
+||mov|13,trnxt(xl)|7,xr||store value in trblk|24734
+||mov|7,xr|3,r_ion||restore possible vrblk pointer|24735
+||mov|8,wb|8,wa||keep offset to name|24736
+||jsr|6,setvr|||if vrblk, set vrget,vrsto|24737
+||mov|7,xr|3,r_iot||get 0 or trtrf ptr|24738
+||bnz|7,xr|6,iop19||jump if trtrf block exists|24739
+||exi||||return to caller|24740
+|iop04|zer|8,wa|||in case no fcblk found|24745
+||ejc|||||24746
+|iop05|mov|8,wb|7,xr||remember blk ptr|24752
+||mov|7,xr|13,vrval(xr)||chain along|24753
+||bne|9,(xr)|22,=b_trt|6,iop06|jump if end of trblk chain|24754
+||bne|13,trtyp(xr)|18,=trtfc|6,iop05|loop if more to go|24755
+||mov|3,r_iot|7,xr||point to file arg1 trblk|24756
+||mov|8,wa|13,trfpt(xr)||get fcblk ptr from trblk|24757
+|iop06|mov|3,r_iof|8,wa||keep possible fcblk ptr|24763
+||mov|3,r_iop|8,wb||keep preceding blk ptr|24764
+||jsr|6,ioppf|||process filearg2|24765
+||jsr|6,sysfc|||see if fcblk required|24766
+||ppm|6,iop16|||fail|24767
+||ppm|6,iop26|||fail|24768
+||bze|8,wa|6,iop12||skip if no new fcblk wanted|24769
+||blt|8,wc|18,=num02|6,iop6a|jump if fcblk in dynamic|24770
+||jsr|6,alost|||get it in static|24771
+||brn|6,iop6b|||skip|24772
+|iop6a|jsr|6,alloc|||get space for fcblk|24776
+|iop6b|mov|7,xl|7,xr||point to fcblk|24780
+||mov|8,wb|8,wa||copy its length|24781
+||btw|8,wb|||get count as words (sgd apr80)|24782
+||lct|8,wb|8,wb||loop counter|24783
+|iop07|zer|10,(xr)+|||clear a word|24787
+||bct|8,wb|6,iop07||loop|24788
+||beq|8,wc|18,=num02|6,iop09|skip if in static - dont set fields|24789
+||mov|9,(xl)|22,=b_xnt||store xnblk code in case|24790
+||mov|13,num01(xl)|8,wa||store length|24791
+||bnz|8,wc|6,iop09||jump if xnblk wanted|24792
+||mov|9,(xl)|22,=b_xrt||xrblk code requested|24793
+||ejc|||||24795
+|iop09|mov|7,xr|3,r_iot||get possible trblk ptr|24800
+||mov|3,r_iof|7,xl||store fcblk ptr|24801
+||bnz|7,xr|6,iop10||jump if trblk already found|24802
+||mov|8,wb|18,=trtfc||trtyp for fcblk trap blk|24806
+||jsr|6,trbld|||make the block|24807
+||mov|3,r_iot|7,xr||copy trtrf ptr|24808
+||mov|7,xl|3,r_iop||point to preceding blk|24809
+||mov|13,vrval(xr)|13,vrval(xl)||copy value field to trblk|24810
+||mov|13,vrval(xl)|7,xr||link new trblk into chain|24811
+||mov|7,xr|7,xl||point to predecessor blk|24812
+||jsr|6,setvr|||set trace intercepts|24813
+||mov|7,xr|13,vrval(xr)||recover trblk ptr|24814
+||brn|6,iop1a|||store fcblk ptr|24815
+|iop10|zer|3,r_iop|||do not release if sysio fails|24819
+|iop1a|mov|13,trfpt(xr)|3,r_iof||store fcblk ptr|24823
+|iop11|mov|8,wa|3,r_iof||copy fcblk ptr or 0|24827
+||mov|8,wb|3,ioptt||get input/output flag|24828
+||mov|7,xr|3,r_io2||get file arg2|24829
+||mov|7,xl|3,r_io1||get file arg1|24830
+||jsr|6,sysio|||associate to the file|24831
+||ppm|6,iop17|||fail|24832
+||ppm|6,iop18|||fail|24833
+||bnz|3,r_iot|6,iop01||not std input if non-null trtrf blk|24834
+||bnz|3,ioptt|6,iop01||jump if output|24835
+||bze|8,wc|6,iop01||no change to standard read length|24836
+||mov|3,cswin|8,wc||store new read length for std file|24837
+||brn|6,iop01|||merge to finish the task|24838
+|iop12|bnz|7,xl|6,iop09||jump if private fcblk|24842
+||brn|6,iop11|||finish the association|24843
+|iop13|exi|1,1|||3rd arg not a string|24847
+|iop14|exi|1,2|||2nd arg unsuitable|24848
+|iop15|ica|7,xs|||discard trblk pointer|24849
+||exi|1,3|||1st arg unsuitable|24850
+|iop16|exi|1,4|||file spec wrong|24851
+|iop26|exi|1,7|||fcblk in use|24852
+|iop17|mov|7,xr|3,r_iop||is there a trblk to release|24856
+||bze|7,xr|6,iopa7||if not|24857
+||mov|7,xl|13,vrval(xr)||point to trblk|24858
+||mov|13,vrval(xr)|13,vrval(xl)||unsplice it|24859
+||jsr|6,setvr|||adjust trace intercepts|24860
+|iopa7|exi|1,5|||i/o file does not exist|24861
+|iop18|mov|7,xr|3,r_iop||is there a trblk to release|24865
+||bze|7,xr|6,iopa7||if not|24866
+||mov|7,xl|13,vrval(xr)||point to trblk|24867
+||mov|13,vrval(xr)|13,vrval(xl)||unsplice it|24868
+||jsr|6,setvr|||adjust trace intercepts|24869
+|iopa8|exi|1,6|||i/o file cannot be read/written|24870
+||ejc|||||24871
+|iop19|mov|8,wc|3,r_ion||wc = name base, wb = name offset|24878
+|iop20|mov|7,xr|13,trtrf(xr)||next link of chain|24882
+||bze|7,xr|6,iop21||not found|24883
+||bne|8,wc|13,ionmb(xr)|6,iop20|no match|24884
+||beq|8,wb|13,ionmo(xr)|6,iop22|exit if matched|24885
+||brn|6,iop20|||loop|24886
+|iop21|mov|8,wa|19,*num05||space needed|24890
 ||jsr|6,alloc|||get it|24891
-||mov|9,(xr)|22,=b_xrt||store block code|24892
+||mov|9,(xr)|22,=b_xrt||store xrblk code|24892
 ||mov|13,num01(xr)|8,wa||store length|24893
-||mov|13,num02(xr)|3,r_fcb||store previous link in this node|24894
-||mov|13,num03(xr)|3,r_iof||store fcblk ptr|24895
-||mov|3,r_fcb|7,xr||insert node into fcblk chain|24896
-|iop25|exi||||return to caller|24900
-||enp||||end procedure ioput|24901
-||ejc|||||24902
-|ktrex|prc|25,r|1,0||entry point (recursive)|24914
-||bze|7,xl|6,ktrx3||immediate exit if keyword untraced|24915
-||bze|3,kvtra|6,ktrx3||immediate exit if trace = 0|24916
-||dcv|3,kvtra|||else decrement trace|24917
-||mov|11,-(xs)|7,xr||save xr|24918
-||mov|7,xr|7,xl||copy trblk pointer|24919
-||mov|7,xl|13,trkvr(xr)||load vrblk pointer (nmbas)|24920
-||mov|8,wa|19,*vrval||set name offset|24921
-||bze|13,trfnc(xr)|6,ktrx1||jump if print trace|24922
-||jsr|6,trxeq|||else execute full trace|24923
-||brn|6,ktrx2|||and jump to exit|24924
-|ktrx1|mov|11,-(xs)|7,xl||stack vrblk ptr for kwnam|24928
-||mov|11,-(xs)|8,wa||stack offset for kwnam|24929
-||jsr|6,prtsn|||print statement number|24930
-||mov|8,wa|18,=ch_am||load ampersand|24931
-||jsr|6,prtch|||print ampersand|24932
-||jsr|6,prtnm|||print keyword name|24933
-||mov|7,xr|21,=tmbeb||point to blank-equal-blank|24934
-||jsr|6,prtst|||print blank-equal-blank|24935
-||jsr|6,kwnam|||get keyword pseudo-variable name|24936
-||mov|3,dnamp|7,xr||reset ptr to delete kvblk|24937
-||jsr|6,acess|||get keyword value|24938
-||ppm||||failure is impossible|24939
-||jsr|6,prtvl|||print keyword value|24940
-||jsr|6,prtnl|||terminate print line|24941
-|ktrx2|mov|7,xr|10,(xs)+||restore entry xr|24945
-|ktrx3|exi||||return to ktrex caller|24949
-||enp||||end procedure ktrex|24950
-||ejc|||||24951
-|kwnam|prc|25,n|1,0||entry point|24962
-||ica|7,xs|||ignore name offset|24963
-||mov|7,xr|10,(xs)+||load name base|24964
-||bge|7,xr|3,state|6,kwnm1|jump if not natural variable name|24965
-||bnz|13,vrlen(xr)|6,kwnm1||error if not system variable|24966
-||mov|7,xr|13,vrsvp(xr)||else point to svblk|24967
-||mov|8,wa|13,svbit(xr)||load bit mask|24968
-||anb|8,wa|4,btknm||and with keyword bit|24969
-||zrb|8,wa|6,kwnm1||error if no keyword association|24970
-||mov|8,wa|13,svlen(xr)||else load name length in characters|24971
-||ctb|8,wa|2,svchs||compute offset to field we want|24972
-||add|7,xr|8,wa||point to svknm field|24973
-||mov|8,wb|9,(xr)||load svknm value|24974
-||mov|8,wa|19,*kvsi_||set size of kvblk|24975
-||jsr|6,alloc|||allocate kvblk|24976
-||mov|9,(xr)|22,=b_kvt||store type word|24977
-||mov|13,kvnum(xr)|8,wb||store keyword number|24978
-||mov|13,kvvar(xr)|21,=trbkv||set dummy trblk pointer|24979
-||mov|7,xl|7,xr||copy kvblk pointer|24980
-||mov|8,wa|19,*kvvar||set proper offset|24981
-||exi||||return to kvnam caller|24982
-|kwnm1|erb|1,251|26,keyword operand is not name of defined keyword|||24986
-||enp||||end procedure kwnam|24987
-||ejc|||||24988
-|lcomp|prc|25,n|1,5||entry point|25005
-||jsr|6,gtstg|||convert second arg to string|25007
-||ppm|6,lcmp6|||jump if second arg not string|25011
-||mov|7,xl|7,xr||else save pointer|25012
-||mov|8,wc|8,wa||and length|25013
-||jsr|6,gtstg|||convert first argument to string|25015
-||ppm|6,lcmp5|||jump if not string|25019
-||mov|8,wb|8,wa||save arg 1 length|25020
-||plc|7,xr|||point to chars of arg 1|25021
-||plc|7,xl|||point to chars of arg 2|25022
-||blo|8,wa|8,wc|6,lcmp1|jump if arg 1 length is smaller|25034
-||mov|8,wa|8,wc||else set arg 2 length as smaller|25035
-|lcmp1|bze|8,wa|6,lcmp7||if null string, compare lengths|25039
-||cmc|6,lcmp4|6,lcmp3||compare strings, jump if unequal|25040
-|lcmp7|bne|8,wb|8,wc|6,lcmp2|if equal, jump if lengths unequal|25041
-||exi|1,4|||else identical strings, leq exit|25042
-||ejc|||||25043
-|lcmp2|bhi|8,wb|8,wc|6,lcmp4|jump if arg 1 length gt arg 2 leng|25049
-|lcmp3|exi|1,3|||take llt exit|25054
-|lcmp4|exi|1,5|||take lgt exit|25058
-|lcmp5|exi|1,1|||take bad first arg exit|25062
-|lcmp6|exi|1,2|||take bad second arg error exit|25066
-||enp||||end procedure lcomp|25067
+||mov|13,ionmb(xr)|8,wc||store name base|24894
+||mov|13,ionmo(xr)|8,wb||store name offset|24895
+||mov|7,xl|3,r_iot||point to trtrf blk|24896
+||mov|8,wa|13,trtrf(xl)||get ptr field contents|24897
+||mov|13,trtrf(xl)|7,xr||store ptr to new block|24898
+||mov|13,trtrf(xr)|8,wa||complete the linking|24899
+|iop22|bze|3,r_iof|6,iop25||skip if no fcblk|24903
+||mov|7,xl|3,r_fcb||ptr to head of existing chain|24904
+|iop23|bze|7,xl|6,iop24||not on if end of chain|24908
+||beq|13,num03(xl)|3,r_iof|6,iop25|dont duplicate if find it|24909
+||mov|7,xl|13,num02(xl)||get next link|24910
+||brn|6,iop23|||loop|24911
+|iop24|mov|8,wa|19,*num04||space needed|24915
+||jsr|6,alloc|||get it|24916
+||mov|9,(xr)|22,=b_xrt||store block code|24917
+||mov|13,num01(xr)|8,wa||store length|24918
+||mov|13,num02(xr)|3,r_fcb||store previous link in this node|24919
+||mov|13,num03(xr)|3,r_iof||store fcblk ptr|24920
+||mov|3,r_fcb|7,xr||insert node into fcblk chain|24921
+|iop25|exi||||return to caller|24925
+||enp||||end procedure ioput|24926
+||ejc|||||24927
+|ktrex|prc|25,r|1,0||entry point (recursive)|24939
+||bze|7,xl|6,ktrx3||immediate exit if keyword untraced|24940
+||bze|3,kvtra|6,ktrx3||immediate exit if trace = 0|24941
+||dcv|3,kvtra|||else decrement trace|24942
+||mov|11,-(xs)|7,xr||save xr|24943
+||mov|7,xr|7,xl||copy trblk pointer|24944
+||mov|7,xl|13,trkvr(xr)||load vrblk pointer (nmbas)|24945
+||mov|8,wa|19,*vrval||set name offset|24946
+||bze|13,trfnc(xr)|6,ktrx1||jump if print trace|24947
+||jsr|6,trxeq|||else execute full trace|24948
+||brn|6,ktrx2|||and jump to exit|24949
+|ktrx1|mov|11,-(xs)|7,xl||stack vrblk ptr for kwnam|24953
+||mov|11,-(xs)|8,wa||stack offset for kwnam|24954
+||jsr|6,prtsn|||print statement number|24955
+||mov|8,wa|18,=ch_am||load ampersand|24956
+||jsr|6,prtch|||print ampersand|24957
+||jsr|6,prtnm|||print keyword name|24958
+||mov|7,xr|21,=tmbeb||point to blank-equal-blank|24959
+||jsr|6,prtst|||print blank-equal-blank|24960
+||jsr|6,kwnam|||get keyword pseudo-variable name|24961
+||mov|3,dnamp|7,xr||reset ptr to delete kvblk|24962
+||jsr|6,acess|||get keyword value|24963
+||ppm||||failure is impossible|24964
+||jsr|6,prtvl|||print keyword value|24965
+||jsr|6,prtnl|||terminate print line|24966
+|ktrx2|mov|7,xr|10,(xs)+||restore entry xr|24970
+|ktrx3|exi||||return to ktrex caller|24974
+||enp||||end procedure ktrex|24975
+||ejc|||||24976
+|kwnam|prc|25,n|1,0||entry point|24987
+||ica|7,xs|||ignore name offset|24988
+||mov|7,xr|10,(xs)+||load name base|24989
+||bge|7,xr|3,state|6,kwnm1|jump if not natural variable name|24990
+||bnz|13,vrlen(xr)|6,kwnm1||error if not system variable|24991
+||mov|7,xr|13,vrsvp(xr)||else point to svblk|24992
+||mov|8,wa|13,svbit(xr)||load bit mask|24993
+||anb|8,wa|4,btknm||and with keyword bit|24994
+||zrb|8,wa|6,kwnm1||error if no keyword association|24995
+||mov|8,wa|13,svlen(xr)||else load name length in characters|24996
+||ctb|8,wa|2,svchs||compute offset to field we want|24997
+||add|7,xr|8,wa||point to svknm field|24998
+||mov|8,wb|9,(xr)||load svknm value|24999
+||mov|8,wa|19,*kvsi_||set size of kvblk|25000
+||jsr|6,alloc|||allocate kvblk|25001
+||mov|9,(xr)|22,=b_kvt||store type word|25002
+||mov|13,kvnum(xr)|8,wb||store keyword number|25003
+||mov|13,kvvar(xr)|21,=trbkv||set dummy trblk pointer|25004
+||mov|7,xl|7,xr||copy kvblk pointer|25005
+||mov|8,wa|19,*kvvar||set proper offset|25006
+||exi||||return to kvnam caller|25007
+|kwnm1|erb|1,251|26,keyword operand is not name of defined keyword|||25011
+||enp||||end procedure kwnam|25012
+||ejc|||||25013
+|lcomp|prc|25,n|1,5||entry point|25030
+||jsr|6,gtstg|||convert second arg to string|25032
+||ppm|6,lcmp6|||jump if second arg not string|25036
+||mov|7,xl|7,xr||else save pointer|25037
+||mov|8,wc|8,wa||and length|25038
+||jsr|6,gtstg|||convert first argument to string|25040
+||ppm|6,lcmp5|||jump if not string|25044
+||mov|8,wb|8,wa||save arg 1 length|25045
+||plc|7,xr|||point to chars of arg 1|25046
+||plc|7,xl|||point to chars of arg 2|25047
+||blo|8,wa|8,wc|6,lcmp1|jump if arg 1 length is smaller|25059
+||mov|8,wa|8,wc||else set arg 2 length as smaller|25060
+|lcmp1|bze|8,wa|6,lcmp7||if null string, compare lengths|25064
+||cmc|6,lcmp4|6,lcmp3||compare strings, jump if unequal|25065
+|lcmp7|bne|8,wb|8,wc|6,lcmp2|if equal, jump if lengths unequal|25066
+||exi|1,4|||else identical strings, leq exit|25067
 ||ejc|||||25068
-|listr|prc|25,e|1,0||entry point|25107
-||bnz|3,cnttl|6,list5||jump if -title or -stitl|25108
-||bnz|3,lstpf|6,list4||immediate exit if already listed|25109
-||bge|3,lstlc|3,lstnp|6,list6|jump if no room|25110
-|list0|mov|7,xr|3,r_cim||load pointer to current image|25114
-||bze|7,xr|6,list4||jump if no image to print|25115
-||plc|7,xr|||point to characters|25116
-||lch|8,wa|9,(xr)||load first character|25117
-||mov|7,xr|3,lstsn||load statement number|25118
-||bze|7,xr|6,list2||jump if no statement number|25119
-||mti|7,xr|||else get stmnt number as integer|25120
-||bne|3,stage|18,=stgic|6,list1|skip if execute time|25121
-||beq|8,wa|18,=ch_as|6,list2|no stmnt number list if comment|25122
-||beq|8,wa|18,=ch_mn|6,list2|no stmnt no. if control card|25123
-|list1|jsr|6,prtin|||else print statement number|25127
-||zer|3,lstsn|||and clear for next time in|25128
-|list2|mov|7,xr|3,lstid||include depth of image|25133
-||bze|7,xr|6,list8||if not from an include file|25134
-||mov|8,wa|18,=stnpd||position for start of statement|25135
-||sub|8,wa|18,=num03||position to place include depth|25136
-||mov|3,profs|8,wa||set as starting position|25137
-||mti|7,xr|||include depth as integer|25138
-||jsr|6,prtin|||print include depth|25139
-||ejc|||||25140
-|list8|mov|3,profs|18,=stnpd||point past statement number|25146
-||mov|7,xr|3,r_cim||load pointer to current image|25156
-||jsr|6,prtst|||print it|25157
-||icv|3,lstlc|||bump line counter|25158
-||bnz|3,erlst|6,list3||jump if error copy to int.ch.|25159
-||jsr|6,prtnl|||terminate line|25160
-||bze|3,cswdb|6,list3||jump if -single mode|25161
-||jsr|6,prtnl|||else add a blank line|25162
-||icv|3,lstlc|||and bump line counter|25163
-|list3|mnz|3,lstpf|||set flag for line printed|25167
-|list4|exi||||return to listr caller|25171
-|list5|zer|3,cnttl|||clear flag|25175
-|list6|jsr|6,prtps|||eject|25179
-||bze|3,prich|6,list7||skip if listing to regular printer|25180
-||beq|3,r_ttl|21,=nulls|6,list0|terminal listing omits null title|25181
-|list7|jsr|6,listt|||list title|25185
-||brn|6,list0|||merge|25186
-||enp||||end procedure listr|25187
-||ejc|||||25188
-|listt|prc|25,e|1,0||entry point|25197
-||mov|7,xr|3,r_ttl||point to source listing title|25198
-||jsr|6,prtst|||print title|25199
-||mov|3,profs|3,lstpo||set offset|25200
-||mov|7,xr|21,=lstms||set page message|25201
-||jsr|6,prtst|||print page message|25202
-||icv|3,lstpg|||bump page number|25203
-||mti|3,lstpg|||load page number as integer|25204
-||jsr|6,prtin|||print page number|25205
-||jsr|6,prtnl|||terminate title line|25206
-||add|3,lstlc|18,=num02||count title line and blank line|25207
-||mov|7,xr|3,r_stl||load pointer to sub-title|25211
-||bze|7,xr|6,lstt1||jump if no sub-title|25212
-||jsr|6,prtst|||else print sub-title|25213
-||jsr|6,prtnl|||terminate line|25214
-||icv|3,lstlc|||bump line count|25215
-|lstt1|jsr|6,prtnl|||print a blank line|25219
-||exi||||return to caller|25220
-||enp||||end procedure listt|25221
-||ejc|||||25222
-|newfn|prc|25,e|1,0||entry point|25239
-||mov|11,-(xs)|7,xr||save new name|25240
-||mov|7,xl|3,r_sfc||load previous name|25241
-||jsr|6,ident|||check for equality|25242
-||ppm|6,nwfn1|||jump if identical|25243
-||mov|7,xr|10,(xs)+||different, restore name|25244
-||mov|3,r_sfc|7,xr||record current file name|25245
-||mov|8,wb|3,cmpsn||get current statement|25246
-||mti|8,wb|||convert to integer|25247
-||jsr|6,icbld|||build icblk for stmt number|25248
-||mov|7,xl|3,r_sfn||file name table|25249
-||mnz|8,wb|||lookup statement number by name|25250
-||jsr|6,tfind|||allocate new teblk|25251
-||ppm||||always possible to allocate block|25252
-||mov|13,teval(xl)|3,r_sfc||record file name as entry value|25253
-||exi|||||25254
-|nwfn1|ica|7,xs|||pop stack|25258
-||exi|||||25259
-||ejc|||||25260
-|nexts|prc|25,e|1,0||entry point|25292
-||bze|3,cswls|6,nxts2||jump if -nolist|25293
-||mov|7,xr|3,r_cim||point to image|25294
-||bze|7,xr|6,nxts2||jump if no image|25295
-||plc|7,xr|||get char ptr|25296
-||lch|8,wa|9,(xr)||get first char|25297
-||bne|8,wa|18,=ch_mn|6,nxts1|jump if not ctrl card|25298
-||bze|3,cswpr|6,nxts2||jump if -noprint|25299
-|nxts1|jsr|6,listr|||list line|25303
-|nxts2|mov|7,xr|3,r_cni||point to next image|25307
-||mov|3,r_cim|7,xr||set as next image|25308
-||mov|3,rdcln|3,rdnln||set as current line number|25309
-||mov|3,lstid|3,cnind||set as current include depth|25311
-||zer|3,r_cni|||clear next image pointer|25313
-||mov|8,wa|13,sclen(xr)||get input image length|25314
-||mov|8,wb|3,cswin||get max allowable length|25315
-||blo|8,wa|8,wb|6,nxts3|skip if not too long|25316
-||mov|8,wa|8,wb||else truncate|25317
-|nxts3|mov|3,scnil|8,wa||use as record length|25321
-||zer|3,scnse|||reset scnse|25322
-||zer|3,lstpf|||set line not listed yet|25323
-||exi||||return to nexts caller|25324
-||enp||||end procedure nexts|25325
-||ejc|||||25326
-|patin|prc|25,n|1,2||entry point|25342
-||mov|7,xl|8,wa||preserve expression arg pcode|25343
-||jsr|6,gtsmi|||try to convert arg as small integer|25344
-||ppm|6,ptin2|||jump if not integer|25345
-||ppm|6,ptin3|||jump if out of range|25346
-|ptin1|jsr|6,pbild|||build pattern node|25350
-||exi||||return to caller|25351
-|ptin2|mov|8,wb|7,xl||copy expr arg case pcode|25355
-||blo|9,(xr)|22,=b_e__|6,ptin1|all ok if expression arg|25356
-||exi|1,1|||else take error exit for wrong type|25357
-|ptin3|exi|1,2|||take out-of-range error exit|25361
-||enp||||end procedure patin|25362
-||ejc|||||25363
-|patst|prc|25,n|1,1||entry point|25387
-||jsr|6,gtstg|||convert argument as string|25388
-||ppm|6,pats7|||jump if not string|25389
-||bze|8,wa|6,pats7||jump if null string (catspaw)|25390
-||bne|8,wa|18,=num01|6,pats2|jump if not one char string|25391
-||bze|8,wb|6,pats2||treat as multi-char if evals call|25395
-||plc|7,xr|||point to character|25396
-||lch|7,xr|9,(xr)||load character|25397
-|pats1|jsr|6,pbild|||call routine to build node|25401
-||exi||||return to patst caller|25402
-||ejc|||||25403
-|pats2|mov|11,-(xs)|7,xl||save multi-char pcode|25409
-||mov|8,wc|3,ctmsk||load current mask bit|25410
-||beq|7,xr|3,r_cts|6,pats6|jump if same as last string c3.738|25411
-||mov|11,-(xs)|7,xr||save string pointer|25412
-||lsh|8,wc|1,1||shift to next position|25413
-||nzb|8,wc|6,pats4||skip if position left in this tbl|25414
-||mov|8,wa|19,*ctsi_||set size of ctblk|25418
-||jsr|6,alloc|||allocate ctblk|25419
-||mov|3,r_ctp|7,xr||store ptr to new ctblk|25420
-||mov|10,(xr)+|22,=b_ctt||store type code, bump ptr|25421
-||lct|8,wb|18,=cfp_a||set number of words to clear|25422
-||mov|8,wc|4,bits0||load all zero bits|25423
-|pats3|mov|10,(xr)+|8,wc||move word of zero bits|25427
-||bct|8,wb|6,pats3||loop till all cleared|25428
-||mov|8,wc|4,bits1||set initial bit position|25429
-|pats4|mov|3,ctmsk|8,wc||save parm2 (new bit position)|25433
-||mov|7,xl|10,(xs)+||restore pointer to argument string|25434
-||mov|3,r_cts|7,xl||save for next time   c3.738|25435
-||mov|8,wb|13,sclen(xl)||load string length|25436
-||bze|8,wb|6,pats6||jump if null string case|25437
-||lct|8,wb|8,wb||else set loop counter|25438
-||plc|7,xl|||point to characters in argument|25439
-||ejc|||||25440
-|pats5|lch|8,wa|10,(xl)+||load next character|25446
-||wtb|8,wa|||convert to byte offset|25447
-||mov|7,xr|3,r_ctp||point to ctblk|25448
-||add|7,xr|8,wa||point to ctblk entry|25449
-||mov|8,wa|8,wc||copy bit mask|25450
-||orb|8,wa|13,ctchs(xr)||or in bits already set|25451
-||mov|13,ctchs(xr)|8,wa||store resulting bit string|25452
-||bct|8,wb|6,pats5||loop till all bits set|25453
-|pats6|mov|7,xr|3,r_ctp||load ctblk ptr as parm1 for pbild|25457
-||zer|7,xl|||clear garbage ptr in xl|25458
-||mov|8,wb|10,(xs)+||load pcode for multi-char str case|25459
-||brn|6,pats1|||back to exit (wc=bitstring=parm2)|25460
-|pats7|mov|8,wb|8,wc||set pcode for expression argument|25467
-||blo|9,(xr)|22,=b_e__|6,pats1|jump to exit if expression arg|25468
-||exi|1,1|||else take wrong type error exit|25469
-||enp||||end procedure patst|25470
-||ejc|||||25471
-|pbild|prc|25,e|1,0||entry point|25482
-||mov|11,-(xs)|7,xr||stack possible parm1|25483
-||mov|7,xr|8,wb||copy pcode|25484
-||lei|7,xr|||load entry point id (bl_px)|25485
-||beq|7,xr|18,=bl_p1|6,pbld1|jump if one parameter|25486
-||beq|7,xr|18,=bl_p0|6,pbld3|jump if no parameters|25487
-||mov|8,wa|19,*pcsi_||set size of p2blk|25491
-||jsr|6,alloc|||allocate block|25492
-||mov|13,parm2(xr)|8,wc||store second parameter|25493
-||brn|6,pbld2|||merge with one parm case|25494
-|pbld1|mov|8,wa|19,*pbsi_||set size of p1blk|25498
-||jsr|6,alloc|||allocate node|25499
-|pbld2|mov|13,parm1(xr)|9,(xs)||store first parameter|25503
-||brn|6,pbld4|||merge with no parameter case|25504
-|pbld3|mov|8,wa|19,*pasi_||set size of p0blk|25508
-||jsr|6,alloc|||allocate node|25509
-|pbld4|mov|9,(xr)|8,wb||store pcode|25513
-||ica|7,xs|||pop first parameter|25514
-||mov|13,pthen(xr)|21,=ndnth||set nothen successor pointer|25515
-||exi||||return to pbild caller|25516
-||enp||||end procedure pbild|25517
-||ejc|||||25518
-|pconc|prc|25,e|1,0||entry point|25553
-||zer|11,-(xs)|||make room for one entry at bottom|25554
-||mov|8,wc|7,xs||store pointer to start of list|25555
-||mov|11,-(xs)|21,=ndnth||stack nothen node as old node|25556
-||mov|11,-(xs)|7,xl||store right arg as copy of nothen|25557
-||mov|7,xt|7,xs||initialize pointer to stack entries|25558
-||jsr|6,pcopy|||copy first node of left arg|25559
-||mov|13,num02(xt)|8,wa||store as result under list|25560
-||ejc|||||25561
-|pcnc1|beq|7,xt|7,xs|6,pcnc2|jump if all entries processed|25568
-||mov|7,xr|11,-(xt)||else load next old address|25569
-||mov|7,xr|13,pthen(xr)||load pointer to successor|25570
-||jsr|6,pcopy|||copy successor node|25571
-||mov|7,xr|11,-(xt)||load pointer to new node (copy)|25572
-||mov|13,pthen(xr)|8,wa||store ptr to new successor|25573
-||bne|9,(xr)|22,=p_alt|6,pcnc1|loop back if not|25578
-||mov|7,xr|13,parm1(xr)||else load pointer to alternative|25579
-||jsr|6,pcopy|||copy it|25580
-||mov|7,xr|9,(xt)||restore ptr to new node|25581
-||mov|13,parm1(xr)|8,wa||store ptr to copied alternative|25582
-||brn|6,pcnc1|||loop back for next entry|25583
-|pcnc2|mov|7,xs|8,wc||restore stack pointer|25587
-||mov|7,xr|10,(xs)+||load pointer to copy|25588
-||exi||||return to pconc caller|25589
-||enp||||end procedure pconc|25590
-||ejc|||||25591
-|pcopy|prc|25,n|1,0||entry point|25606
-||mov|8,wb|7,xt||save xt|25607
-||mov|7,xt|8,wc||point to start of list|25608
-|pcop1|dca|7,xt|||point to next entry on list|25612
-||beq|7,xr|9,(xt)|6,pcop2|jump if match|25613
-||dca|7,xt|||else skip over copied address|25614
-||bne|7,xt|7,xs|6,pcop1|loop back if more to test|25615
-||mov|8,wa|9,(xr)||load first word of block|25619
-||jsr|6,blkln|||get length of block|25620
-||mov|7,xl|7,xr||save pointer to old node|25621
-||jsr|6,alloc|||allocate space for copy|25622
-||mov|11,-(xs)|7,xl||store old address on list|25623
-||mov|11,-(xs)|7,xr||store new address on list|25624
-||chk||||check for stack overflow|25625
-||mvw||||move words from old block to copy|25626
-||mov|8,wa|9,(xs)||load pointer to copy|25627
-||brn|6,pcop3|||jump to exit|25628
-|pcop2|mov|8,wa|11,-(xt)||load address of copy from list|25632
-|pcop3|mov|7,xt|8,wb||restore xt|25636
-||exi||||return to pcopy caller|25637
-||enp||||end procedure pcopy|25638
-||ejc|||||25639
-|prflr|prc|25,e|1,0|||25650
-||bze|3,pfdmp|6,prfl4||no printing if no profiling done|25651
-||mov|11,-(xs)|7,xr||preserve entry xr|25652
-||mov|3,pfsvw|8,wb||and also wb|25653
-||jsr|6,prtpg|||eject|25654
-||mov|7,xr|21,=pfms1||load msg /program profile/|25655
-||jsr|6,prtst|||and print it|25656
-||jsr|6,prtnl|||followed by newline|25657
-||jsr|6,prtnl|||and another|25658
-||mov|7,xr|21,=pfms2||point to first hdr|25659
-||jsr|6,prtst|||print it|25660
-||jsr|6,prtnl|||new line|25661
-||mov|7,xr|21,=pfms3||second hdr|25662
-||jsr|6,prtst|||print it|25663
-||jsr|6,prtnl|||new line|25664
-||jsr|6,prtnl|||and another blank line|25665
-||zer|8,wb|||initial stmt count|25666
-||mov|7,xr|3,pftbl||point to table origin|25667
-||add|7,xr|19,*xndta||bias past xnblk header (sgd07)|25668
-|prfl1|icv|8,wb|||bump stmt nr|25672
-||ldi|9,(xr)|||load nr of executions|25673
-||ieq|6,prfl3|||no printing if zero|25674
-||mov|3,profs|18,=pfpd1||point where to print|25675
-||jsr|6,prtin|||and print it|25676
-||zer|3,profs|||back to start of line|25677
-||mti|8,wb|||load stmt nr|25678
-||jsr|6,prtin|||print it there|25679
-||mov|3,profs|18,=pfpd2||and pad past count|25680
-||ldi|13,cfp_i(xr)|||load total exec time|25681
-||jsr|6,prtin|||print that too|25682
-||ldi|13,cfp_i(xr)|||reload time|25683
-||mli|4,intth|||convert to microsec|25684
-||iov|6,prfl2|||omit next bit if overflow|25685
-||dvi|9,(xr)|||divide by executions|25686
-||mov|3,profs|18,=pfpd3||pad last print|25687
-||jsr|6,prtin|||and print mcsec/execn|25688
-|prfl2|jsr|6,prtnl|||thats another line|25692
-|prfl3|add|7,xr|19,*pf_i2||bump index ptr (sgd07)|25696
-||blt|8,wb|3,pfnte|6,prfl1|loop if more stmts|25697
-||mov|7,xr|10,(xs)+||restore callers xr|25698
-||mov|8,wb|3,pfsvw||and wb too|25699
-|prfl4|exi||||return|25703
-||enp||||end of prflr|25704
-||ejc|||||25705
-|prflu|prc|25,e|1,0|||25714
-||bnz|3,pffnc|6,pflu4||skip if just entered function|25715
-||mov|11,-(xs)|7,xr||preserve entry xr|25716
-||mov|3,pfsvw|8,wa||save wa (sgd07)|25717
-||bnz|3,pftbl|6,pflu2||branch if table allocated|25718
-||sub|3,pfnte|18,=num01||adjust for extra count (sgd07)|25728
-||mti|4,pfi2a|||convrt entry size to int|25729
-||sti|3,pfste|||and store safely for later|25730
-||mti|3,pfnte|||load table length as integer|25731
-||mli|3,pfste|||multiply by entry size|25732
-||mfi|8,wa|||get back address-style|25733
-||add|8,wa|18,=num02||add on 2 word overhead|25734
-||wtb|8,wa|||convert the whole lot to bytes|25735
-||jsr|6,alost|||gimme the space|25736
-||mov|3,pftbl|7,xr||save block pointer|25737
-||mov|10,(xr)+|22,=b_xnt||put block type and ...|25738
-||mov|10,(xr)+|8,wa||... length into header|25739
-||mfi|8,wa|||get back nr of wds in data area|25740
-||lct|8,wa|8,wa||load the counter|25741
-|pflu1|zer|10,(xr)+|||blank a word|25745
-||bct|8,wa|6,pflu1||and alllllll the rest|25746
-|pflu2|mti|3,kvstn|||load nr of stmt just ended|25750
-||sbi|4,intv1|||make into index offset|25751
-||mli|3,pfste|||make offset of table entry|25752
-||mfi|8,wa|||convert to address|25753
-||wtb|8,wa|||get as baus|25754
-||add|8,wa|19,*num02||offset includes table header|25755
-||mov|7,xr|3,pftbl||get table start|25756
-||bge|8,wa|13,num01(xr)|6,pflu3|if out of table, skip it|25757
-||add|7,xr|8,wa||else point to entry|25758
-||ldi|9,(xr)|||get nr of executions so far|25759
-||adi|4,intv1|||nudge up one|25760
-||sti|9,(xr)|||and put back|25761
-||jsr|6,systm|||get time now|25762
-||sti|3,pfetm|||stash ending time|25763
-||sbi|3,pfstm|||subtract start time|25764
-||adi|13,cfp_i(xr)|||add cumulative time so far|25765
-||sti|13,cfp_i(xr)|||and put back new total|25766
-||ldi|3,pfetm|||load end time of this stmt ...|25767
-||sti|3,pfstm|||... which is start time of next|25768
-|pflu3|mov|7,xr|10,(xs)+||restore callers xr|25772
-||mov|8,wa|3,pfsvw||restore saved reg|25773
-||exi||||and return|25774
-|pflu4|zer|3,pffnc|||reset the condition flag|25780
-||exi||||and immediate return|25781
-||enp||||end of procedure prflu|25782
-||ejc|||||25783
-|prpar|prc|25,e|1,0||entry point|25796
-||bnz|8,wc|6,prpa8||jump to associate terminal|25797
-||jsr|6,syspp|||get print parameters|25798
-||bnz|8,wb|6,prpa1||jump if lines/page specified|25799
-||mov|8,wb|3,mxint||else use a large value|25800
-||rsh|8,wb|1,1||but not too large|25801
-|prpa1|mov|3,lstnp|8,wb||store number of lines/page|25805
-||mov|3,lstlc|8,wb||pretend page is full initially|25806
-||zer|3,lstpg|||clear page number|25807
-||mov|8,wb|3,prlen||get prior length if any|25808
-||bze|8,wb|6,prpa2||skip if no length|25809
-||bgt|8,wa|8,wb|6,prpa3|skip storing if too big|25810
-|prpa2|mov|3,prlen|8,wa||store value|25814
-|prpa3|mov|8,wb|4,bits3||bit 3 mask|25818
-||anb|8,wb|8,wc||get -nolist bit|25819
-||zrb|8,wb|6,prpa4||skip if clear|25820
-||zer|3,cswls|||set -nolist|25821
-|prpa4|mov|8,wb|4,bits1||bit 1 mask|25825
-||anb|8,wb|8,wc||get bit|25826
-||mov|3,erich|8,wb||store int. chan. error flag|25827
-||mov|8,wb|4,bits2||bit 2 mask|25828
-||anb|8,wb|8,wc||get bit|25829
-||mov|3,prich|8,wb||flag for std printer on int. chan.|25830
-||mov|8,wb|4,bits4||bit 4 mask|25831
-||anb|8,wb|8,wc||get bit|25832
-||mov|3,cpsts|8,wb||flag for compile stats suppressn.|25833
-||mov|8,wb|4,bits5||bit 5 mask|25834
-||anb|8,wb|8,wc||get bit|25835
-||mov|3,exsts|8,wb||flag for exec stats suppression|25836
-||ejc|||||25837
-||mov|8,wb|4,bits6||bit 6 mask|25841
-||anb|8,wb|8,wc||get bit|25842
-||mov|3,precl|8,wb||extended/compact listing flag|25843
-||sub|8,wa|18,=num08||point 8 chars from line end|25844
-||zrb|8,wb|6,prpa5||jump if not extended|25845
-||mov|3,lstpo|8,wa||store for listing page headings|25846
-|prpa5|mov|8,wb|4,bits7||bit 7 mask|25850
-||anb|8,wb|8,wc||get bit 7|25851
-||mov|3,cswex|8,wb||set -noexecute if non-zero|25852
-||mov|8,wb|4,bit10||bit 10 mask|25853
-||anb|8,wb|8,wc||get bit 10|25854
-||mov|3,headp|8,wb||pretend printed to omit headers|25855
-||mov|8,wb|4,bits9||bit 9 mask|25856
-||anb|8,wb|8,wc||get bit 9|25857
-||mov|3,prsto|8,wb||keep it as std listing option|25858
-||mov|8,wb|8,wc||copy flags|25860
-||rsh|8,wb|1,12||right justify bit 13|25861
-||anb|8,wb|4,bits1||get bit|25862
-||mov|3,kvcas|8,wb||set -case|25863
-||mov|8,wb|4,bit12||bit 12 mask|25865
-||anb|8,wb|8,wc||get bit 12|25866
-||mov|3,cswer|8,wb||keep it as errors/noerrors option|25867
-||zrb|8,wb|6,prpa6||skip if clear|25868
-||mov|8,wa|3,prlen||get print buffer length|25869
-||sub|8,wa|18,=num08||point 8 chars from line end|25870
-||mov|3,lstpo|8,wa||store page offset|25871
-|prpa6|mov|8,wb|4,bit11||bit 11 mask|25875
-||anb|8,wb|8,wc||get bit 11|25876
-||mov|3,cswpr|8,wb||set -print if non-zero|25877
-||anb|8,wc|4,bits8||see if terminal to be activated|25881
-||bnz|8,wc|6,prpa8||jump if terminal required|25882
-||bze|3,initr|6,prpa9||jump if no terminal to detach|25883
-||mov|7,xl|21,=v_ter||ptr to /terminal/|25884
-||jsr|6,gtnvr|||get vrblk pointer|25885
-||ppm||||cant fail|25886
-||mov|13,vrval(xr)|21,=nulls||clear value of terminal|25887
-||jsr|6,setvr|||remove association|25888
-||brn|6,prpa9|||return|25889
-|prpa8|mnz|3,initr|||note terminal associated|25893
-||bze|3,dnamb|6,prpa9||cant if memory not organised|25894
-||mov|7,xl|21,=v_ter||point to terminal string|25895
-||mov|8,wb|18,=trtou||output trace type|25896
-||jsr|6,inout|||attach output trblk to vrblk|25897
-||mov|11,-(xs)|7,xr||stack trblk ptr|25898
-||mov|7,xl|21,=v_ter||point to terminal string|25899
-||mov|8,wb|18,=trtin||input trace type|25900
-||jsr|6,inout|||attach input trace blk|25901
-||mov|13,vrval(xr)|10,(xs)+||add output trblk to chain|25902
-|prpa9|exi||||return|25906
-||enp||||end procedure prpar|25907
-||ejc|||||25908
-|prtch|prc|25,e|1,0||entry point|25917
-||mov|11,-(xs)|7,xr||save xr|25918
-||bne|3,profs|3,prlen|6,prch1|jump if room in buffer|25919
-||jsr|6,prtnl|||else print this line|25920
-|prch1|mov|7,xr|3,prbuf||point to print buffer|25924
-||psc|7,xr|3,profs||point to next character location|25925
-||sch|8,wa|9,(xr)||store new character|25926
-||csc|7,xr|||complete store characters|25927
-||icv|3,profs|||bump pointer|25928
-||mov|7,xr|10,(xs)+||restore entry xr|25929
-||exi||||return to prtch caller|25930
-||enp||||end procedure prtch|25931
-||ejc|||||25932
-|prtic|prc|25,e|1,0||entry point|25944
-||mov|11,-(xs)|7,xr||save xr|25945
-||mov|7,xr|3,prbuf||point to buffer|25946
-||mov|8,wa|3,profs||no of chars|25947
-||jsr|6,syspi|||print|25948
-||ppm|6,prtc2|||fail return|25949
-|prtc1|mov|7,xr|10,(xs)+||restore xr|25953
-||exi||||return|25954
-|prtc2|zer|3,erich|||prevent looping|25958
-||erb|1,252|26,error on printing to interactive channel|||25959
-||brn|6,prtc1|||return|25960
-||enp||||procedure prtic|25961
-||ejc|||||25962
-|prtis|prc|25,e|1,0||entry point|25975
-||bnz|3,prich|6,prts1||jump if standard printer is int.ch.|25976
-||bze|3,erich|6,prts1||skip if not doing int. error reps.|25977
-||jsr|6,prtic|||print to interactive channel|25978
-|prts1|jsr|6,prtnl|||print to standard printer|25982
-||exi||||return|25983
-||enp||||end procedure prtis|25984
-||ejc|||||25985
-|prtin|prc|25,e|1,0||entry point|25997
-||mov|11,-(xs)|7,xr||save xr|25998
-||jsr|6,icbld|||build integer block|25999
-||blo|7,xr|3,dnamb|6,prti1|jump if icblk below dynamic|26000
-||bhi|7,xr|3,dnamp|6,prti1|jump if above dynamic|26001
-||mov|3,dnamp|7,xr||immediately delete it|26002
-|prti1|mov|11,-(xs)|7,xr||stack ptr for gtstg|26006
-||jsr|6,gtstg|||convert to string|26007
-||ppm||||convert error is impossible|26008
-||mov|3,dnamp|7,xr||reset pointer to delete scblk|26009
-||jsr|6,prtst|||print integer string|26010
-||mov|7,xr|10,(xs)+||restore entry xr|26011
-||exi||||return to prtin caller|26012
-||enp||||end procedure prtin|26013
-||ejc|||||26014
-|prtmi|prc|25,e|1,0||entry point|26024
-||jsr|6,prtst|||print string message|26025
-||mov|3,profs|18,=prtmf||set column offset|26026
-||jsr|6,prtin|||print integer|26027
-||jsr|6,prtnl|||print line|26028
-||exi||||return to prtmi caller|26029
-||enp||||end procedure prtmi|26030
-||ejc|||||26031
-|prtmm|prc|25,e|1,0|||26040
-||mov|8,wa|3,dnamp||next available loc|26041
-||sub|8,wa|3,statb||minus start|26042
-||mti|8,wa|||convert to integer|26047
-||mov|7,xr|21,=encm1||point to /memory used (words)/|26048
-||jsr|6,prtmi|||print message|26049
-||mov|8,wa|3,dname||end of memory|26050
-||sub|8,wa|3,dnamp||minus next available loc|26051
-||mti|8,wa|||convert to integer|26056
-||mov|7,xr|21,=encm2||point to /memory available (words)/|26057
-||jsr|6,prtmi|||print line|26058
-||exi||||return to prtmm caller|26059
-||enp||||end of procedure prtmm|26060
-||ejc|||||26061
-|prtmx|prc|25,e|1,0||entry point|26068
-||jsr|6,prtst|||print string message|26069
-||mov|3,profs|18,=prtmf||set column offset|26070
-||jsr|6,prtin|||print integer|26071
-||jsr|6,prtis|||print line|26072
-||exi||||return|26073
-||enp||||end procedure prtmx|26074
-||ejc|||||26075
-|prtnl|prc|25,r|1,0||entry point|26084
-||bnz|3,headp|6,prnl0||were headers printed|26085
-||jsr|6,prtps|||no - print them|26086
-|prnl0|mov|11,-(xs)|7,xr||save entry xr|26090
-||mov|3,prtsa|8,wa||save wa|26091
-||mov|3,prtsb|8,wb||save wb|26092
-||mov|7,xr|3,prbuf||load pointer to buffer|26093
-||mov|8,wa|3,profs||load number of chars in buffer|26094
-||jsr|6,syspr|||call system print routine|26095
-||ppm|6,prnl2|||jump if failed|26096
-||lct|8,wa|3,prlnw||load length of buffer in words|26097
-||add|7,xr|19,*schar||point to chars of buffer|26098
-||mov|8,wb|4,nullw||get word of blanks|26099
-|prnl1|mov|10,(xr)+|8,wb||store word of blanks, bump ptr|26103
-||bct|8,wa|6,prnl1||loop till all blanked|26104
-||mov|8,wb|3,prtsb||restore wb|26108
-||mov|8,wa|3,prtsa||restore wa|26109
-||mov|7,xr|10,(xs)+||restore entry xr|26110
-||zer|3,profs|||reset print buffer pointer|26111
-||exi||||return to prtnl caller|26112
-|prnl2|bnz|3,prtef|6,prnl3||jump if not first time|26116
-||mnz|3,prtef|||mark first occurrence|26117
-||erb|1,253|26,print limit exceeded on standard output channel|||26118
-|prnl3|mov|8,wb|18,=nini8||ending code|26122
-||mov|8,wa|3,kvstn||statement number|26123
-||mov|7,xl|3,r_fcb||get fcblk chain head|26124
-||jsr|6,sysej|||stop|26125
-||enp||||end procedure prtnl|26126
-||ejc|||||26127
-|prtnm|prc|25,r|1,0||entry point (recursive, see prtvl)|26140
-||mov|11,-(xs)|8,wa||save wa (offset is collectable)|26141
-||mov|11,-(xs)|7,xr||save entry xr|26142
-||mov|11,-(xs)|7,xl||save name base|26143
-||bhi|7,xl|3,state|6,prn02|jump if not natural variable|26144
-||mov|7,xr|7,xl||point to vrblk|26149
-||jsr|6,prtvn|||print name of variable|26150
-|prn01|mov|7,xl|10,(xs)+||restore name base|26154
-||mov|7,xr|10,(xs)+||restore entry value of xr|26155
-||mov|8,wa|10,(xs)+||restore wa|26156
-||exi||||return to prtnm caller|26157
-|prn02|mov|8,wb|8,wa||copy name offset|26161
-||bne|9,(xl)|22,=b_pdt|6,prn03|jump if array or table|26162
-||mov|7,xr|13,pddfp(xl)||load pointer to dfblk|26166
-||add|7,xr|8,wa||add name offset|26167
-||mov|7,xr|13,pdfof(xr)||load vrblk pointer for field|26168
-||jsr|6,prtvn|||print field name|26169
-||mov|8,wa|18,=ch_pp||load left paren|26170
-||jsr|6,prtch|||print character|26171
-||ejc|||||26172
-|prn03|bne|9,(xl)|22,=b_tet|6,prn04|jump if we got there (or not te)|26185
-||mov|7,xl|13,tenxt(xl)||else move out on chain|26186
-||brn|6,prn03|||and loop back|26187
-|prn04|mov|7,xr|3,prnmv||point to vrblk we found last time|26195
-||mov|8,wa|3,hshtb||point to hash table in case not|26196
-||brn|6,prn07|||jump into search for special check|26197
-|prn05|mov|7,xr|8,wa||copy slot pointer|26201
-||ica|8,wa|||bump slot pointer|26202
-||sub|7,xr|19,*vrnxt||introduce standard vrblk offset|26203
-|prn06|mov|7,xr|13,vrnxt(xr)||point to next vrblk on hash chain|26207
-|prn07|mov|8,wc|7,xr||copy vrblk pointer|26211
-||bze|8,wc|6,prn09||jump if chain end (or prnmv zero)|26212
-||ejc|||||26213
-|prn08|mov|7,xr|13,vrval(xr)||load value|26219
-||beq|9,(xr)|22,=b_trt|6,prn08|loop if that was a trblk|26220
-||beq|7,xr|7,xl|6,prn10|jump if this matches the name base|26224
-||mov|7,xr|8,wc||else point back to that vrblk|26225
-||brn|6,prn06|||and loop back|26226
-|prn09|blt|8,wa|3,hshte|6,prn05|loop back if more to go|26230
-||mov|7,xr|7,xl||else not found, copy value pointer|26231
-||jsr|6,prtvl|||print value|26232
-||brn|6,prn11|||and merge ahead|26233
-|prn10|mov|7,xr|8,wc||copy vrblk pointer|26237
-||mov|3,prnmv|7,xr||save for next time in|26238
-||jsr|6,prtvn|||print variable name|26239
-|prn11|mov|8,wc|9,(xl)||load first word of name base|26243
-||bne|8,wc|22,=b_pdt|6,prn13|jump if not program defined|26244
-||mov|8,wa|18,=ch_rp||load right paren, merge|26248
-|prn12|jsr|6,prtch|||print final character|26252
-||mov|8,wa|8,wb||restore name offset|26253
-||brn|6,prn01|||merge back to exit|26254
-||ejc|||||26255
-|prn13|mov|8,wa|18,=ch_bb||load left bracket|26261
-||jsr|6,prtch|||and print it|26262
-||mov|7,xl|9,(xs)||restore block pointer|26263
-||mov|8,wc|9,(xl)||load type word again|26264
-||bne|8,wc|22,=b_tet|6,prn15|jump if not table|26265
-||mov|7,xr|13,tesub(xl)||load subscript value|26269
-||mov|7,xl|8,wb||save name offset|26270
-||jsr|6,prtvl|||print subscript value|26271
-||mov|8,wb|7,xl||restore name offset|26272
-|prn14|mov|8,wa|18,=ch_rb||load right bracket|26276
-||brn|6,prn12|||merge back to print it|26277
-|prn15|mov|8,wa|8,wb||copy name offset|26281
-||btw|8,wa|||convert to words|26282
-||beq|8,wc|22,=b_art|6,prn16|jump if arblk|26283
-||sub|8,wa|18,=vcvlb||adjust for standard fields|26287
-||mti|8,wa|||move to integer accum|26288
-||jsr|6,prtin|||print linear subscript|26289
-||brn|6,prn14|||merge back for right bracket|26290
-||ejc|||||26291
-|prn16|mov|8,wc|13,arofs(xl)||load length of bounds info|26300
-||ica|8,wc|||adjust for arpro field|26301
-||btw|8,wc|||convert to words|26302
-||sub|8,wa|8,wc||get linear zero-origin subscript|26303
-||mti|8,wa|||get integer value|26304
-||lct|8,wa|13,arndm(xl)||set num of dimensions as loop count|26305
-||add|7,xl|13,arofs(xl)||point past bounds information|26306
-||sub|7,xl|19,*arlbd||set ok offset for proper ptr later|26307
-|prn17|sub|7,xl|19,*ardms||point to next set of bounds|26311
-||sti|3,prnsi|||save current offset|26312
-||rmi|13,ardim(xl)|||get remainder on dividing by dimens|26313
-||mfi|11,-(xs)|||store on stack (one word)|26314
-||ldi|3,prnsi|||reload argument|26315
-||dvi|13,ardim(xl)|||divide to get quotient|26316
-||bct|8,wa|6,prn17||loop till all stacked|26317
-||zer|7,xr|||set offset to first set of bounds|26318
-||lct|8,wb|13,arndm(xl)||load count of dims to control loop|26319
-||brn|6,prn19|||jump into print loop|26320
-|prn18|mov|8,wa|18,=ch_cm||load a comma|26325
-||jsr|6,prtch|||print it|26326
-|prn19|mti|10,(xs)+|||load subscript offset as integer|26330
-||add|7,xl|7,xr||point to current lbd|26331
-||adi|13,arlbd(xl)|||add lbd to get signed subscript|26332
-||sub|7,xl|7,xr||point back to start of arblk|26333
-||jsr|6,prtin|||print subscript|26334
-||add|7,xr|19,*ardms||bump offset to next bounds|26335
-||bct|8,wb|6,prn18||loop back till all printed|26336
-||brn|6,prn14|||merge back to print right bracket|26337
-||enp||||end procedure prtnm|26338
-||ejc|||||26339
-|prtnv|prc|25,e|1,0||entry point|26355
-||jsr|6,prtnm|||print argument name|26356
-||mov|11,-(xs)|7,xr||save entry xr|26357
-||mov|11,-(xs)|8,wa||save name offset (collectable)|26358
-||mov|7,xr|21,=tmbeb||point to blank equal blank|26359
-||jsr|6,prtst|||print it|26360
-||mov|7,xr|7,xl||copy name base|26361
-||add|7,xr|8,wa||point to value|26362
-||mov|7,xr|9,(xr)||load value pointer|26363
-||jsr|6,prtvl|||print value|26364
-||jsr|6,prtnl|||terminate line|26365
-||mov|8,wa|10,(xs)+||restore name offset|26366
-||mov|7,xr|10,(xs)+||restore entry xr|26367
-||exi||||return to caller|26368
-||enp||||end procedure prtnv|26369
-||ejc|||||26370
-|prtpg|prc|25,e|1,0||entry point|26379
-||beq|3,stage|18,=stgxt|6,prp01|jump if execution time|26380
-||bze|3,lstlc|6,prp06||return if top of page already|26381
-||zer|3,lstlc|||clear line count|26382
-|prp01|mov|11,-(xs)|7,xr||preserve xr|26386
-||bnz|3,prstd|6,prp02||eject if flag set|26387
-||bnz|3,prich|6,prp03||jump if interactive listing channel|26388
-||bze|3,precl|6,prp03||jump if compact listing|26389
-|prp02|jsr|6,sysep|||eject|26393
-||brn|6,prp04|||merge|26394
-|prp03|mov|7,xr|3,headp||remember headp|26400
-||mnz|3,headp|||set to avoid repeated prtpg calls|26401
-||jsr|6,prtnl|||print blank line|26402
-||jsr|6,prtnl|||print blank line|26403
-||jsr|6,prtnl|||print blank line|26404
-||mov|3,lstlc|18,=num03||count blank lines|26405
-||mov|3,headp|7,xr||restore header flag|26406
-||ejc|||||26407
-|prp04|bnz|3,headp|6,prp05||jump if header listed|26413
-||mnz|3,headp|||mark headers printed|26414
-||mov|11,-(xs)|7,xl||keep xl|26415
-||mov|7,xr|21,=headr||point to listing header|26416
-||jsr|6,prtst|||place it|26417
-||jsr|6,sysid|||get system identification|26418
-||jsr|6,prtst|||append extra chars|26419
-||jsr|6,prtnl|||print it|26420
-||mov|7,xr|7,xl||extra header line|26421
-||jsr|6,prtst|||place it|26422
-||jsr|6,prtnl|||print it|26423
-||jsr|6,prtnl|||print a blank|26424
-||jsr|6,prtnl|||and another|26425
-||add|3,lstlc|18,=num04||four header lines printed|26426
-||mov|7,xl|10,(xs)+||restore xl|26427
-|prp05|mov|7,xr|10,(xs)+||restore xr|26431
-|prp06|exi||||return|26435
-||enp||||end procedure prtpg|26436
-||ejc|||||26437
-|prtps|prc|25,e|1,0||entry point|26446
-||mov|3,prstd|3,prsto||copy option flag|26447
-||jsr|6,prtpg|||print page|26448
-||zer|3,prstd|||clear flag|26449
-||exi||||return|26450
-||enp||||end procedure prtps|26451
-||ejc|||||26452
-|prtsn|prc|25,e|1,0||entry point|26471
-||mov|11,-(xs)|7,xr||save entry xr|26472
-||mov|3,prsna|8,wa||save entry wa|26473
-||mov|7,xr|21,=tmasb||point to asterisks|26474
-||jsr|6,prtst|||print asterisks|26475
-||mov|3,profs|18,=num04||point into middle of asterisks|26476
-||mti|3,kvstn|||load statement number as integer|26477
-||jsr|6,prtin|||print integer statement number|26478
-||mov|3,profs|18,=prsnf||point past asterisks plus blank|26479
-||mov|7,xr|3,kvfnc||get fnclevel|26480
-||mov|8,wa|18,=ch_li||set letter i|26481
-|prsn1|bze|7,xr|6,prsn2||jump if all set|26485
-||jsr|6,prtch|||else print an i|26486
-||dcv|7,xr|||decrement counter|26487
-||brn|6,prsn1|||loop back|26488
-|prsn2|mov|8,wa|18,=ch_bl||get blank|26492
-||jsr|6,prtch|||print blank|26493
-||mov|8,wa|3,prsna||restore entry wa|26494
-||mov|7,xr|10,(xs)+||restore entry xr|26495
-||exi||||return to prtsn caller|26496
-||enp||||end procedure prtsn|26497
-||ejc|||||26498
-|prtst|prc|25,r|1,0||entry point|26513
-||bnz|3,headp|6,prst0||were headers printed|26514
-||jsr|6,prtps|||no - print them|26515
-|prst0|mov|3,prsva|8,wa||save wa|26519
-||mov|3,prsvb|8,wb||save wb|26520
-||zer|8,wb|||set chars printed count to zero|26521
-|prst1|mov|8,wa|13,sclen(xr)||load string length|26525
-||sub|8,wa|8,wb||subtract count of chars already out|26526
-||bze|8,wa|6,prst4||jump to exit if none left|26527
-||mov|11,-(xs)|7,xl||else stack entry xl|26528
-||mov|11,-(xs)|7,xr||save argument|26529
-||mov|7,xl|7,xr||copy for eventual move|26530
-||mov|7,xr|3,prlen||load print buffer length|26531
-||sub|7,xr|3,profs||get chars left in print buffer|26532
-||bnz|7,xr|6,prst2||skip if room left on this line|26533
-||jsr|6,prtnl|||else print this line|26534
-||mov|7,xr|3,prlen||and set full width available|26535
-||ejc|||||26536
-|prst2|blo|8,wa|7,xr|6,prst3|jump if room for rest of string|26542
-||mov|8,wa|7,xr||else set to fill line|26543
-|prst3|mov|7,xr|3,prbuf||point to print buffer|26547
-||plc|7,xl|8,wb||point to location in string|26548
-||psc|7,xr|3,profs||point to location in buffer|26549
-||add|8,wb|8,wa||bump string chars count|26550
-||add|3,profs|8,wa||bump buffer pointer|26551
-||mov|3,prsvc|8,wb||preserve char counter|26552
-||mvc||||move characters to buffer|26553
-||mov|8,wb|3,prsvc||recover char counter|26554
-||mov|7,xr|10,(xs)+||restore argument pointer|26555
-||mov|7,xl|10,(xs)+||restore entry xl|26556
-||brn|6,prst1|||loop back to test for more|26557
-|prst4|mov|8,wb|3,prsvb||restore entry wb|26561
-||mov|8,wa|3,prsva||restore entry wa|26562
-||exi||||return to prtst caller|26563
-||enp||||end procedure prtst|26564
-||ejc|||||26565
-|prttr|prc|25,e|1,0||entry point|26575
-||mov|11,-(xs)|7,xr||save xr|26576
-||jsr|6,prtic|||print buffer contents|26577
-||mov|7,xr|3,prbuf||point to print bfr to clear it|26578
-||lct|8,wa|3,prlnw||get buffer length|26579
-||add|7,xr|19,*schar||point past scblk header|26580
-||mov|8,wb|4,nullw||get blanks|26581
-|prtt1|mov|10,(xr)+|8,wb||clear a word|26585
-||bct|8,wa|6,prtt1||loop|26586
-||zer|3,profs|||reset profs|26587
-||mov|7,xr|10,(xs)+||restore xr|26588
-||exi||||return|26589
-||enp||||end procedure prttr|26590
-||ejc|||||26591
-|prtvl|prc|25,r|1,0||entry point, recursive|26602
-||mov|11,-(xs)|7,xl||save entry xl|26603
-||mov|11,-(xs)|7,xr||save argument|26604
-||chk||||check for stack overflow|26605
-|prv01|mov|3,prvsi|13,idval(xr)||copy idval (if any)|26609
-||mov|7,xl|9,(xr)||load first word of block|26610
-||lei|7,xl|||load entry point id|26611
-||bsw|7,xl|2,bl__t|6,prv02|switch on block type|26612
-||iff|2,bl_ar|6,prv05||arblk|26630
-||iff|1,1|6,prv02|||26630
-||iff|1,2|6,prv02|||26630
-||iff|2,bl_ic|6,prv08||icblk|26630
-||iff|2,bl_nm|6,prv09||nmblk|26630
-||iff|1,5|6,prv02|||26630
-||iff|1,6|6,prv02|||26630
-||iff|1,7|6,prv02|||26630
-||iff|2,bl_rc|6,prv08||rcblk|26630
-||iff|2,bl_sc|6,prv11||scblk|26630
-||iff|2,bl_se|6,prv12||seblk|26630
-||iff|2,bl_tb|6,prv13||tbblk|26630
-||iff|2,bl_vc|6,prv13||vcblk|26630
-||iff|1,13|6,prv02|||26630
-||iff|1,14|6,prv02|||26630
-||iff|1,15|6,prv02|||26630
-||iff|2,bl_pd|6,prv10||pdblk|26630
-||iff|2,bl_tr|6,prv04||trblk|26630
-||esw||||end of switch on block type|26630
-|prv02|jsr|6,dtype|||get datatype name|26634
-||jsr|6,prtst|||print datatype name|26635
-|prv03|mov|7,xr|10,(xs)+||reload argument|26639
-||mov|7,xl|10,(xs)+||restore xl|26640
-||exi||||return to prtvl caller|26641
-|prv04|mov|7,xr|13,trval(xr)||load real value|26645
-||brn|6,prv01|||and loop back|26646
-||ejc|||||26647
-|prv05|mov|7,xl|7,xr||preserve argument|26655
-||mov|7,xr|21,=scarr||point to datatype name (array)|26656
-||jsr|6,prtst|||print it|26657
-||mov|8,wa|18,=ch_pp||load left paren|26658
-||jsr|6,prtch|||print left paren|26659
-||add|7,xl|13,arofs(xl)||point to prototype|26660
-||mov|7,xr|9,(xl)||load prototype|26661
-||jsr|6,prtst|||print prototype|26662
-|prv06|mov|8,wa|18,=ch_rp||load right paren|26666
-||jsr|6,prtch|||print right paren|26667
-|prv07|mov|8,wa|18,=ch_bl||load blank|26671
-||jsr|6,prtch|||print it|26672
-||mov|8,wa|18,=ch_nm||load number sign|26673
-||jsr|6,prtch|||print it|26674
-||mti|3,prvsi|||get idval|26675
-||jsr|6,prtin|||print id number|26676
-||brn|6,prv03|||back to exit|26677
-|prv08|mov|11,-(xs)|7,xr||stack argument for gtstg|26683
-||jsr|6,gtstg|||convert to string|26684
-||ppm||||error return is impossible|26685
-||jsr|6,prtst|||print the string|26686
-||mov|3,dnamp|7,xr||delete garbage string from storage|26687
-||brn|6,prv03|||back to exit|26688
-||ejc|||||26689
-|prv09|mov|7,xl|13,nmbas(xr)||load name base|26698
-||mov|8,wa|9,(xl)||load first word of block|26699
-||beq|8,wa|22,=b_kvt|6,prv02|just print name if keyword|26700
-||beq|8,wa|22,=b_evt|6,prv02|just print name if expression var|26701
-||mov|8,wa|18,=ch_dt||else get dot|26702
-||jsr|6,prtch|||and print it|26703
-||mov|8,wa|13,nmofs(xr)||load name offset|26704
-||jsr|6,prtnm|||print name|26705
-||brn|6,prv03|||back to exit|26706
-|prv10|jsr|6,dtype|||get datatype name|26712
-||jsr|6,prtst|||print datatype name|26713
-||brn|6,prv07|||merge back to print id|26714
-|prv11|mov|8,wa|18,=ch_sq||load single quote|26720
-||jsr|6,prtch|||print quote|26721
-||jsr|6,prtst|||print string value|26722
-||jsr|6,prtch|||print another quote|26723
-||brn|6,prv03|||back to exit|26724
-||ejc|||||26725
-|prv12|mov|8,wa|18,=ch_as||load asterisk|26733
-||jsr|6,prtch|||print asterisk|26734
-||mov|7,xr|13,sevar(xr)||load variable pointer|26735
-||jsr|6,prtvn|||print variable name|26736
-||brn|6,prv03|||jump back to exit|26737
-|prv13|mov|7,xl|7,xr||preserve argument|26743
-||jsr|6,dtype|||get datatype name|26744
-||jsr|6,prtst|||print datatype name|26745
-||mov|8,wa|18,=ch_pp||load left paren|26746
-||jsr|6,prtch|||print left paren|26747
-||mov|8,wa|13,tblen(xl)||load length of block (=vclen)|26748
-||btw|8,wa|||convert to word count|26749
-||sub|8,wa|18,=tbsi_||allow for standard fields|26750
-||beq|9,(xl)|22,=b_tbt|6,prv14|jump if table|26751
-||add|8,wa|18,=vctbd||for vcblk, adjust size|26752
-|prv14|mti|8,wa|||move as integer|26756
-||jsr|6,prtin|||print integer prototype|26757
-||brn|6,prv06|||merge back for rest|26758
-||enp||||end procedure prtvl|26781
-||ejc|||||26782
-|prtvn|prc|25,e|1,0||entry point|26791
-||mov|11,-(xs)|7,xr||stack vrblk pointer|26792
-||add|7,xr|19,*vrsof||point to possible string name|26793
-||bnz|13,sclen(xr)|6,prvn1||jump if not system variable|26794
-||mov|7,xr|13,vrsvo(xr)||point to svblk with name|26795
-|prvn1|jsr|6,prtst|||print string name of variable|26799
-||mov|7,xr|10,(xs)+||restore vrblk pointer|26800
-||exi||||return to prtvn caller|26801
-||enp||||end procedure prtvn|26802
-||ejc|||||26805
-|rcbld|prc|25,e|1,0||entry point|26814
-||mov|7,xr|3,dnamp||load pointer to next available loc|26815
-||add|7,xr|19,*rcsi_||point past new rcblk|26816
-||blo|7,xr|3,dname|6,rcbl1|jump if there is room|26817
-||mov|8,wa|19,*rcsi_||else load rcblk length|26818
-||jsr|6,alloc|||use standard allocator to get block|26819
-||add|7,xr|8,wa||point past block to merge|26820
-|rcbl1|mov|3,dnamp|7,xr||set new pointer|26824
-||sub|7,xr|19,*rcsi_||point back to start of block|26825
-||mov|9,(xr)|22,=b_rcl||store type word|26826
-||str|13,rcval(xr)|||store real value in rcblk|26827
-||exi||||return to rcbld caller|26828
-||enp||||end procedure rcbld|26829
-||ejc|||||26831
-|readr|prc|25,e|1,0||entry point|26845
-||mov|7,xr|3,r_cni||get ptr to next image|26846
-||bnz|7,xr|6,read3||exit if already read|26847
-||bnz|3,cnind|6,reada||if within include file|26849
-||bne|3,stage|18,=stgic|6,read3|exit if not initial compile|26851
-|reada|mov|8,wa|3,cswin||max read length|26852
-||zer|7,xl|||clear any dud value in xl|26853
-||jsr|6,alocs|||allocate buffer|26854
-||jsr|6,sysrd|||read input image|26855
-||ppm|6,read4|||jump if eof or new file name|26856
-||icv|3,rdnln|||increment next line number|26857
-||dcv|3,polct|||test if time to poll interface|26859
-||bnz|3,polct|6,read0||not yet|26860
-||zer|8,wa|||=0 for poll|26861
-||mov|8,wb|3,rdnln||line number|26862
-||jsr|6,syspl|||allow interactive access|26863
-||err|1,320|26,user interrupt|||26864
-||ppm||||single step|26865
-||ppm||||expression evaluation|26866
-||mov|3,polcs|8,wa||new countdown start value|26867
-||mov|3,polct|8,wa||new counter value|26868
-|read0|ble|13,sclen(xr)|3,cswin|6,read1|use smaller of string lnth ...|26870
-||mov|13,sclen(xr)|3,cswin||... and xxx of -inxxx|26871
-|read1|mnz|8,wb|||set trimr to perform trim|26875
-||jsr|6,trimr|||trim trailing blanks|26876
-|read2|mov|3,r_cni|7,xr||store copy of pointer|26880
-|read3|exi||||return to readr caller|26884
-|read4|bze|13,sclen(xr)|6,read5||jump if true end of file|26893
-||zer|8,wb|||new source file name|26894
-||mov|3,rdnln|8,wb||restart line counter for new file|26895
-||jsr|6,trimr|||remove unused space in block|26896
-||jsr|6,newfn|||record new file name|26897
-||brn|6,reada|||now reissue read for record data|26898
-|read5|mov|3,dnamp|7,xr||pop unused scblk|26902
-||bze|3,cnind|6,read6||jump if not within an include file|26904
-||zer|7,xl|||eof within include file|26905
-||jsr|6,sysif|||switch stream back to previous file|26906
-||ppm|||||26907
-||mov|8,wa|3,cnind||restore prev line number, file name|26908
-||add|8,wa|18,=vcvlb||vector offset in words|26909
-||wtb|8,wa|||convert to bytes|26910
-||mov|7,xr|3,r_ifa||file name array|26911
-||add|7,xr|8,wa||ptr to element|26912
-||mov|3,r_sfc|9,(xr)||change source file name|26913
-||mov|9,(xr)|21,=nulls||release scblk|26914
-||mov|7,xr|3,r_ifl||line number array|26915
-||add|7,xr|8,wa||ptr to element|26916
-||mov|7,xl|9,(xr)||icblk containing saved line number|26917
-||ldi|13,icval(xl)|||line number integer|26918
-||mfi|3,rdnln|||change source line number|26919
-||mov|9,(xr)|21,=inton||release icblk|26920
-||dcv|3,cnind|||decrement nesting level|26921
-||mov|8,wb|3,cmpsn||current statement number|26922
-||icv|8,wb|||anticipate end of previous stmt|26923
-||mti|8,wb|||convert to integer|26924
-||jsr|6,icbld|||build icblk for stmt number|26925
-||mov|7,xl|3,r_sfn||file name table|26926
-||mnz|8,wb|||lookup statement number by name|26927
-||jsr|6,tfind|||allocate new teblk|26928
-||ppm||||always possible to allocate block|26929
-||mov|13,teval(xl)|3,r_sfc||record file name as entry value|26930
-||beq|3,stage|18,=stgic|6,reada|if initial compile, reissue read|26931
-||bnz|3,cnind|6,reada||still reading from include file|26932
-||mov|7,xl|3,r_ici||restore code argument string|26937
-||zer|3,r_ici|||release original string|26938
-||mov|8,wa|3,cnsil||get length of string|26939
-||mov|8,wb|3,cnspt||offset of characters left|26940
-||sub|8,wa|8,wb||number of characters left|26941
-||mov|3,scnil|8,wa||set new scan length|26942
-||zer|3,scnpt|||scan from start of substring|26943
-||jsr|6,sbstr|||create substring of remainder|26944
-||mov|3,r_cim|7,xr||set scan image|26945
-||brn|6,read2|||return|26946
-|read6|zer|7,xr|||zero ptr as result|26962
-||brn|6,read2|||merge|26963
-||enp||||end procedure readr|26964
-||ejc|||||26965
-|sbstr|prc|25,e|1,0||entry point|27060
-||bze|8,wa|6,sbst2||jump if null substring|27061
-||jsr|6,alocs|||else allocate scblk|27062
-||mov|8,wa|8,wc||move number of characters|27063
-||mov|8,wc|7,xr||save ptr to new scblk|27064
-||plc|7,xl|8,wb||prepare to load chars from old blk|27065
-||psc|7,xr|||prepare to store chars in new blk|27066
-||mvc||||move characters to new string|27067
-||mov|7,xr|8,wc||then restore scblk pointer|27068
-|sbst1|zer|7,xl|||clear garbage pointer in xl|27072
-||exi||||return to sbstr caller|27073
-|sbst2|mov|7,xr|21,=nulls||set null string as result|27077
-||brn|6,sbst1|||return|27078
-||enp||||end procedure sbstr|27079
-||ejc|||||27080
-|stgcc|prc|25,e|1,0|||27091
-||mov|8,wa|3,polcs||assume no profiling or stcount tracing|27093
-||mov|8,wb|18,=num01||poll each time polcs expires|27094
-||ldi|3,kvstl|||get stmt limit|27098
-||bnz|3,kvpfl|6,stgc1||jump if profiling enabled|27099
-||ilt|6,stgc3|||no stcount tracing if negative|27100
-||bze|3,r_stc|6,stgc2||jump if not stcount tracing|27101
-|stgc1|mov|8,wb|8,wa||count polcs times within stmg|27106
-||mov|8,wa|18,=num01||break out of stmgo on each stmt|27107
-||brn|6,stgc3||||27111
-|stgc2|mti|8,wa|||breakout count start value|27115
-||sbi|3,kvstl|||proposed stmcs minus stmt limit|27116
-||ile|6,stgc3|||jump if stmt count does not limit|27117
-||ldi|3,kvstl|||stlimit limits breakcount count|27118
-||mfi|8,wa|||use it instead|27119
-|stgc3|mov|3,stmcs|8,wa||update breakout count start value|27123
-||mov|3,stmct|8,wa||reset breakout counter|27124
-||mov|3,polct|8,wb|||27126
-||exi|||||27128
-||ejc|||||27129
-|tfind|prc|25,e|1,1||entry point|27148
-||mov|11,-(xs)|8,wb||save name/value indicator|27149
-||mov|11,-(xs)|7,xr||save subscript value|27150
-||mov|11,-(xs)|7,xl||save table pointer|27151
-||mov|8,wa|13,tblen(xl)||load length of tbblk|27152
-||btw|8,wa|||convert to word count|27153
-||sub|8,wa|18,=tbbuk||get number of buckets|27154
-||mti|8,wa|||convert to integer value|27155
-||sti|3,tfnsi|||save for later|27156
-||mov|7,xl|9,(xr)||load first word of subscript|27157
-||lei|7,xl|||load block entry id (bl_xx)|27158
-||bsw|7,xl|2,bl__d|6,tfn00|switch on block type|27159
-||iff|1,0|6,tfn00|||27170
-||iff|1,1|6,tfn00|||27170
-||iff|1,2|6,tfn00|||27170
-||iff|2,bl_ic|6,tfn02||jump if integer|27170
-||iff|2,bl_nm|6,tfn04||jump if name|27170
-||iff|2,bl_p0|6,tfn03||jump if pattern|27170
-||iff|2,bl_p1|6,tfn03||jump if pattern|27170
-||iff|2,bl_p2|6,tfn03||jump if pattern|27170
-||iff|2,bl_rc|6,tfn02||real|27170
-||iff|2,bl_sc|6,tfn05||jump if string|27170
-||iff|1,10|6,tfn00|||27170
-||iff|1,11|6,tfn00|||27170
-||iff|1,12|6,tfn00|||27170
-||iff|1,13|6,tfn00|||27170
-||iff|1,14|6,tfn00|||27170
-||iff|1,15|6,tfn00|||27170
-||iff|1,16|6,tfn00|||27170
-||esw||||end switch on block type|27170
-|tfn00|mov|8,wa|12,1(xr)||load second word|27175
-|tfn01|mti|8,wa|||convert to integer|27179
-||brn|6,tfn06|||jump to merge|27180
-||ejc|||||27181
-|tfn02|ldi|12,1(xr)|||load value as hash source|27191
-||ige|6,tfn06|||ok if positive or zero|27192
-||ngi||||make positive|27193
-||iov|6,tfn06|||clear possible overflow|27194
-||brn|6,tfn06|||merge|27195
-|tfn03|mov|8,wa|9,(xr)||load first word as hash source|27199
-||brn|6,tfn01|||merge back|27200
-|tfn04|mov|8,wa|13,nmofs(xr)||load offset as hash source|27204
-||brn|6,tfn01|||merge back|27205
-|tfn05|jsr|6,hashs|||call routine to compute hash|27209
-|tfn06|rmi|3,tfnsi|||compute hash index by remaindering|27213
-||mfi|8,wc|||get as one word integer|27214
-||wtb|8,wc|||convert to byte offset|27215
-||mov|7,xl|9,(xs)||get table ptr again|27216
-||add|7,xl|8,wc||point to proper bucket|27217
-||mov|7,xr|13,tbbuk(xl)||load first teblk pointer|27218
-||beq|7,xr|9,(xs)|6,tfn10|jump if no teblks on chain|27219
-|tfn07|mov|8,wb|7,xr||save teblk pointer|27223
-||mov|7,xr|13,tesub(xr)||load subscript value|27224
-||mov|7,xl|12,1(xs)||load input argument subscript val|27225
-||jsr|6,ident|||compare them|27226
-||ppm|6,tfn08|||jump if equal (ident)|27227
-||mov|7,xl|8,wb||restore teblk pointer|27231
-||mov|7,xr|13,tenxt(xl)||point to next teblk on chain|27232
-||bne|7,xr|9,(xs)|6,tfn07|jump if there is one|27233
-||mov|8,wc|19,*tenxt||set offset to link field (xl base)|27237
-||brn|6,tfn11|||jump to merge|27238
-||ejc|||||27239
-|tfn08|mov|7,xl|8,wb||restore teblk pointer|27245
-||mov|8,wa|19,*teval||set teblk name offset|27246
-||mov|8,wb|12,2(xs)||restore name/value indicator|27247
-||bnz|8,wb|6,tfn09||jump if called by name|27248
-||jsr|6,acess|||else get value|27249
-||ppm|6,tfn12|||jump if reference fails|27250
-||zer|8,wb|||restore name/value indicator|27251
-|tfn09|add|7,xs|19,*num03||pop stack entries|27255
-||exi||||return to tfind caller|27256
-|tfn10|add|8,wc|19,*tbbuk||get offset to bucket ptr|27260
-||mov|7,xl|9,(xs)||set tbblk ptr as base|27261
-|tfn11|mov|7,xr|9,(xs)||tbblk pointer|27265
-||mov|7,xr|13,tbinv(xr)||load default value in case|27266
-||mov|8,wb|12,2(xs)||load name/value indicator|27267
-||bze|8,wb|6,tfn09||exit with default if value call|27268
-||mov|8,wb|7,xr||copy default value|27269
-||mov|8,wa|19,*tesi_||set size of teblk|27273
-||jsr|6,alloc|||allocate teblk|27274
-||add|7,xl|8,wc||point to hash link|27275
-||mov|9,(xl)|7,xr||link new teblk at end of chain|27276
-||mov|9,(xr)|22,=b_tet||store type word|27277
-||mov|13,teval(xr)|8,wb||set default as initial value|27278
-||mov|13,tenxt(xr)|10,(xs)+||set tbblk ptr to mark end of chain|27279
-||mov|13,tesub(xr)|10,(xs)+||store subscript value|27280
-||mov|8,wb|10,(xs)+||restore name/value indicator|27281
-||mov|7,xl|7,xr||copy teblk pointer (name base)|27282
-||mov|8,wa|19,*teval||set offset|27283
-||exi||||return to caller with new teblk|27284
-|tfn12|exi|1,1|||alternative return|27288
-||enp||||end procedure tfind|27289
-||ejc|||||27290
-|tmake|prc|25,e|1,0|||27300
-||mov|8,wa|8,wc||copy number of headers|27301
-||add|8,wa|18,=tbsi_||adjust for standard fields|27302
-||wtb|8,wa|||convert length to bytes|27303
-||jsr|6,alloc|||allocate space for tbblk|27304
-||mov|8,wb|7,xr||copy pointer to tbblk|27305
-||mov|10,(xr)+|22,=b_tbt||store type word|27306
-||zer|10,(xr)+|||zero id for the moment|27307
-||mov|10,(xr)+|8,wa||store length (tblen)|27308
-||mov|10,(xr)+|7,xl||store initial lookup value|27309
-||lct|8,wc|8,wc||set loop counter (num headers)|27310
-|tma01|mov|10,(xr)+|8,wb||store tbblk ptr in bucket header|27314
-||bct|8,wc|6,tma01||loop till all stored|27315
-||mov|7,xr|8,wb||recall pointer to tbblk|27316
-||exi|||||27317
-||enp|||||27318
-||ejc|||||27319
-|vmake|prc|25,e|1,1||entry point|27331
-||lct|8,wb|8,wa||copy elements for loop later on|27332
-||add|8,wa|18,=vcsi_||add space for standard fields|27333
-||wtb|8,wa|||convert length to bytes|27334
-||bgt|8,wa|3,mxlen|6,vmak2|fail if too large|27335
-||jsr|6,alloc|||allocate space for vcblk|27336
-||mov|9,(xr)|22,=b_vct||store type word|27337
-||zer|13,idval(xr)|||initialize idval|27338
-||mov|13,vclen(xr)|8,wa||set length|27339
-||mov|8,wc|7,xl||copy default value|27340
-||mov|7,xl|7,xr||copy vcblk pointer|27341
-||add|7,xl|19,*vcvls||point to first element value|27342
-|vmak1|mov|10,(xl)+|8,wc||store one value|27346
-||bct|8,wb|6,vmak1||loop till all stored|27347
-||exi||||success return|27348
-|vmak2|exi|1,1|||fail return|27352
-||enp|||||27353
-||ejc|||||27354
-||ejc|||||27402
-||ejc|||||27447
-|scane|prc|25,e|1,0||entry point|27453
-||zer|3,scnbl|||reset blanks flag|27454
-||mov|3,scnsa|8,wa||save wa|27455
-||mov|3,scnsb|8,wb||save wb|27456
-||mov|3,scnsc|8,wc||save wc|27457
-||bze|3,scnrs|6,scn03||jump if no rescan|27458
-||mov|7,xl|3,scntp||set previous returned scan type|27462
-||mov|7,xr|3,r_scp||set previous returned pointer|27463
-||zer|3,scnrs|||reset rescan switch|27464
-||brn|6,scn13|||jump to exit|27465
-|scn01|jsr|6,readr|||read next image|27469
-||mov|8,wb|19,*dvubs||set wb for not reading name|27470
-||bze|7,xr|6,scn30||treat as semi-colon if none|27471
-||plc|7,xr|||else point to first character|27472
-||lch|8,wc|9,(xr)||load first character|27473
-||beq|8,wc|18,=ch_dt|6,scn02|jump if dot for continuation|27474
-||bne|8,wc|18,=ch_pl|6,scn30|else treat as semicolon unless plus|27475
-|scn02|jsr|6,nexts|||acquire next source image|27479
-||mov|3,scnpt|18,=num01||set scan pointer past continuation|27480
-||mnz|3,scnbl|||set blanks flag|27481
-||ejc|||||27482
-|scn03|mov|8,wa|3,scnpt||load current offset|27488
-||beq|8,wa|3,scnil|6,scn01|check continuation if end|27489
-||mov|7,xl|3,r_cim||point to current line|27490
-||plc|7,xl|8,wa||point to current character|27491
-||mov|3,scnse|8,wa||set start of element location|27492
-||mov|8,wc|21,=opdvs||point to operator dv list|27493
-||mov|8,wb|19,*dvubs||set constant for operator circuit|27494
-||brn|6,scn06|||start scanning|27495
-|scn05|bze|8,wb|6,scn10||jump if trailing|27499
-||icv|3,scnse|||increment start of element|27500
-||beq|8,wa|3,scnil|6,scn01|jump if end of image|27501
-||mnz|3,scnbl|||note blanks seen|27502
-|scn06|lch|7,xr|10,(xl)+||get next character|27514
-||icv|8,wa|||bump scan offset|27515
-||mov|3,scnpt|8,wa||store offset past char scanned|27516
-||bsw|7,xr|2,cfp_u|6,scn07|switch on scanned character|27518
-||ejc|||||27545
-||ejc|||||27601
-||iff|1,0|6,scn07|||27634
-||iff|1,1|6,scn07|||27634
-||iff|1,2|6,scn07|||27634
-||iff|1,3|6,scn07|||27634
-||iff|1,4|6,scn07|||27634
-||iff|1,5|6,scn07|||27634
-||iff|1,6|6,scn07|||27634
-||iff|1,7|6,scn07|||27634
-||iff|1,8|6,scn07|||27634
-||iff|2,ch_ht|6,scn05||horizontal tab|27634
-||iff|1,10|6,scn07|||27634
-||iff|1,11|6,scn07|||27634
-||iff|1,12|6,scn07|||27634
-||iff|1,13|6,scn07|||27634
-||iff|1,14|6,scn07|||27634
-||iff|1,15|6,scn07|||27634
-||iff|1,16|6,scn07|||27634
-||iff|1,17|6,scn07|||27634
-||iff|1,18|6,scn07|||27634
-||iff|1,19|6,scn07|||27634
-||iff|1,20|6,scn07|||27634
-||iff|1,21|6,scn07|||27634
-||iff|1,22|6,scn07|||27634
-||iff|1,23|6,scn07|||27634
-||iff|1,24|6,scn07|||27634
-||iff|1,25|6,scn07|||27634
-||iff|1,26|6,scn07|||27634
-||iff|1,27|6,scn07|||27634
-||iff|1,28|6,scn07|||27634
-||iff|1,29|6,scn07|||27634
-||iff|1,30|6,scn07|||27634
-||iff|1,31|6,scn07|||27634
-||iff|2,ch_bl|6,scn05||blank|27634
-||iff|2,ch_ex|6,scn37||exclamation mark|27634
-||iff|2,ch_dq|6,scn17||double quote|27634
-||iff|2,ch_nm|6,scn41||number sign|27634
-||iff|2,ch_dl|6,scn36||dollar|27634
-||iff|2,ch_pc|6,scn38||percent|27634
-||iff|2,ch_am|6,scn44||ampersand|27634
-||iff|2,ch_sq|6,scn16||single quote|27634
-||iff|2,ch_pp|6,scn25||left paren|27634
-||iff|2,ch_rp|6,scn26||right paren|27634
-||iff|2,ch_as|6,scn49||asterisk|27634
-||iff|2,ch_pl|6,scn33||plus|27634
-||iff|2,ch_cm|6,scn31||comma|27634
-||iff|2,ch_mn|6,scn34||minus|27634
-||iff|2,ch_dt|6,scn32||dot|27634
-||iff|2,ch_sl|6,scn40||slash|27634
-||iff|2,ch_d0|6,scn08||digit 0|27634
-||iff|2,ch_d1|6,scn08||digit 1|27634
-||iff|2,ch_d2|6,scn08||digit 2|27634
-||iff|2,ch_d3|6,scn08||digit 3|27634
-||iff|2,ch_d4|6,scn08||digit 4|27634
-||iff|2,ch_d5|6,scn08||digit 5|27634
-||iff|2,ch_d6|6,scn08||digit 6|27634
-||iff|2,ch_d7|6,scn08||digit 7|27634
-||iff|2,ch_d8|6,scn08||digit 8|27634
-||iff|2,ch_d9|6,scn08||digit 9|27634
-||iff|2,ch_cl|6,scn29||colon|27634
-||iff|2,ch_sm|6,scn30||semi-colon|27634
-||iff|2,ch_bb|6,scn28||left bracket|27634
-||iff|2,ch_eq|6,scn46||equal|27634
-||iff|2,ch_rb|6,scn27||right bracket|27634
-||iff|2,ch_qu|6,scn45||question mark|27634
-||iff|2,ch_at|6,scn42||at|27634
-||iff|2,ch_ua|6,scn09||shifted a|27634
-||iff|2,ch_ub|6,scn09||shifted b|27634
-||iff|2,ch_uc|6,scn09||shifted c|27634
-||iff|2,ch_ud|6,scn09||shifted d|27634
-||iff|2,ch_ue|6,scn09||shifted e|27634
-||iff|2,ch_uf|6,scn20||shifted f|27634
-||iff|2,ch_ug|6,scn09||shifted g|27634
-||iff|2,ch_uh|6,scn09||shifted h|27634
-||iff|2,ch_ui|6,scn09||shifted i|27634
-||iff|2,ch_uj|6,scn09||shifted j|27634
-||iff|2,ch_uk|6,scn09||shifted k|27634
-||iff|2,ch_ul|6,scn09||shifted l|27634
-||iff|2,ch_um|6,scn09||shifted m|27634
-||iff|2,ch_un|6,scn09||shifted n|27634
-||iff|2,ch_uo|6,scn09||shifted o|27634
-||iff|2,ch_up|6,scn09||shifted p|27634
-||iff|2,ch_uq|6,scn09||shifted q|27634
-||iff|2,ch_ur|6,scn09||shifted r|27634
-||iff|2,ch_us|6,scn21||shifted s|27634
-||iff|2,ch_ut|6,scn09||shifted t|27634
-||iff|2,ch_uu|6,scn09||shifted u|27634
-||iff|2,ch_uv|6,scn09||shifted v|27634
-||iff|2,ch_uw|6,scn09||shifted w|27634
-||iff|2,ch_ux|6,scn09||shifted x|27634
-||iff|2,ch_uy|6,scn09||shifted y|27634
-||iff|2,ch_uz|6,scn09||shifted z|27634
-||iff|2,ch_ob|6,scn28||left bracket|27634
-||iff|1,92|6,scn07|||27634
-||iff|2,ch_cb|6,scn27||right bracket|27634
-||iff|2,ch_ey|6,scn37||up arrow|27634
-||iff|2,ch_u_|6,scn24||underline|27634
-||iff|1,96|6,scn07|||27634
-||iff|2,ch_la|6,scn09||letter a|27634
-||iff|2,ch_lb|6,scn09||letter b|27634
-||iff|2,ch_lc|6,scn09||letter c|27634
-||iff|2,ch_ld|6,scn09||letter d|27634
-||iff|2,ch_le|6,scn09||letter e|27634
-||iff|2,ch_lf|6,scn20||letter f|27634
-||iff|2,ch_lg|6,scn09||letter g|27634
-||iff|2,ch_lh|6,scn09||letter h|27634
-||iff|2,ch_li|6,scn09||letter i|27634
-||iff|2,ch_lj|6,scn09||letter j|27634
-||iff|2,ch_lk|6,scn09||letter k|27634
-||iff|2,ch_ll|6,scn09||letter l|27634
-||iff|2,ch_lm|6,scn09||letter m|27634
-||iff|2,ch_ln|6,scn09||letter n|27634
-||iff|2,ch_lo|6,scn09||letter o|27634
-||iff|2,ch_lp|6,scn09||letter p|27634
-||iff|2,ch_lq|6,scn09||letter q|27634
-||iff|2,ch_lr|6,scn09||letter r|27634
-||iff|2,ch_ls|6,scn21||letter s|27634
-||iff|2,ch_lt|6,scn09||letter t|27634
-||iff|2,ch_lu|6,scn09||letter u|27634
-||iff|2,ch_lv|6,scn09||letter v|27634
-||iff|2,ch_lw|6,scn09||letter w|27634
-||iff|2,ch_lx|6,scn09||letter x|27634
-||iff|2,ch_ly|6,scn09||letter y|27634
-||iff|2,ch_l_|6,scn09||letter z|27634
-||iff|1,123|6,scn07|||27634
-||iff|2,ch_br|6,scn43||vertical bar|27634
-||iff|1,125|6,scn07|||27634
-||iff|2,ch_nt|6,scn35||not|27634
-||iff|1,127|6,scn07|||27634
-||esw||||end switch on character|27634
-|scn07|bze|8,wb|6,scn10||jump if scanning name or constant|27638
-||erb|1,230|26,syntax error: illegal character|||27639
-||ejc|||||27640
-|scn08|bze|8,wb|6,scn09||keep scanning if name/constant|27646
-||zer|8,wc|||else set flag for scanning constant|27647
-|scn09|beq|8,wa|3,scnil|6,scn11|jump if end of image|27651
-||zer|8,wb|||set flag for scanning name/const|27652
-||brn|6,scn06|||merge back to continue scan|27653
-|scn10|dcv|8,wa|||reset offset to point to delimiter|27657
-|scn11|mov|3,scnpt|8,wa||store updated scan offset|27661
-||mov|8,wb|3,scnse||point to start of element|27662
-||sub|8,wa|8,wb||get number of characters|27663
-||mov|7,xl|3,r_cim||point to line image|27664
-||bnz|8,wc|6,scn15||jump if name|27665
-||jsr|6,sbstr|||get string for constant|27669
-||mov|3,dnamp|7,xr||delete from storage (not needed)|27670
-||jsr|6,gtnum|||convert to numeric|27671
-||ppm|6,scn14|||jump if conversion failure|27672
-|scn12|mov|7,xl|18,=t_con||set result type of constant|27676
-||ejc|||||27677
-|scn13|mov|8,wa|3,scnsa||restore wa|27683
-||mov|8,wb|3,scnsb||restore wb|27684
-||mov|8,wc|3,scnsc||restore wc|27685
-||mov|3,r_scp|7,xr||save xr in case rescan|27686
-||mov|3,scntp|7,xl||save xl in case rescan|27687
-||zer|3,scngo|||reset possible goto flag|27688
-||exi||||return to scane caller|27689
-|scn14|erb|1,231|26,syntax error: invalid numeric item|||27693
-|scn15|jsr|6,sbstr|||build string name of variable|27697
-||bnz|3,scncc|6,scn13||return if cncrd call|27698
-||jsr|6,gtnvr|||locate/build vrblk|27699
-||ppm||||dummy (unused) error return|27700
-||mov|7,xl|18,=t_var||set type as variable|27701
-||brn|6,scn13|||back to exit|27702
-|scn16|bze|8,wb|6,scn10||terminator if scanning name or cnst|27706
-||mov|8,wb|18,=ch_sq||set terminator as single quote|27707
-||brn|6,scn18|||merge|27708
-|scn17|bze|8,wb|6,scn10||terminator if scanning name or cnst|27712
-||mov|8,wb|18,=ch_dq||set double quote terminator, merge|27713
-|scn18|beq|8,wa|3,scnil|6,scn19|error if end of image|27717
-||lch|8,wc|10,(xl)+||else load next character|27718
-||icv|8,wa|||bump offset|27719
-||bne|8,wc|8,wb|6,scn18|loop back if not terminator|27720
-||ejc|||||27721
-||mov|8,wb|3,scnpt||point to first character|27727
-||mov|3,scnpt|8,wa||save offset past final quote|27728
-||dcv|8,wa|||point back past last character|27729
-||sub|8,wa|8,wb||get number of characters|27730
-||mov|7,xl|3,r_cim||point to input image|27731
-||jsr|6,sbstr|||build substring value|27732
-||brn|6,scn12|||back to exit with constant result|27733
-|scn19|mov|3,scnpt|8,wa||set updated scan pointer|27737
-||erb|1,232|26,syntax error: unmatched string quote|||27738
-|scn20|mov|7,xr|18,=t_fgo||set return code for fail goto|27742
-||brn|6,scn22|||jump to merge|27743
-|scn21|mov|7,xr|18,=t_sgo||set success goto as return code|27747
-|scn22|bze|3,scngo|6,scn09||treat as normal letter if not goto|27751
-|scn23|bze|8,wb|6,scn10||jump if end of name/constant|27755
-||mov|7,xl|7,xr||else copy code|27756
-||brn|6,scn13|||and jump to exit|27757
-|scn24|bze|8,wb|6,scn09||part of name if scanning name|27761
-||brn|6,scn07|||else illegal|27762
-||ejc|||||27763
-|scn25|mov|7,xr|18,=t_lpr||set left paren return code|27769
-||bnz|8,wb|6,scn23||return left paren unless name|27770
-||bze|8,wc|6,scn10||delimiter if scanning constant|27771
-||mov|8,wb|3,scnse||point to start of name|27775
-||mov|3,scnpt|8,wa||set pointer past left paren|27776
-||dcv|8,wa|||point back past last char of name|27777
-||sub|8,wa|8,wb||get name length|27778
-||mov|7,xl|3,r_cim||point to input image|27779
-||jsr|6,sbstr|||get string name for function|27780
-||jsr|6,gtnvr|||locate/build vrblk|27781
-||ppm||||dummy (unused) error return|27782
-||mov|7,xl|18,=t_fnc||set code for function call|27783
-||brn|6,scn13|||back to exit|27784
-|scn26|mov|7,xr|18,=t_rpr||right paren, set code|27788
-||brn|6,scn23|||take special character exit|27789
-|scn27|mov|7,xr|18,=t_rbr||right bracket, set code|27791
-||brn|6,scn23|||take special character exit|27792
-|scn28|mov|7,xr|18,=t_lbr||left bracket, set code|27794
-||brn|6,scn23|||take special character exit|27795
-|scn29|mov|7,xr|18,=t_col||colon, set code|27797
-||brn|6,scn23|||take special character exit|27798
-|scn30|mov|7,xr|18,=t_smc||semi-colon, set code|27800
-||brn|6,scn23|||take special character exit|27801
-|scn31|mov|7,xr|18,=t_cma||comma, set code|27803
-||brn|6,scn23|||take special character exit|27804
-||ejc|||||27805
-|scn32|bze|8,wb|6,scn09||dot can be part of name or constant|27817
-||add|8,wc|8,wb||else bump pointer|27818
-|scn33|bze|8,wc|6,scn09||plus can be part of constant|27820
-||bze|8,wb|6,scn48||plus cannot be part of name|27821
-||add|8,wc|8,wb||else bump pointer|27822
-|scn34|bze|8,wc|6,scn09||minus can be part of constant|27824
-||bze|8,wb|6,scn48||minus cannot be part of name|27825
-||add|8,wc|8,wb||else bump pointer|27826
-|scn35|add|8,wc|8,wb||not|27828
-|scn36|add|8,wc|8,wb||dollar|27829
-|scn37|add|8,wc|8,wb||exclamation|27830
-|scn38|add|8,wc|8,wb||percent|27831
-|scn39|add|8,wc|8,wb||asterisk|27832
-|scn40|add|8,wc|8,wb||slash|27833
-|scn41|add|8,wc|8,wb||number sign|27834
-|scn42|add|8,wc|8,wb||at sign|27835
-|scn43|add|8,wc|8,wb||vertical bar|27836
-|scn44|add|8,wc|8,wb||ampersand|27837
-|scn45|add|8,wc|8,wb||question mark|27838
-|scn46|bze|8,wb|6,scn10||operator terminates name/constant|27843
-||mov|7,xr|8,wc||else copy dv pointer|27844
-||lch|8,wc|9,(xl)||load next character|27845
-||mov|7,xl|18,=t_bop||set binary op in case|27846
-||beq|8,wa|3,scnil|6,scn47|should be binary if image end|27847
-||beq|8,wc|18,=ch_bl|6,scn47|should be binary if followed by blk|27848
-||beq|8,wc|18,=ch_ht|6,scn47|jump if horizontal tab|27850
-||beq|8,wc|18,=ch_sm|6,scn47|semicolon can immediately follow =|27855
-||beq|8,wc|18,=ch_cl|6,scn47|colon can immediately follow =|27856
-||beq|8,wc|18,=ch_rp|6,scn47|right paren can immediately follow =|27857
-||beq|8,wc|18,=ch_rb|6,scn47|right bracket can immediately follow =|27858
-||beq|8,wc|18,=ch_cb|6,scn47|right bracket can immediately follow =|27859
-||add|7,xr|19,*dvbs_||point to dv for unary op|27863
-||mov|7,xl|18,=t_uop||set type for unary operator|27864
-||ble|3,scntp|18,=t_uok|6,scn13|ok unary if ok preceding element|27865
-||ejc|||||27866
-|scn47|bnz|3,scnbl|6,scn13||all ok if preceding blanks, exit|27872
-|scn48|erb|1,233|26,syntax error: invalid use of operator|||27876
-|scn49|bze|8,wb|6,scn10||end of name if scanning name|27880
-||beq|8,wa|3,scnil|6,scn39|not ** if * at image end|27881
-||mov|7,xr|8,wa||else save offset past first *|27882
-||mov|3,scnof|8,wa||save another copy|27883
-||lch|8,wa|10,(xl)+||load next character|27884
-||bne|8,wa|18,=ch_as|6,scn50|not ** if next char not *|27885
-||icv|7,xr|||else step offset past second *|27886
-||beq|7,xr|3,scnil|6,scn51|ok exclam if end of image|27887
-||lch|8,wa|9,(xl)||else load next character|27888
-||beq|8,wa|18,=ch_bl|6,scn51|exclamation if blank|27889
-||beq|8,wa|18,=ch_ht|6,scn51|exclamation if horizontal tab|27891
-|scn50|mov|8,wa|3,scnof||recover stored offset|27899
-||mov|7,xl|3,r_cim||point to line again|27900
-||plc|7,xl|8,wa||point to current char|27901
-||brn|6,scn39|||merge with unary *|27902
-|scn51|mov|3,scnpt|7,xr||save scan pointer past 2nd *|27906
-||mov|8,wa|7,xr||copy scan pointer|27907
-||brn|6,scn37|||merge with exclamation|27908
-||enp||||end procedure scane|27909
-||ejc|||||27910
-|scngf|prc|25,e|1,0||entry point|27927
-||jsr|6,scane|||scan initial element|27928
-||beq|7,xl|18,=t_lpr|6,scng1|skip if left paren (normal goto)|27929
-||beq|7,xl|18,=t_lbr|6,scng2|skip if left bracket (direct goto)|27930
-||erb|1,234|26,syntax error: goto field incorrect|||27931
-|scng1|mov|8,wb|18,=num01||set expan flag for normal goto|27935
-||jsr|6,expan|||analyze goto field|27936
-||mov|8,wa|21,=opdvn||point to opdv for complex goto|27937
-||ble|7,xr|3,statb|6,scng3|jump if not in static (sgd15)|27938
-||blo|7,xr|3,state|6,scng4|jump to exit if simple label name|27939
-||brn|6,scng3|||complex goto - merge|27940
-|scng2|mov|8,wb|18,=num02||set expan flag for direct goto|27944
-||jsr|6,expan|||scan goto field|27945
-||mov|8,wa|21,=opdvd||set opdv pointer for direct goto|27946
-||ejc|||||27947
-|scng3|mov|11,-(xs)|8,wa||stack operator dv pointer|27953
-||mov|11,-(xs)|7,xr||stack pointer to expression tree|27954
-||jsr|6,expop|||pop operator off|27955
-||mov|7,xr|10,(xs)+||reload new expression tree pointer|27956
-|scng4|exi||||return to caller|27960
-||enp||||end procedure scngf|27961
-||ejc|||||27962
-|setvr|prc|25,e|1,0||entry point|27977
-||bhi|7,xr|3,state|6,setv1|exit if not natural variable|27978
-||mov|7,xl|7,xr||copy vrblk pointer|27982
-||mov|13,vrget(xr)|22,=b_vrl||store normal get value|27983
-||beq|13,vrsto(xr)|22,=b_vre|6,setv1|skip if protected variable|27984
-||mov|13,vrsto(xr)|22,=b_vrs||store normal store value|27985
-||mov|7,xl|13,vrval(xl)||point to next entry on chain|27986
-||bne|9,(xl)|22,=b_trt|6,setv1|jump if end of trblk chain|27987
-||mov|13,vrget(xr)|22,=b_vra||store trapped routine address|27988
-||mov|13,vrsto(xr)|22,=b_vrv||set trapped routine address|27989
-|setv1|exi||||return to setvr caller|27993
-||enp||||end procedure setvr|27994
-||ejc|||||27997
-||ejc|||||28034
-|sorta|prc|25,n|1,1||entry point|28038
-||mov|3,srtsr|8,wa||sort/rsort indicator|28039
-||mov|3,srtst|19,*num01||default stride of 1|28040
-||zer|3,srtof|||default zero offset to sort key|28041
-||mov|3,srtdf|21,=nulls||clear datatype field name|28042
-||mov|3,r_sxr|10,(xs)+||unstack argument 2|28043
-||mov|7,xr|10,(xs)+||get first argument|28044
-||mnz|8,wa|||use key/values of table entries|28045
-||jsr|6,gtarr|||convert to array|28046
-||ppm|6,srt18|||signal that table is empty|28047
-||ppm|6,srt16|||error if non-convertable|28048
-||mov|11,-(xs)|7,xr||stack ptr to resulting key array|28049
-||mov|11,-(xs)|7,xr||another copy for copyb|28050
-||jsr|6,copyb|||get copy array for sorting into|28051
-||ppm||||cant fail|28052
-||mov|11,-(xs)|7,xr||stack pointer to sort array|28053
-||mov|7,xr|3,r_sxr||get second arg|28054
-||mov|7,xl|13,num01(xs)||get ptr to key array|28055
-||bne|9,(xl)|22,=b_vct|6,srt02|jump if arblk|28056
-||beq|7,xr|21,=nulls|6,srt01|jump if null second arg|28057
-||jsr|6,gtnvr|||get vrblk ptr for it|28058
-||err|1,257|26,erroneous 2nd arg in sort/rsort of vector|||28059
-||mov|3,srtdf|7,xr||store datatype field name vrblk|28060
-|srt01|mov|8,wc|19,*vclen||offset to a(0)|28064
-||mov|8,wb|19,*vcvls||offset to first item|28065
-||mov|8,wa|13,vclen(xl)||get block length|28066
-||sub|8,wa|19,*vcsi_||get no. of entries, n (in bytes)|28067
-||brn|6,srt04|||merge|28068
-|srt02|ldi|13,ardim(xl)|||get possible dimension|28072
-||mfi|8,wa|||convert to short integer|28073
-||wtb|8,wa|||further convert to baus|28074
-||mov|8,wb|19,*arvls||offset to first value if one|28075
-||mov|8,wc|19,*arpro||offset before values if one dim.|28076
-||beq|13,arndm(xl)|18,=num01|6,srt04|jump in fact if one dim.|28077
-||bne|13,arndm(xl)|18,=num02|6,srt16|fail unless two dimens|28078
-||ldi|13,arlb2(xl)|||get lower bound 2 as default|28079
-||beq|7,xr|21,=nulls|6,srt03|jump if default second arg|28080
-||jsr|6,gtint|||convert to integer|28081
-||ppm|6,srt17|||fail|28082
-||ldi|13,icval(xr)|||get actual integer value|28083
-||ejc|||||28084
-|srt03|sbi|13,arlb2(xl)|||subtract low bound|28090
-||iov|6,srt17|||fail if overflow|28091
-||ilt|6,srt17|||fail if below low bound|28092
-||sbi|13,ardm2(xl)|||check against dimension|28093
-||ige|6,srt17|||fail if too large|28094
-||adi|13,ardm2(xl)|||restore value|28095
-||mfi|8,wa|||get as small integer|28096
-||wtb|8,wa|||offset within row to key|28097
-||mov|3,srtof|8,wa||keep offset|28098
-||ldi|13,ardm2(xl)|||second dimension is row length|28099
-||mfi|8,wa|||convert to short integer|28100
-||mov|7,xr|8,wa||copy row length|28101
-||wtb|8,wa|||convert to bytes|28102
-||mov|3,srtst|8,wa||store as stride|28103
-||ldi|13,ardim(xl)|||get number of rows|28104
-||mfi|8,wa|||as a short integer|28105
-||wtb|8,wa|||convert n to baus|28106
-||mov|8,wc|13,arlen(xl)||offset past array end|28107
-||sub|8,wc|8,wa||adjust, giving space for n offsets|28108
-||dca|8,wc|||point to a(0)|28109
-||mov|8,wb|13,arofs(xl)||offset to word before first item|28110
-||ica|8,wb|||offset to first item|28111
-|srt04|ble|8,wa|19,*num01|6,srt15|return if only a single item|28123
-||mov|3,srtsn|8,wa||store number of items (in baus)|28124
-||mov|3,srtso|8,wc||store offset to a(0)|28125
-||mov|8,wc|13,arlen(xl)||length of array or vec (=vclen)|28126
-||add|8,wc|7,xl||point past end of array or vector|28127
-||mov|3,srtsf|8,wb||store offset to first row|28128
-||add|7,xl|8,wb||point to first item in key array|28129
-|srt05|mov|7,xr|9,(xl)||get an entry|28133
-|srt06|bne|9,(xr)|22,=b_trt|6,srt07|jump out if not trblk|28137
-||mov|7,xr|13,trval(xr)||get value field|28138
-||brn|6,srt06|||loop|28139
-||ejc|||||28140
-|srt07|mov|10,(xl)+|7,xr||store as array entry|28146
-||blt|7,xl|8,wc|6,srt05|loop if not done|28147
-||mov|7,xl|9,(xs)||get adrs of sort array|28148
-||mov|7,xr|3,srtsf||initial offset to first key|28149
-||mov|8,wb|3,srtst||get stride|28150
-||add|7,xl|3,srtso||offset to a(0)|28151
-||ica|7,xl|||point to a(1)|28152
-||mov|8,wc|3,srtsn||get n|28153
-||btw|8,wc|||convert from bytes|28154
-||mov|3,srtnr|8,wc||store as row count|28155
-||lct|8,wc|8,wc||loop counter|28156
-|srt08|mov|10,(xl)+|7,xr||store an offset|28160
-||add|7,xr|8,wb||bump offset by stride|28161
-||bct|8,wc|6,srt08||loop through rows|28162
-|srt09|mov|8,wa|3,srtsn||get n|28169
-||mov|8,wc|3,srtnr||get number of rows|28170
-||rsh|8,wc|1,1||i = n / 2 (wc=i, index into array)|28171
-||wtb|8,wc|||convert back to bytes|28172
-|srt10|jsr|6,sorth|||sorth(i,n)|28176
-||dca|8,wc|||i = i - 1|28177
-||bnz|8,wc|6,srt10||loop if i gt 0|28178
-||mov|8,wc|8,wa||i = n|28179
-|srt11|dca|8,wc|||i = i - 1 (n - 1 initially)|28185
-||bze|8,wc|6,srt12||jump if done|28186
-||mov|7,xr|9,(xs)||get sort array address|28187
-||add|7,xr|3,srtso||point to a(0)|28188
-||mov|7,xl|7,xr||a(0) address|28189
-||add|7,xl|8,wc||a(i) address|28190
-||mov|8,wb|13,num01(xl)||copy a(i+1)|28191
-||mov|13,num01(xl)|13,num01(xr)||move a(1) to a(i+1)|28192
-||mov|13,num01(xr)|8,wb||complete exchange of a(1), a(i+1)|28193
-||mov|8,wa|8,wc||n = i for sorth|28194
-||mov|8,wc|19,*num01||i = 1 for sorth|28195
-||jsr|6,sorth|||sorth(1,n)|28196
-||mov|8,wc|8,wa||restore wc|28197
-||brn|6,srt11|||loop|28198
-||ejc|||||28199
-|srt12|mov|7,xr|9,(xs)||base adrs of key array|28206
-||mov|8,wc|7,xr||copy it|28207
-||add|8,wc|3,srtso||offset of a(0)|28208
-||add|7,xr|3,srtsf||adrs of first row of sort array|28209
-||mov|8,wb|3,srtst||get stride|28210
-|srt13|ica|8,wc|||adrs of next of sorted offsets|28215
-||mov|7,xl|8,wc||copy it for access|28216
-||mov|7,xl|9,(xl)||get offset|28217
-||add|7,xl|13,num01(xs)||add key array base adrs|28218
-||mov|8,wa|8,wb||get count of characters in row|28219
-||mvw||||copy a complete row|28220
-||dcv|3,srtnr|||decrement row count|28221
-||bnz|3,srtnr|6,srt13||repeat till all rows done|28222
-|srt15|mov|7,xr|10,(xs)+||pop result array ptr|28226
-||ica|7,xs|||pop key array ptr|28227
-||zer|3,r_sxl|||clear junk|28228
-||zer|3,r_sxr|||clear junk|28229
-||exi||||return|28230
-|srt16|erb|1,256|26,sort/rsort 1st arg not suitable array or table|||28234
-|srt17|erb|1,258|26,sort/rsort 2nd arg out of range or non-integer|||28235
-|srt18|exi|1,1|||return indication of null table|28239
-||enp||||end procudure sorta|28240
-||ejc|||||28241
-|sortc|prc|25,e|1,1||entry point|28262
-||mov|3,srts1|8,wa||save offset 1|28263
-||mov|3,srts2|8,wb||save offset 2|28264
-||mov|3,srtsc|8,wc||save wc|28265
-||add|7,xl|3,srtof||add offset to comparand field|28266
-||mov|7,xr|7,xl||copy base + offset|28267
-||add|7,xl|8,wa||add key1 offset|28268
-||add|7,xr|8,wb||add key2 offset|28269
-||mov|7,xl|9,(xl)||get key1|28270
-||mov|7,xr|9,(xr)||get key2|28271
-||bne|3,srtdf|21,=nulls|6,src12|jump if datatype field name used|28272
-||ejc|||||28273
-|src01|mov|8,wc|9,(xl)||get type code|28279
-||bne|8,wc|9,(xr)|6,src02|skip if not same datatype|28280
-||beq|8,wc|22,=b_scl|6,src09|jump if both strings|28281
-||beq|8,wc|22,=b_icl|6,src14|jump if both integers|28282
-|src02|mov|3,r_sxl|7,xl||keep arg1|28290
-||mov|3,r_sxr|7,xr||keep arg2|28291
-||beq|8,wc|22,=b_scl|6,src11|do not allow conversion to number|28294
-||beq|9,(xr)|22,=b_scl|6,src11|if either arg is a string|28295
-|src14|mov|11,-(xs)|7,xl||stack|28338
-||mov|11,-(xs)|7,xr||args|28339
-||jsr|6,acomp|||compare objects|28340
-||ppm|6,src10|||not numeric|28341
-||ppm|6,src10|||not numeric|28342
-||ppm|6,src03|||key1 less|28343
-||ppm|6,src08|||keys equal|28344
-||ppm|6,src05|||key1 greater|28345
-|src03|bnz|3,srtsr|6,src06||jump if rsort|28349
-|src04|mov|8,wc|3,srtsc||restore wc|28351
-||exi|1,1|||return|28352
-|src05|bnz|3,srtsr|6,src04||jump if rsort|28356
-|src06|mov|8,wc|3,srtsc||restore wc|28358
-||exi||||return|28359
-|src07|blt|7,xl|7,xr|6,src03|item first created is less|28363
-||bgt|7,xl|7,xr|6,src05|addresses rise in order of creation|28364
-|src08|blt|3,srts1|3,srts2|6,src04|test offsets or key addrss instead|28368
-||brn|6,src06|||offset 1 greater|28369
-||ejc|||||28370
-|src09|mov|11,-(xs)|7,xl||stack|28380
-||mov|11,-(xs)|7,xr||args|28381
-||jsr|6,lcomp|||compare objects|28382
-||ppm||||cant|28383
-||ppm||||fail|28384
-||ppm|6,src03|||key1 less|28385
-||ppm|6,src08|||keys equal|28386
-||ppm|6,src05|||key1 greater|28387
-|src10|mov|7,xl|3,r_sxl||get arg1|28391
-||mov|7,xr|3,r_sxr||get arg2|28392
-||mov|8,wc|9,(xl)||get type of key1|28393
-||beq|8,wc|9,(xr)|6,src07|jump if keys of same type|28394
-|src11|mov|7,xl|8,wc||get block type word|28398
-||mov|7,xr|9,(xr)||get block type word|28399
-||lei|7,xl|||entry point id for key1|28400
-||lei|7,xr|||entry point id for key2|28401
-||bgt|7,xl|7,xr|6,src05|jump if key1 gt key2|28402
-||brn|6,src03|||key1 lt key2|28403
-|src12|jsr|6,sortf|||call routine to find field 1|28407
-||mov|11,-(xs)|7,xl||stack item pointer|28408
-||mov|7,xl|7,xr||get key2|28409
-||jsr|6,sortf|||find field 2|28410
-||mov|7,xr|7,xl||place as key2|28411
-||mov|7,xl|10,(xs)+||recover key1|28412
-||brn|6,src01|||merge|28413
-||enp||||procedure sortc|28414
-||ejc|||||28415
-|sortf|prc|25,e|1,0||entry point|28433
-||bne|9,(xl)|22,=b_pdt|6,srtf3|return if not pdblk|28434
-||mov|11,-(xs)|7,xr||keep xr|28435
-||mov|7,xr|3,srtfd||get possible former dfblk ptr|28436
-||bze|7,xr|6,srtf4||jump if not|28437
-||bne|7,xr|13,pddfp(xl)|6,srtf4|jump if not right datatype|28438
-||bne|3,srtdf|3,srtff|6,srtf4|jump if not right field name|28439
-||add|7,xl|3,srtfo||add offset to required field|28440
-|srtf1|mov|7,xl|9,(xl)||get item from field|28444
-|srtf2|mov|7,xr|10,(xs)+||restore xr|28448
-|srtf3|exi||||return|28450
-||ejc|||||28451
-|srtf4|mov|7,xr|7,xl||copy original pointer|28457
-||mov|7,xr|13,pddfp(xr)||point to dfblk|28458
-||mov|3,srtfd|7,xr||keep a copy|28459
-||mov|8,wc|13,fargs(xr)||get number of fields|28460
-||wtb|8,wc|||convert to bytes|28461
-||add|7,xr|13,dflen(xr)||point past last field|28462
-|srtf5|dca|8,wc|||count down|28466
-||dca|7,xr|||point in front|28467
-||beq|9,(xr)|3,srtdf|6,srtf6|skip out if found|28468
-||bnz|8,wc|6,srtf5||loop|28469
-||brn|6,srtf2|||return - not found|28470
-|srtf6|mov|3,srtff|9,(xr)||keep field name ptr|28474
-||add|8,wc|19,*pdfld||add offset to first field|28475
-||mov|3,srtfo|8,wc||store as field offset|28476
-||add|7,xl|8,wc||point to field|28477
-||brn|6,srtf1|||return|28478
-||enp||||procedure sortf|28479
-||ejc|||||28480
-|sorth|prc|25,n|1,0||entry point|28495
-||mov|3,srtsn|8,wa||save n|28496
-||mov|3,srtwc|8,wc||keep wc|28497
-||mov|7,xl|9,(xs)||sort array base adrs|28498
-||add|7,xl|3,srtso||add offset to a(0)|28499
-||add|7,xl|8,wc||point to a(j)|28500
-||mov|3,srtrt|9,(xl)||get offset to root|28501
-||add|8,wc|8,wc||double j - cant exceed n|28502
-|srh01|bgt|8,wc|3,srtsn|6,srh03|done if j gt n|28506
-||beq|8,wc|3,srtsn|6,srh02|skip if j equals n|28507
-||mov|7,xr|9,(xs)||sort array base adrs|28508
-||mov|7,xl|13,num01(xs)||key array base adrs|28509
-||add|7,xr|3,srtso||point to a(0)|28510
-||add|7,xr|8,wc||adrs of a(j)|28511
-||mov|8,wa|13,num01(xr)||get a(j+1)|28512
-||mov|8,wb|9,(xr)||get a(j)|28513
-||jsr|6,sortc|||compare keys - lt(a(j+1),a(j))|28517
-||ppm|6,srh02|||a(j+1) lt a(j)|28518
-||ica|8,wc|||point to greater son, a(j+1)|28519
-||ejc|||||28520
-|srh02|mov|7,xl|13,num01(xs)||key array base adrs|28526
-||mov|7,xr|9,(xs)||get sort array address|28527
-||add|7,xr|3,srtso||adrs of a(0)|28528
-||mov|8,wb|7,xr||copy this adrs|28529
-||add|7,xr|8,wc||adrs of greater son, a(j)|28530
-||mov|8,wa|9,(xr)||get a(j)|28531
-||mov|7,xr|8,wb||point back to a(0)|28532
-||mov|8,wb|3,srtrt||get root|28533
-||jsr|6,sortc|||compare them - lt(a(j),root)|28534
-||ppm|6,srh03|||father exceeds sons - done|28535
-||mov|7,xr|9,(xs)||get sort array adrs|28536
-||add|7,xr|3,srtso||point to a(0)|28537
-||mov|7,xl|7,xr||copy it|28538
-||mov|8,wa|8,wc||copy j|28539
-||btw|8,wc|||convert to words|28540
-||rsh|8,wc|1,1||get j/2|28541
-||wtb|8,wc|||convert back to bytes|28542
-||add|7,xl|8,wa||point to a(j)|28543
-||add|7,xr|8,wc||adrs of a(j/2)|28544
-||mov|9,(xr)|9,(xl)||a(j/2) = a(j)|28545
-||mov|8,wc|8,wa||recover j|28546
-||aov|8,wc|8,wc|6,srh03|j = j*2. done if too big|28547
-||brn|6,srh01|||loop|28548
-|srh03|btw|8,wc|||convert to words|28552
-||rsh|8,wc|1,1||j = j/2|28553
-||wtb|8,wc|||convert back to bytes|28554
-||mov|7,xr|9,(xs)||sort array adrs|28555
-||add|7,xr|3,srtso||adrs of a(0)|28556
-||add|7,xr|8,wc||adrs of a(j/2)|28557
-||mov|9,(xr)|3,srtrt||a(j/2) = root|28558
-||mov|8,wa|3,srtsn||restore wa|28559
-||mov|8,wc|3,srtwc||restore wc|28560
-||exi||||return|28561
-||enp||||end procedure sorth|28562
-||ejc|||||28564
-|trace|prc|25,n|1,2||entry point|28580
-||jsr|6,gtstg|||get trace type string|28581
-||ppm|6,trc15|||jump if not string|28582
-||plc|7,xr|||else point to string|28583
-||lch|8,wa|9,(xr)||load first character|28584
-||flc|8,wa|||fold to upper case|28586
-||mov|7,xr|9,(xs)||load name argument|28588
-||mov|9,(xs)|7,xl||stack trblk ptr or zero|28589
-||mov|8,wc|18,=trtac||set trtyp for access trace|28590
-||beq|8,wa|18,=ch_la|6,trc10|jump if a (access)|28591
-||mov|8,wc|18,=trtvl||set trtyp for value trace|28592
-||beq|8,wa|18,=ch_lv|6,trc10|jump if v (value)|28593
-||beq|8,wa|18,=ch_bl|6,trc10|jump if blank (value)|28594
-||beq|8,wa|18,=ch_lf|6,trc01|jump if f (function)|28598
-||beq|8,wa|18,=ch_lr|6,trc01|jump if r (return)|28599
-||beq|8,wa|18,=ch_ll|6,trc03|jump if l (label)|28600
-||beq|8,wa|18,=ch_lk|6,trc06|jump if k (keyword)|28601
-||bne|8,wa|18,=ch_lc|6,trc15|else error if not c (call)|28602
-|trc01|jsr|6,gtnvr|||point to vrblk for name|28606
-||ppm|6,trc16|||jump if bad name|28607
-||ica|7,xs|||pop stack|28608
-||mov|7,xr|13,vrfnc(xr)||point to function block|28609
-||bne|9,(xr)|22,=b_pfc|6,trc17|error if not program function|28610
-||beq|8,wa|18,=ch_lr|6,trc02|jump if r (return)|28611
-||ejc|||||28612
-||mov|13,pfctr(xr)|7,xl||set/reset call trace|28618
-||beq|8,wa|18,=ch_lc|6,exnul|exit with null if c (call)|28619
-|trc02|mov|13,pfrtr(xr)|7,xl||set/reset return trace|28623
-||exi||||return|28624
-|trc03|jsr|6,gtnvr|||point to vrblk|28628
-||ppm|6,trc16|||jump if bad name|28629
-||mov|7,xl|13,vrlbl(xr)||load label pointer|28630
-||bne|9,(xl)|22,=b_trt|6,trc04|jump if no old trace|28631
-||mov|7,xl|13,trlbl(xl)||else delete old trace association|28632
-|trc04|beq|7,xl|21,=stndl|6,trc16|error if undefined label|28636
-||mov|8,wb|10,(xs)+||get trblk ptr again|28637
-||bze|8,wb|6,trc05||jump if stoptr case|28638
-||mov|13,vrlbl(xr)|8,wb||else set new trblk pointer|28639
-||mov|13,vrtra(xr)|22,=b_vrt||set label trace routine address|28640
-||mov|7,xr|8,wb||copy trblk pointer|28641
-||mov|13,trlbl(xr)|7,xl||store real label in trblk|28642
-||exi||||return|28643
-|trc05|mov|13,vrlbl(xr)|7,xl||store label ptr back in vrblk|28647
-||mov|13,vrtra(xr)|22,=b_vrg||store normal transfer address|28648
+|lcmp2|bhi|8,wb|8,wc|6,lcmp4|jump if arg 1 length gt arg 2 leng|25074
+|lcmp3|exi|1,3|||take llt exit|25079
+|lcmp4|exi|1,5|||take lgt exit|25083
+|lcmp5|exi|1,1|||take bad first arg exit|25087
+|lcmp6|exi|1,2|||take bad second arg error exit|25091
+||enp||||end procedure lcomp|25092
+||ejc|||||25093
+|listr|prc|25,e|1,0||entry point|25132
+||bnz|3,cnttl|6,list5||jump if -title or -stitl|25133
+||bnz|3,lstpf|6,list4||immediate exit if already listed|25134
+||bge|3,lstlc|3,lstnp|6,list6|jump if no room|25135
+|list0|mov|7,xr|3,r_cim||load pointer to current image|25139
+||bze|7,xr|6,list4||jump if no image to print|25140
+||plc|7,xr|||point to characters|25141
+||lch|8,wa|9,(xr)||load first character|25142
+||mov|7,xr|3,lstsn||load statement number|25143
+||bze|7,xr|6,list2||jump if no statement number|25144
+||mti|7,xr|||else get stmnt number as integer|25145
+||bne|3,stage|18,=stgic|6,list1|skip if execute time|25146
+||beq|8,wa|18,=ch_as|6,list2|no stmnt number list if comment|25147
+||beq|8,wa|18,=ch_mn|6,list2|no stmnt no. if control card|25148
+|list1|jsr|6,prtin|||else print statement number|25152
+||zer|3,lstsn|||and clear for next time in|25153
+|list2|mov|7,xr|3,lstid||include depth of image|25158
+||bze|7,xr|6,list8||if not from an include file|25159
+||mov|8,wa|18,=stnpd||position for start of statement|25160
+||sub|8,wa|18,=num03||position to place include depth|25161
+||mov|3,profs|8,wa||set as starting position|25162
+||mti|7,xr|||include depth as integer|25163
+||jsr|6,prtin|||print include depth|25164
+||ejc|||||25165
+|list8|mov|3,profs|18,=stnpd||point past statement number|25171
+||mov|7,xr|3,r_cim||load pointer to current image|25181
+||jsr|6,prtst|||print it|25182
+||icv|3,lstlc|||bump line counter|25183
+||bnz|3,erlst|6,list3||jump if error copy to int.ch.|25184
+||jsr|6,prtnl|||terminate line|25185
+||bze|3,cswdb|6,list3||jump if -single mode|25186
+||jsr|6,prtnl|||else add a blank line|25187
+||icv|3,lstlc|||and bump line counter|25188
+|list3|mnz|3,lstpf|||set flag for line printed|25192
+|list4|exi||||return to listr caller|25196
+|list5|zer|3,cnttl|||clear flag|25200
+|list6|jsr|6,prtps|||eject|25204
+||bze|3,prich|6,list7||skip if listing to regular printer|25205
+||beq|3,r_ttl|21,=nulls|6,list0|terminal listing omits null title|25206
+|list7|jsr|6,listt|||list title|25210
+||brn|6,list0|||merge|25211
+||enp||||end procedure listr|25212
+||ejc|||||25213
+|listt|prc|25,e|1,0||entry point|25222
+||mov|7,xr|3,r_ttl||point to source listing title|25223
+||jsr|6,prtst|||print title|25224
+||mov|3,profs|3,lstpo||set offset|25225
+||mov|7,xr|21,=lstms||set page message|25226
+||jsr|6,prtst|||print page message|25227
+||icv|3,lstpg|||bump page number|25228
+||mti|3,lstpg|||load page number as integer|25229
+||jsr|6,prtin|||print page number|25230
+||jsr|6,prtnl|||terminate title line|25231
+||add|3,lstlc|18,=num02||count title line and blank line|25232
+||mov|7,xr|3,r_stl||load pointer to sub-title|25236
+||bze|7,xr|6,lstt1||jump if no sub-title|25237
+||jsr|6,prtst|||else print sub-title|25238
+||jsr|6,prtnl|||terminate line|25239
+||icv|3,lstlc|||bump line count|25240
+|lstt1|jsr|6,prtnl|||print a blank line|25244
+||exi||||return to caller|25245
+||enp||||end procedure listt|25246
+||ejc|||||25247
+|newfn|prc|25,e|1,0||entry point|25264
+||mov|11,-(xs)|7,xr||save new name|25265
+||mov|7,xl|3,r_sfc||load previous name|25266
+||jsr|6,ident|||check for equality|25267
+||ppm|6,nwfn1|||jump if identical|25268
+||mov|7,xr|10,(xs)+||different, restore name|25269
+||mov|3,r_sfc|7,xr||record current file name|25270
+||mov|8,wb|3,cmpsn||get current statement|25271
+||mti|8,wb|||convert to integer|25272
+||jsr|6,icbld|||build icblk for stmt number|25273
+||mov|7,xl|3,r_sfn||file name table|25274
+||mnz|8,wb|||lookup statement number by name|25275
+||jsr|6,tfind|||allocate new teblk|25276
+||ppm||||always possible to allocate block|25277
+||mov|13,teval(xl)|3,r_sfc||record file name as entry value|25278
+||exi|||||25279
+|nwfn1|ica|7,xs|||pop stack|25283
+||exi|||||25284
+||ejc|||||25285
+|nexts|prc|25,e|1,0||entry point|25317
+||bze|3,cswls|6,nxts2||jump if -nolist|25318
+||mov|7,xr|3,r_cim||point to image|25319
+||bze|7,xr|6,nxts2||jump if no image|25320
+||plc|7,xr|||get char ptr|25321
+||lch|8,wa|9,(xr)||get first char|25322
+||bne|8,wa|18,=ch_mn|6,nxts1|jump if not ctrl card|25323
+||bze|3,cswpr|6,nxts2||jump if -noprint|25324
+|nxts1|jsr|6,listr|||list line|25328
+|nxts2|mov|7,xr|3,r_cni||point to next image|25332
+||mov|3,r_cim|7,xr||set as next image|25333
+||mov|3,rdcln|3,rdnln||set as current line number|25334
+||mov|3,lstid|3,cnind||set as current include depth|25336
+||zer|3,r_cni|||clear next image pointer|25338
+||mov|8,wa|13,sclen(xr)||get input image length|25339
+||mov|8,wb|3,cswin||get max allowable length|25340
+||blo|8,wa|8,wb|6,nxts3|skip if not too long|25341
+||mov|8,wa|8,wb||else truncate|25342
+|nxts3|mov|3,scnil|8,wa||use as record length|25346
+||zer|3,scnse|||reset scnse|25347
+||zer|3,lstpf|||set line not listed yet|25348
+||exi||||return to nexts caller|25349
+||enp||||end procedure nexts|25350
+||ejc|||||25351
+|patin|prc|25,n|1,2||entry point|25367
+||mov|7,xl|8,wa||preserve expression arg pcode|25368
+||jsr|6,gtsmi|||try to convert arg as small integer|25369
+||ppm|6,ptin2|||jump if not integer|25370
+||ppm|6,ptin3|||jump if out of range|25371
+|ptin1|jsr|6,pbild|||build pattern node|25375
+||exi||||return to caller|25376
+|ptin2|mov|8,wb|7,xl||copy expr arg case pcode|25380
+||blo|9,(xr)|22,=b_e__|6,ptin1|all ok if expression arg|25381
+||exi|1,1|||else take error exit for wrong type|25382
+|ptin3|exi|1,2|||take out-of-range error exit|25386
+||enp||||end procedure patin|25387
+||ejc|||||25388
+|patst|prc|25,n|1,1||entry point|25412
+||jsr|6,gtstg|||convert argument as string|25413
+||ppm|6,pats7|||jump if not string|25414
+||bze|8,wa|6,pats7||jump if null string (catspaw)|25415
+||bne|8,wa|18,=num01|6,pats2|jump if not one char string|25416
+||bze|8,wb|6,pats2||treat as multi-char if evals call|25420
+||plc|7,xr|||point to character|25421
+||lch|7,xr|9,(xr)||load character|25422
+|pats1|jsr|6,pbild|||call routine to build node|25426
+||exi||||return to patst caller|25427
+||ejc|||||25428
+|pats2|mov|11,-(xs)|7,xl||save multi-char pcode|25434
+||mov|8,wc|3,ctmsk||load current mask bit|25435
+||beq|7,xr|3,r_cts|6,pats6|jump if same as last string c3.738|25436
+||mov|11,-(xs)|7,xr||save string pointer|25437
+||lsh|8,wc|1,1||shift to next position|25438
+||nzb|8,wc|6,pats4||skip if position left in this tbl|25439
+||mov|8,wa|19,*ctsi_||set size of ctblk|25443
+||jsr|6,alloc|||allocate ctblk|25444
+||mov|3,r_ctp|7,xr||store ptr to new ctblk|25445
+||mov|10,(xr)+|22,=b_ctt||store type code, bump ptr|25446
+||lct|8,wb|18,=cfp_a||set number of words to clear|25447
+||mov|8,wc|4,bits0||load all zero bits|25448
+|pats3|mov|10,(xr)+|8,wc||move word of zero bits|25452
+||bct|8,wb|6,pats3||loop till all cleared|25453
+||mov|8,wc|4,bits1||set initial bit position|25454
+|pats4|mov|3,ctmsk|8,wc||save parm2 (new bit position)|25458
+||mov|7,xl|10,(xs)+||restore pointer to argument string|25459
+||mov|3,r_cts|7,xl||save for next time   c3.738|25460
+||mov|8,wb|13,sclen(xl)||load string length|25461
+||bze|8,wb|6,pats6||jump if null string case|25462
+||lct|8,wb|8,wb||else set loop counter|25463
+||plc|7,xl|||point to characters in argument|25464
+||ejc|||||25465
+|pats5|lch|8,wa|10,(xl)+||load next character|25471
+||wtb|8,wa|||convert to byte offset|25472
+||mov|7,xr|3,r_ctp||point to ctblk|25473
+||add|7,xr|8,wa||point to ctblk entry|25474
+||mov|8,wa|8,wc||copy bit mask|25475
+||orb|8,wa|13,ctchs(xr)||or in bits already set|25476
+||mov|13,ctchs(xr)|8,wa||store resulting bit string|25477
+||bct|8,wb|6,pats5||loop till all bits set|25478
+|pats6|mov|7,xr|3,r_ctp||load ctblk ptr as parm1 for pbild|25482
+||zer|7,xl|||clear garbage ptr in xl|25483
+||mov|8,wb|10,(xs)+||load pcode for multi-char str case|25484
+||brn|6,pats1|||back to exit (wc=bitstring=parm2)|25485
+|pats7|mov|8,wb|8,wc||set pcode for expression argument|25492
+||blo|9,(xr)|22,=b_e__|6,pats1|jump to exit if expression arg|25493
+||exi|1,1|||else take wrong type error exit|25494
+||enp||||end procedure patst|25495
+||ejc|||||25496
+|pbild|prc|25,e|1,0||entry point|25507
+||mov|11,-(xs)|7,xr||stack possible parm1|25508
+||mov|7,xr|8,wb||copy pcode|25509
+||lei|7,xr|||load entry point id (bl_px)|25510
+||beq|7,xr|18,=bl_p1|6,pbld1|jump if one parameter|25511
+||beq|7,xr|18,=bl_p0|6,pbld3|jump if no parameters|25512
+||mov|8,wa|19,*pcsi_||set size of p2blk|25516
+||jsr|6,alloc|||allocate block|25517
+||mov|13,parm2(xr)|8,wc||store second parameter|25518
+||brn|6,pbld2|||merge with one parm case|25519
+|pbld1|mov|8,wa|19,*pbsi_||set size of p1blk|25523
+||jsr|6,alloc|||allocate node|25524
+|pbld2|mov|13,parm1(xr)|9,(xs)||store first parameter|25528
+||brn|6,pbld4|||merge with no parameter case|25529
+|pbld3|mov|8,wa|19,*pasi_||set size of p0blk|25533
+||jsr|6,alloc|||allocate node|25534
+|pbld4|mov|9,(xr)|8,wb||store pcode|25538
+||ica|7,xs|||pop first parameter|25539
+||mov|13,pthen(xr)|21,=ndnth||set nothen successor pointer|25540
+||exi||||return to pbild caller|25541
+||enp||||end procedure pbild|25542
+||ejc|||||25543
+|pconc|prc|25,e|1,0||entry point|25578
+||zer|11,-(xs)|||make room for one entry at bottom|25579
+||mov|8,wc|7,xs||store pointer to start of list|25580
+||mov|11,-(xs)|21,=ndnth||stack nothen node as old node|25581
+||mov|11,-(xs)|7,xl||store right arg as copy of nothen|25582
+||mov|7,xt|7,xs||initialize pointer to stack entries|25583
+||jsr|6,pcopy|||copy first node of left arg|25584
+||mov|13,num02(xt)|8,wa||store as result under list|25585
+||ejc|||||25586
+|pcnc1|beq|7,xt|7,xs|6,pcnc2|jump if all entries processed|25593
+||mov|7,xr|11,-(xt)||else load next old address|25594
+||mov|7,xr|13,pthen(xr)||load pointer to successor|25595
+||jsr|6,pcopy|||copy successor node|25596
+||mov|7,xr|11,-(xt)||load pointer to new node (copy)|25597
+||mov|13,pthen(xr)|8,wa||store ptr to new successor|25598
+||bne|9,(xr)|22,=p_alt|6,pcnc1|loop back if not|25603
+||mov|7,xr|13,parm1(xr)||else load pointer to alternative|25604
+||jsr|6,pcopy|||copy it|25605
+||mov|7,xr|9,(xt)||restore ptr to new node|25606
+||mov|13,parm1(xr)|8,wa||store ptr to copied alternative|25607
+||brn|6,pcnc1|||loop back for next entry|25608
+|pcnc2|mov|7,xs|8,wc||restore stack pointer|25612
+||mov|7,xr|10,(xs)+||load pointer to copy|25613
+||exi||||return to pconc caller|25614
+||enp||||end procedure pconc|25615
+||ejc|||||25616
+|pcopy|prc|25,n|1,0||entry point|25631
+||mov|8,wb|7,xt||save xt|25632
+||mov|7,xt|8,wc||point to start of list|25633
+|pcop1|dca|7,xt|||point to next entry on list|25637
+||beq|7,xr|9,(xt)|6,pcop2|jump if match|25638
+||dca|7,xt|||else skip over copied address|25639
+||bne|7,xt|7,xs|6,pcop1|loop back if more to test|25640
+||mov|8,wa|9,(xr)||load first word of block|25644
+||jsr|6,blkln|||get length of block|25645
+||mov|7,xl|7,xr||save pointer to old node|25646
+||jsr|6,alloc|||allocate space for copy|25647
+||mov|11,-(xs)|7,xl||store old address on list|25648
+||mov|11,-(xs)|7,xr||store new address on list|25649
+||chk||||check for stack overflow|25650
+||mvw||||move words from old block to copy|25651
+||mov|8,wa|9,(xs)||load pointer to copy|25652
+||brn|6,pcop3|||jump to exit|25653
+|pcop2|mov|8,wa|11,-(xt)||load address of copy from list|25657
+|pcop3|mov|7,xt|8,wb||restore xt|25661
+||exi||||return to pcopy caller|25662
+||enp||||end procedure pcopy|25663
+||ejc|||||25664
+|prflr|prc|25,e|1,0|||25675
+||bze|3,pfdmp|6,prfl4||no printing if no profiling done|25676
+||mov|11,-(xs)|7,xr||preserve entry xr|25677
+||mov|3,pfsvw|8,wb||and also wb|25678
+||jsr|6,prtpg|||eject|25679
+||mov|7,xr|21,=pfms1||load msg /program profile/|25680
+||jsr|6,prtst|||and print it|25681
+||jsr|6,prtnl|||followed by newline|25682
+||jsr|6,prtnl|||and another|25683
+||mov|7,xr|21,=pfms2||point to first hdr|25684
+||jsr|6,prtst|||print it|25685
+||jsr|6,prtnl|||new line|25686
+||mov|7,xr|21,=pfms3||second hdr|25687
+||jsr|6,prtst|||print it|25688
+||jsr|6,prtnl|||new line|25689
+||jsr|6,prtnl|||and another blank line|25690
+||zer|8,wb|||initial stmt count|25691
+||mov|7,xr|3,pftbl||point to table origin|25692
+||add|7,xr|19,*xndta||bias past xnblk header (sgd07)|25693
+|prfl1|icv|8,wb|||bump stmt nr|25697
+||ldi|9,(xr)|||load nr of executions|25698
+||ieq|6,prfl3|||no printing if zero|25699
+||mov|3,profs|18,=pfpd1||point where to print|25700
+||jsr|6,prtin|||and print it|25701
+||zer|3,profs|||back to start of line|25702
+||mti|8,wb|||load stmt nr|25703
+||jsr|6,prtin|||print it there|25704
+||mov|3,profs|18,=pfpd2||and pad past count|25705
+||ldi|13,cfp_i(xr)|||load total exec time|25706
+||jsr|6,prtin|||print that too|25707
+||ldi|13,cfp_i(xr)|||reload time|25708
+||mli|4,intth|||convert to microsec|25709
+||iov|6,prfl2|||omit next bit if overflow|25710
+||dvi|9,(xr)|||divide by executions|25711
+||mov|3,profs|18,=pfpd3||pad last print|25712
+||jsr|6,prtin|||and print mcsec/execn|25713
+|prfl2|jsr|6,prtnl|||thats another line|25717
+|prfl3|add|7,xr|19,*pf_i2||bump index ptr (sgd07)|25721
+||blt|8,wb|3,pfnte|6,prfl1|loop if more stmts|25722
+||mov|7,xr|10,(xs)+||restore callers xr|25723
+||mov|8,wb|3,pfsvw||and wb too|25724
+|prfl4|exi||||return|25728
+||enp||||end of prflr|25729
+||ejc|||||25730
+|prflu|prc|25,e|1,0|||25739
+||bnz|3,pffnc|6,pflu4||skip if just entered function|25740
+||mov|11,-(xs)|7,xr||preserve entry xr|25741
+||mov|3,pfsvw|8,wa||save wa (sgd07)|25742
+||bnz|3,pftbl|6,pflu2||branch if table allocated|25743
+||sub|3,pfnte|18,=num01||adjust for extra count (sgd07)|25753
+||mti|4,pfi2a|||convrt entry size to int|25754
+||sti|3,pfste|||and store safely for later|25755
+||mti|3,pfnte|||load table length as integer|25756
+||mli|3,pfste|||multiply by entry size|25757
+||mfi|8,wa|||get back address-style|25758
+||add|8,wa|18,=num02||add on 2 word overhead|25759
+||wtb|8,wa|||convert the whole lot to bytes|25760
+||jsr|6,alost|||gimme the space|25761
+||mov|3,pftbl|7,xr||save block pointer|25762
+||mov|10,(xr)+|22,=b_xnt||put block type and ...|25763
+||mov|10,(xr)+|8,wa||... length into header|25764
+||mfi|8,wa|||get back nr of wds in data area|25765
+||lct|8,wa|8,wa||load the counter|25766
+|pflu1|zer|10,(xr)+|||blank a word|25770
+||bct|8,wa|6,pflu1||and alllllll the rest|25771
+|pflu2|mti|3,kvstn|||load nr of stmt just ended|25775
+||sbi|4,intv1|||make into index offset|25776
+||mli|3,pfste|||make offset of table entry|25777
+||mfi|8,wa|||convert to address|25778
+||wtb|8,wa|||get as baus|25779
+||add|8,wa|19,*num02||offset includes table header|25780
+||mov|7,xr|3,pftbl||get table start|25781
+||bge|8,wa|13,num01(xr)|6,pflu3|if out of table, skip it|25782
+||add|7,xr|8,wa||else point to entry|25783
+||ldi|9,(xr)|||get nr of executions so far|25784
+||adi|4,intv1|||nudge up one|25785
+||sti|9,(xr)|||and put back|25786
+||jsr|6,systm|||get time now|25787
+||sti|3,pfetm|||stash ending time|25788
+||sbi|3,pfstm|||subtract start time|25789
+||adi|13,cfp_i(xr)|||add cumulative time so far|25790
+||sti|13,cfp_i(xr)|||and put back new total|25791
+||ldi|3,pfetm|||load end time of this stmt ...|25792
+||sti|3,pfstm|||... which is start time of next|25793
+|pflu3|mov|7,xr|10,(xs)+||restore callers xr|25797
+||mov|8,wa|3,pfsvw||restore saved reg|25798
+||exi||||and return|25799
+|pflu4|zer|3,pffnc|||reset the condition flag|25805
+||exi||||and immediate return|25806
+||enp||||end of procedure prflu|25807
+||ejc|||||25808
+|prpar|prc|25,e|1,0||entry point|25821
+||bnz|8,wc|6,prpa8||jump to associate terminal|25822
+||jsr|6,syspp|||get print parameters|25823
+||bnz|8,wb|6,prpa1||jump if lines/page specified|25824
+||mov|8,wb|3,mxint||else use a large value|25825
+||rsh|8,wb|1,1||but not too large|25826
+|prpa1|mov|3,lstnp|8,wb||store number of lines/page|25830
+||mov|3,lstlc|8,wb||pretend page is full initially|25831
+||zer|3,lstpg|||clear page number|25832
+||mov|8,wb|3,prlen||get prior length if any|25833
+||bze|8,wb|6,prpa2||skip if no length|25834
+||bgt|8,wa|8,wb|6,prpa3|skip storing if too big|25835
+|prpa2|mov|3,prlen|8,wa||store value|25839
+|prpa3|mov|8,wb|4,bits3||bit 3 mask|25843
+||anb|8,wb|8,wc||get -nolist bit|25844
+||zrb|8,wb|6,prpa4||skip if clear|25845
+||zer|3,cswls|||set -nolist|25846
+|prpa4|mov|8,wb|4,bits1||bit 1 mask|25850
+||anb|8,wb|8,wc||get bit|25851
+||mov|3,erich|8,wb||store int. chan. error flag|25852
+||mov|8,wb|4,bits2||bit 2 mask|25853
+||anb|8,wb|8,wc||get bit|25854
+||mov|3,prich|8,wb||flag for std printer on int. chan.|25855
+||mov|8,wb|4,bits4||bit 4 mask|25856
+||anb|8,wb|8,wc||get bit|25857
+||mov|3,cpsts|8,wb||flag for compile stats suppressn.|25858
+||mov|8,wb|4,bits5||bit 5 mask|25859
+||anb|8,wb|8,wc||get bit|25860
+||mov|3,exsts|8,wb||flag for exec stats suppression|25861
+||ejc|||||25862
+||mov|8,wb|4,bits6||bit 6 mask|25866
+||anb|8,wb|8,wc||get bit|25867
+||mov|3,precl|8,wb||extended/compact listing flag|25868
+||sub|8,wa|18,=num08||point 8 chars from line end|25869
+||zrb|8,wb|6,prpa5||jump if not extended|25870
+||mov|3,lstpo|8,wa||store for listing page headings|25871
+|prpa5|mov|8,wb|4,bits7||bit 7 mask|25875
+||anb|8,wb|8,wc||get bit 7|25876
+||mov|3,cswex|8,wb||set -noexecute if non-zero|25877
+||mov|8,wb|4,bit10||bit 10 mask|25878
+||anb|8,wb|8,wc||get bit 10|25879
+||mov|3,headp|8,wb||pretend printed to omit headers|25880
+||mov|8,wb|4,bits9||bit 9 mask|25881
+||anb|8,wb|8,wc||get bit 9|25882
+||mov|3,prsto|8,wb||keep it as std listing option|25883
+||mov|8,wb|8,wc||copy flags|25885
+||rsh|8,wb|1,12||right justify bit 13|25886
+||anb|8,wb|4,bits1||get bit|25887
+||mov|3,kvcas|8,wb||set -case|25888
+||mov|8,wb|4,bit12||bit 12 mask|25890
+||anb|8,wb|8,wc||get bit 12|25891
+||mov|3,cswer|8,wb||keep it as errors/noerrors option|25892
+||zrb|8,wb|6,prpa6||skip if clear|25893
+||mov|8,wa|3,prlen||get print buffer length|25894
+||sub|8,wa|18,=num08||point 8 chars from line end|25895
+||mov|3,lstpo|8,wa||store page offset|25896
+|prpa6|mov|8,wb|4,bit11||bit 11 mask|25900
+||anb|8,wb|8,wc||get bit 11|25901
+||mov|3,cswpr|8,wb||set -print if non-zero|25902
+||anb|8,wc|4,bits8||see if terminal to be activated|25906
+||bnz|8,wc|6,prpa8||jump if terminal required|25907
+||bze|3,initr|6,prpa9||jump if no terminal to detach|25908
+||mov|7,xl|21,=v_ter||ptr to /terminal/|25909
+||jsr|6,gtnvr|||get vrblk pointer|25910
+||ppm||||cant fail|25911
+||mov|13,vrval(xr)|21,=nulls||clear value of terminal|25912
+||jsr|6,setvr|||remove association|25913
+||brn|6,prpa9|||return|25914
+|prpa8|mnz|3,initr|||note terminal associated|25918
+||bze|3,dnamb|6,prpa9||cant if memory not organised|25919
+||mov|7,xl|21,=v_ter||point to terminal string|25920
+||mov|8,wb|18,=trtou||output trace type|25921
+||jsr|6,inout|||attach output trblk to vrblk|25922
+||mov|11,-(xs)|7,xr||stack trblk ptr|25923
+||mov|7,xl|21,=v_ter||point to terminal string|25924
+||mov|8,wb|18,=trtin||input trace type|25925
+||jsr|6,inout|||attach input trace blk|25926
+||mov|13,vrval(xr)|10,(xs)+||add output trblk to chain|25927
+|prpa9|exi||||return|25931
+||enp||||end procedure prpar|25932
+||ejc|||||25933
+|prtch|prc|25,e|1,0||entry point|25942
+||mov|11,-(xs)|7,xr||save xr|25943
+||bne|3,profs|3,prlen|6,prch1|jump if room in buffer|25944
+||jsr|6,prtnl|||else print this line|25945
+|prch1|mov|7,xr|3,prbuf||point to print buffer|25949
+||psc|7,xr|3,profs||point to next character location|25950
+||sch|8,wa|9,(xr)||store new character|25951
+||csc|7,xr|||complete store characters|25952
+||icv|3,profs|||bump pointer|25953
+||mov|7,xr|10,(xs)+||restore entry xr|25954
+||exi||||return to prtch caller|25955
+||enp||||end procedure prtch|25956
+||ejc|||||25957
+|prtic|prc|25,e|1,0||entry point|25969
+||mov|11,-(xs)|7,xr||save xr|25970
+||mov|7,xr|3,prbuf||point to buffer|25971
+||mov|8,wa|3,profs||no of chars|25972
+||jsr|6,syspi|||print|25973
+||ppm|6,prtc2|||fail return|25974
+|prtc1|mov|7,xr|10,(xs)+||restore xr|25978
+||exi||||return|25979
+|prtc2|zer|3,erich|||prevent looping|25983
+||erb|1,252|26,error on printing to interactive channel|||25984
+||brn|6,prtc1|||return|25985
+||enp||||procedure prtic|25986
+||ejc|||||25987
+|prtis|prc|25,e|1,0||entry point|26000
+||bnz|3,prich|6,prts1||jump if standard printer is int.ch.|26001
+||bze|3,erich|6,prts1||skip if not doing int. error reps.|26002
+||jsr|6,prtic|||print to interactive channel|26003
+|prts1|jsr|6,prtnl|||print to standard printer|26007
+||exi||||return|26008
+||enp||||end procedure prtis|26009
+||ejc|||||26010
+|prtin|prc|25,e|1,0||entry point|26022
+||mov|11,-(xs)|7,xr||save xr|26023
+||jsr|6,icbld|||build integer block|26024
+||blo|7,xr|3,dnamb|6,prti1|jump if icblk below dynamic|26025
+||bhi|7,xr|3,dnamp|6,prti1|jump if above dynamic|26026
+||mov|3,dnamp|7,xr||immediately delete it|26027
+|prti1|mov|11,-(xs)|7,xr||stack ptr for gtstg|26031
+||jsr|6,gtstg|||convert to string|26032
+||ppm||||convert error is impossible|26033
+||mov|3,dnamp|7,xr||reset pointer to delete scblk|26034
+||jsr|6,prtst|||print integer string|26035
+||mov|7,xr|10,(xs)+||restore entry xr|26036
+||exi||||return to prtin caller|26037
+||enp||||end procedure prtin|26038
+||ejc|||||26039
+|prtmi|prc|25,e|1,0||entry point|26049
+||jsr|6,prtst|||print string message|26050
+||mov|3,profs|18,=prtmf||set column offset|26051
+||jsr|6,prtin|||print integer|26052
+||jsr|6,prtnl|||print line|26053
+||exi||||return to prtmi caller|26054
+||enp||||end procedure prtmi|26055
+||ejc|||||26056
+|prtmm|prc|25,e|1,0|||26065
+||mov|8,wa|3,dnamp||next available loc|26066
+||sub|8,wa|3,statb||minus start|26067
+||mti|8,wa|||convert to integer|26072
+||mov|7,xr|21,=encm1||point to /memory used (words)/|26073
+||jsr|6,prtmi|||print message|26074
+||mov|8,wa|3,dname||end of memory|26075
+||sub|8,wa|3,dnamp||minus next available loc|26076
+||mti|8,wa|||convert to integer|26081
+||mov|7,xr|21,=encm2||point to /memory available (words)/|26082
+||jsr|6,prtmi|||print line|26083
+||exi||||return to prtmm caller|26084
+||enp||||end of procedure prtmm|26085
+||ejc|||||26086
+|prtmx|prc|25,e|1,0||entry point|26093
+||jsr|6,prtst|||print string message|26094
+||mov|3,profs|18,=prtmf||set column offset|26095
+||jsr|6,prtin|||print integer|26096
+||jsr|6,prtis|||print line|26097
+||exi||||return|26098
+||enp||||end procedure prtmx|26099
+||ejc|||||26100
+|prtnl|prc|25,r|1,0||entry point|26109
+||bnz|3,headp|6,prnl0||were headers printed|26110
+||jsr|6,prtps|||no - print them|26111
+|prnl0|mov|11,-(xs)|7,xr||save entry xr|26115
+||mov|3,prtsa|8,wa||save wa|26116
+||mov|3,prtsb|8,wb||save wb|26117
+||mov|7,xr|3,prbuf||load pointer to buffer|26118
+||mov|8,wa|3,profs||load number of chars in buffer|26119
+||jsr|6,syspr|||call system print routine|26120
+||ppm|6,prnl2|||jump if failed|26121
+||lct|8,wa|3,prlnw||load length of buffer in words|26122
+||add|7,xr|19,*schar||point to chars of buffer|26123
+||mov|8,wb|4,nullw||get word of blanks|26124
+|prnl1|mov|10,(xr)+|8,wb||store word of blanks, bump ptr|26128
+||bct|8,wa|6,prnl1||loop till all blanked|26129
+||mov|8,wb|3,prtsb||restore wb|26133
+||mov|8,wa|3,prtsa||restore wa|26134
+||mov|7,xr|10,(xs)+||restore entry xr|26135
+||zer|3,profs|||reset print buffer pointer|26136
+||exi||||return to prtnl caller|26137
+|prnl2|bnz|3,prtef|6,prnl3||jump if not first time|26141
+||mnz|3,prtef|||mark first occurrence|26142
+||erb|1,253|26,print limit exceeded on standard output channel|||26143
+|prnl3|mov|8,wb|18,=nini8||ending code|26147
+||mov|8,wa|3,kvstn||statement number|26148
+||mov|7,xl|3,r_fcb||get fcblk chain head|26149
+||jsr|6,sysej|||stop|26150
+||enp||||end procedure prtnl|26151
+||ejc|||||26152
+|prtnm|prc|25,r|1,0||entry point (recursive, see prtvl)|26165
+||mov|11,-(xs)|8,wa||save wa (offset is collectable)|26166
+||mov|11,-(xs)|7,xr||save entry xr|26167
+||mov|11,-(xs)|7,xl||save name base|26168
+||bhi|7,xl|3,state|6,prn02|jump if not natural variable|26169
+||mov|7,xr|7,xl||point to vrblk|26174
+||jsr|6,prtvn|||print name of variable|26175
+|prn01|mov|7,xl|10,(xs)+||restore name base|26179
+||mov|7,xr|10,(xs)+||restore entry value of xr|26180
+||mov|8,wa|10,(xs)+||restore wa|26181
+||exi||||return to prtnm caller|26182
+|prn02|mov|8,wb|8,wa||copy name offset|26186
+||bne|9,(xl)|22,=b_pdt|6,prn03|jump if array or table|26187
+||mov|7,xr|13,pddfp(xl)||load pointer to dfblk|26191
+||add|7,xr|8,wa||add name offset|26192
+||mov|7,xr|13,pdfof(xr)||load vrblk pointer for field|26193
+||jsr|6,prtvn|||print field name|26194
+||mov|8,wa|18,=ch_pp||load left paren|26195
+||jsr|6,prtch|||print character|26196
+||ejc|||||26197
+|prn03|bne|9,(xl)|22,=b_tet|6,prn04|jump if we got there (or not te)|26210
+||mov|7,xl|13,tenxt(xl)||else move out on chain|26211
+||brn|6,prn03|||and loop back|26212
+|prn04|mov|7,xr|3,prnmv||point to vrblk we found last time|26220
+||mov|8,wa|3,hshtb||point to hash table in case not|26221
+||brn|6,prn07|||jump into search for special check|26222
+|prn05|mov|7,xr|8,wa||copy slot pointer|26226
+||ica|8,wa|||bump slot pointer|26227
+||sub|7,xr|19,*vrnxt||introduce standard vrblk offset|26228
+|prn06|mov|7,xr|13,vrnxt(xr)||point to next vrblk on hash chain|26232
+|prn07|mov|8,wc|7,xr||copy vrblk pointer|26236
+||bze|8,wc|6,prn09||jump if chain end (or prnmv zero)|26237
+||ejc|||||26238
+|prn08|mov|7,xr|13,vrval(xr)||load value|26244
+||beq|9,(xr)|22,=b_trt|6,prn08|loop if that was a trblk|26245
+||beq|7,xr|7,xl|6,prn10|jump if this matches the name base|26249
+||mov|7,xr|8,wc||else point back to that vrblk|26250
+||brn|6,prn06|||and loop back|26251
+|prn09|blt|8,wa|3,hshte|6,prn05|loop back if more to go|26255
+||mov|7,xr|7,xl||else not found, copy value pointer|26256
+||jsr|6,prtvl|||print value|26257
+||brn|6,prn11|||and merge ahead|26258
+|prn10|mov|7,xr|8,wc||copy vrblk pointer|26262
+||mov|3,prnmv|7,xr||save for next time in|26263
+||jsr|6,prtvn|||print variable name|26264
+|prn11|mov|8,wc|9,(xl)||load first word of name base|26268
+||bne|8,wc|22,=b_pdt|6,prn13|jump if not program defined|26269
+||mov|8,wa|18,=ch_rp||load right paren, merge|26273
+|prn12|jsr|6,prtch|||print final character|26277
+||mov|8,wa|8,wb||restore name offset|26278
+||brn|6,prn01|||merge back to exit|26279
+||ejc|||||26280
+|prn13|mov|8,wa|18,=ch_bb||load left bracket|26286
+||jsr|6,prtch|||and print it|26287
+||mov|7,xl|9,(xs)||restore block pointer|26288
+||mov|8,wc|9,(xl)||load type word again|26289
+||bne|8,wc|22,=b_tet|6,prn15|jump if not table|26290
+||mov|7,xr|13,tesub(xl)||load subscript value|26294
+||mov|7,xl|8,wb||save name offset|26295
+||jsr|6,prtvl|||print subscript value|26296
+||mov|8,wb|7,xl||restore name offset|26297
+|prn14|mov|8,wa|18,=ch_rb||load right bracket|26301
+||brn|6,prn12|||merge back to print it|26302
+|prn15|mov|8,wa|8,wb||copy name offset|26306
+||btw|8,wa|||convert to words|26307
+||beq|8,wc|22,=b_art|6,prn16|jump if arblk|26308
+||sub|8,wa|18,=vcvlb||adjust for standard fields|26312
+||mti|8,wa|||move to integer accum|26313
+||jsr|6,prtin|||print linear subscript|26314
+||brn|6,prn14|||merge back for right bracket|26315
+||ejc|||||26316
+|prn16|mov|8,wc|13,arofs(xl)||load length of bounds info|26325
+||ica|8,wc|||adjust for arpro field|26326
+||btw|8,wc|||convert to words|26327
+||sub|8,wa|8,wc||get linear zero-origin subscript|26328
+||mti|8,wa|||get integer value|26329
+||lct|8,wa|13,arndm(xl)||set num of dimensions as loop count|26330
+||add|7,xl|13,arofs(xl)||point past bounds information|26331
+||sub|7,xl|19,*arlbd||set ok offset for proper ptr later|26332
+|prn17|sub|7,xl|19,*ardms||point to next set of bounds|26336
+||sti|3,prnsi|||save current offset|26337
+||rmi|13,ardim(xl)|||get remainder on dividing by dimens|26338
+||mfi|11,-(xs)|||store on stack (one word)|26339
+||ldi|3,prnsi|||reload argument|26340
+||dvi|13,ardim(xl)|||divide to get quotient|26341
+||bct|8,wa|6,prn17||loop till all stacked|26342
+||zer|7,xr|||set offset to first set of bounds|26343
+||lct|8,wb|13,arndm(xl)||load count of dims to control loop|26344
+||brn|6,prn19|||jump into print loop|26345
+|prn18|mov|8,wa|18,=ch_cm||load a comma|26350
+||jsr|6,prtch|||print it|26351
+|prn19|mti|10,(xs)+|||load subscript offset as integer|26355
+||add|7,xl|7,xr||point to current lbd|26356
+||adi|13,arlbd(xl)|||add lbd to get signed subscript|26357
+||sub|7,xl|7,xr||point back to start of arblk|26358
+||jsr|6,prtin|||print subscript|26359
+||add|7,xr|19,*ardms||bump offset to next bounds|26360
+||bct|8,wb|6,prn18||loop back till all printed|26361
+||brn|6,prn14|||merge back to print right bracket|26362
+||enp||||end procedure prtnm|26363
+||ejc|||||26364
+|prtnv|prc|25,e|1,0||entry point|26380
+||jsr|6,prtnm|||print argument name|26381
+||mov|11,-(xs)|7,xr||save entry xr|26382
+||mov|11,-(xs)|8,wa||save name offset (collectable)|26383
+||mov|7,xr|21,=tmbeb||point to blank equal blank|26384
+||jsr|6,prtst|||print it|26385
+||mov|7,xr|7,xl||copy name base|26386
+||add|7,xr|8,wa||point to value|26387
+||mov|7,xr|9,(xr)||load value pointer|26388
+||jsr|6,prtvl|||print value|26389
+||jsr|6,prtnl|||terminate line|26390
+||mov|8,wa|10,(xs)+||restore name offset|26391
+||mov|7,xr|10,(xs)+||restore entry xr|26392
+||exi||||return to caller|26393
+||enp||||end procedure prtnv|26394
+||ejc|||||26395
+|prtpg|prc|25,e|1,0||entry point|26404
+||beq|3,stage|18,=stgxt|6,prp01|jump if execution time|26405
+||bze|3,lstlc|6,prp06||return if top of page already|26406
+||zer|3,lstlc|||clear line count|26407
+|prp01|mov|11,-(xs)|7,xr||preserve xr|26411
+||bnz|3,prstd|6,prp02||eject if flag set|26412
+||bnz|3,prich|6,prp03||jump if interactive listing channel|26413
+||bze|3,precl|6,prp03||jump if compact listing|26414
+|prp02|jsr|6,sysep|||eject|26418
+||brn|6,prp04|||merge|26419
+|prp03|mov|7,xr|3,headp||remember headp|26425
+||mnz|3,headp|||set to avoid repeated prtpg calls|26426
+||jsr|6,prtnl|||print blank line|26427
+||jsr|6,prtnl|||print blank line|26428
+||jsr|6,prtnl|||print blank line|26429
+||mov|3,lstlc|18,=num03||count blank lines|26430
+||mov|3,headp|7,xr||restore header flag|26431
+||ejc|||||26432
+|prp04|bnz|3,headp|6,prp05||jump if header listed|26438
+||mnz|3,headp|||mark headers printed|26439
+||mov|11,-(xs)|7,xl||keep xl|26440
+||mov|7,xr|21,=headr||point to listing header|26441
+||jsr|6,prtst|||place it|26442
+||jsr|6,sysid|||get system identification|26443
+||jsr|6,prtst|||append extra chars|26444
+||jsr|6,prtnl|||print it|26445
+||mov|7,xr|7,xl||extra header line|26446
+||jsr|6,prtst|||place it|26447
+||jsr|6,prtnl|||print it|26448
+||jsr|6,prtnl|||print a blank|26449
+||jsr|6,prtnl|||and another|26450
+||add|3,lstlc|18,=num04||four header lines printed|26451
+||mov|7,xl|10,(xs)+||restore xl|26452
+|prp05|mov|7,xr|10,(xs)+||restore xr|26456
+|prp06|exi||||return|26460
+||enp||||end procedure prtpg|26461
+||ejc|||||26462
+|prtps|prc|25,e|1,0||entry point|26471
+||mov|3,prstd|3,prsto||copy option flag|26472
+||jsr|6,prtpg|||print page|26473
+||zer|3,prstd|||clear flag|26474
+||exi||||return|26475
+||enp||||end procedure prtps|26476
+||ejc|||||26477
+|prtsn|prc|25,e|1,0||entry point|26496
+||mov|11,-(xs)|7,xr||save entry xr|26497
+||mov|3,prsna|8,wa||save entry wa|26498
+||mov|7,xr|21,=tmasb||point to asterisks|26499
+||jsr|6,prtst|||print asterisks|26500
+||mov|3,profs|18,=num04||point into middle of asterisks|26501
+||mti|3,kvstn|||load statement number as integer|26502
+||jsr|6,prtin|||print integer statement number|26503
+||mov|3,profs|18,=prsnf||point past asterisks plus blank|26504
+||mov|7,xr|3,kvfnc||get fnclevel|26505
+||mov|8,wa|18,=ch_li||set letter i|26506
+|prsn1|bze|7,xr|6,prsn2||jump if all set|26510
+||jsr|6,prtch|||else print an i|26511
+||dcv|7,xr|||decrement counter|26512
+||brn|6,prsn1|||loop back|26513
+|prsn2|mov|8,wa|18,=ch_bl||get blank|26517
+||jsr|6,prtch|||print blank|26518
+||mov|8,wa|3,prsna||restore entry wa|26519
+||mov|7,xr|10,(xs)+||restore entry xr|26520
+||exi||||return to prtsn caller|26521
+||enp||||end procedure prtsn|26522
+||ejc|||||26523
+|prtst|prc|25,r|1,0||entry point|26538
+||bnz|3,headp|6,prst0||were headers printed|26539
+||jsr|6,prtps|||no - print them|26540
+|prst0|mov|3,prsva|8,wa||save wa|26544
+||mov|3,prsvb|8,wb||save wb|26545
+||zer|8,wb|||set chars printed count to zero|26546
+|prst1|mov|8,wa|13,sclen(xr)||load string length|26550
+||sub|8,wa|8,wb||subtract count of chars already out|26551
+||bze|8,wa|6,prst4||jump to exit if none left|26552
+||mov|11,-(xs)|7,xl||else stack entry xl|26553
+||mov|11,-(xs)|7,xr||save argument|26554
+||mov|7,xl|7,xr||copy for eventual move|26555
+||mov|7,xr|3,prlen||load print buffer length|26556
+||sub|7,xr|3,profs||get chars left in print buffer|26557
+||bnz|7,xr|6,prst2||skip if room left on this line|26558
+||jsr|6,prtnl|||else print this line|26559
+||mov|7,xr|3,prlen||and set full width available|26560
+||ejc|||||26561
+|prst2|blo|8,wa|7,xr|6,prst3|jump if room for rest of string|26567
+||mov|8,wa|7,xr||else set to fill line|26568
+|prst3|mov|7,xr|3,prbuf||point to print buffer|26572
+||plc|7,xl|8,wb||point to location in string|26573
+||psc|7,xr|3,profs||point to location in buffer|26574
+||add|8,wb|8,wa||bump string chars count|26575
+||add|3,profs|8,wa||bump buffer pointer|26576
+||mov|3,prsvc|8,wb||preserve char counter|26577
+||mvc||||move characters to buffer|26578
+||mov|8,wb|3,prsvc||recover char counter|26579
+||mov|7,xr|10,(xs)+||restore argument pointer|26580
+||mov|7,xl|10,(xs)+||restore entry xl|26581
+||brn|6,prst1|||loop back to test for more|26582
+|prst4|mov|8,wb|3,prsvb||restore entry wb|26586
+||mov|8,wa|3,prsva||restore entry wa|26587
+||exi||||return to prtst caller|26588
+||enp||||end procedure prtst|26589
+||ejc|||||26590
+|prttr|prc|25,e|1,0||entry point|26600
+||mov|11,-(xs)|7,xr||save xr|26601
+||jsr|6,prtic|||print buffer contents|26602
+||mov|7,xr|3,prbuf||point to print bfr to clear it|26603
+||lct|8,wa|3,prlnw||get buffer length|26604
+||add|7,xr|19,*schar||point past scblk header|26605
+||mov|8,wb|4,nullw||get blanks|26606
+|prtt1|mov|10,(xr)+|8,wb||clear a word|26610
+||bct|8,wa|6,prtt1||loop|26611
+||zer|3,profs|||reset profs|26612
+||mov|7,xr|10,(xs)+||restore xr|26613
+||exi||||return|26614
+||enp||||end procedure prttr|26615
+||ejc|||||26616
+|prtvl|prc|25,r|1,0||entry point, recursive|26627
+||mov|11,-(xs)|7,xl||save entry xl|26628
+||mov|11,-(xs)|7,xr||save argument|26629
+||chk||||check for stack overflow|26630
+|prv01|mov|3,prvsi|13,idval(xr)||copy idval (if any)|26634
+||mov|7,xl|9,(xr)||load first word of block|26635
+||lei|7,xl|||load entry point id|26636
+||bsw|7,xl|2,bl__t|6,prv02|switch on block type|26637
+||iff|2,bl_ar|6,prv05||arblk|26655
+||iff|1,1|6,prv02|||26655
+||iff|1,2|6,prv02|||26655
+||iff|2,bl_ic|6,prv08||icblk|26655
+||iff|2,bl_nm|6,prv09||nmblk|26655
+||iff|1,5|6,prv02|||26655
+||iff|1,6|6,prv02|||26655
+||iff|1,7|6,prv02|||26655
+||iff|2,bl_rc|6,prv08||rcblk|26655
+||iff|2,bl_sc|6,prv11||scblk|26655
+||iff|2,bl_se|6,prv12||seblk|26655
+||iff|2,bl_tb|6,prv13||tbblk|26655
+||iff|2,bl_vc|6,prv13||vcblk|26655
+||iff|1,13|6,prv02|||26655
+||iff|1,14|6,prv02|||26655
+||iff|1,15|6,prv02|||26655
+||iff|2,bl_pd|6,prv10||pdblk|26655
+||iff|2,bl_tr|6,prv04||trblk|26655
+||esw||||end of switch on block type|26655
+|prv02|jsr|6,dtype|||get datatype name|26659
+||jsr|6,prtst|||print datatype name|26660
+|prv03|mov|7,xr|10,(xs)+||reload argument|26664
+||mov|7,xl|10,(xs)+||restore xl|26665
+||exi||||return to prtvl caller|26666
+|prv04|mov|7,xr|13,trval(xr)||load real value|26670
+||brn|6,prv01|||and loop back|26671
+||ejc|||||26672
+|prv05|mov|7,xl|7,xr||preserve argument|26680
+||mov|7,xr|21,=scarr||point to datatype name (array)|26681
+||jsr|6,prtst|||print it|26682
+||mov|8,wa|18,=ch_pp||load left paren|26683
+||jsr|6,prtch|||print left paren|26684
+||add|7,xl|13,arofs(xl)||point to prototype|26685
+||mov|7,xr|9,(xl)||load prototype|26686
+||jsr|6,prtst|||print prototype|26687
+|prv06|mov|8,wa|18,=ch_rp||load right paren|26691
+||jsr|6,prtch|||print right paren|26692
+|prv07|mov|8,wa|18,=ch_bl||load blank|26696
+||jsr|6,prtch|||print it|26697
+||mov|8,wa|18,=ch_nm||load number sign|26698
+||jsr|6,prtch|||print it|26699
+||mti|3,prvsi|||get idval|26700
+||jsr|6,prtin|||print id number|26701
+||brn|6,prv03|||back to exit|26702
+|prv08|mov|11,-(xs)|7,xr||stack argument for gtstg|26708
+||jsr|6,gtstg|||convert to string|26709
+||ppm||||error return is impossible|26710
+||jsr|6,prtst|||print the string|26711
+||mov|3,dnamp|7,xr||delete garbage string from storage|26712
+||brn|6,prv03|||back to exit|26713
+||ejc|||||26714
+|prv09|mov|7,xl|13,nmbas(xr)||load name base|26723
+||mov|8,wa|9,(xl)||load first word of block|26724
+||beq|8,wa|22,=b_kvt|6,prv02|just print name if keyword|26725
+||beq|8,wa|22,=b_evt|6,prv02|just print name if expression var|26726
+||mov|8,wa|18,=ch_dt||else get dot|26727
+||jsr|6,prtch|||and print it|26728
+||mov|8,wa|13,nmofs(xr)||load name offset|26729
+||jsr|6,prtnm|||print name|26730
+||brn|6,prv03|||back to exit|26731
+|prv10|jsr|6,dtype|||get datatype name|26737
+||jsr|6,prtst|||print datatype name|26738
+||brn|6,prv07|||merge back to print id|26739
+|prv11|mov|8,wa|18,=ch_sq||load single quote|26745
+||jsr|6,prtch|||print quote|26746
+||jsr|6,prtst|||print string value|26747
+||jsr|6,prtch|||print another quote|26748
+||brn|6,prv03|||back to exit|26749
+||ejc|||||26750
+|prv12|mov|8,wa|18,=ch_as||load asterisk|26758
+||jsr|6,prtch|||print asterisk|26759
+||mov|7,xr|13,sevar(xr)||load variable pointer|26760
+||jsr|6,prtvn|||print variable name|26761
+||brn|6,prv03|||jump back to exit|26762
+|prv13|mov|7,xl|7,xr||preserve argument|26768
+||jsr|6,dtype|||get datatype name|26769
+||jsr|6,prtst|||print datatype name|26770
+||mov|8,wa|18,=ch_pp||load left paren|26771
+||jsr|6,prtch|||print left paren|26772
+||mov|8,wa|13,tblen(xl)||load length of block (=vclen)|26773
+||btw|8,wa|||convert to word count|26774
+||sub|8,wa|18,=tbsi_||allow for standard fields|26775
+||beq|9,(xl)|22,=b_tbt|6,prv14|jump if table|26776
+||add|8,wa|18,=vctbd||for vcblk, adjust size|26777
+|prv14|mti|8,wa|||move as integer|26781
+||jsr|6,prtin|||print integer prototype|26782
+||brn|6,prv06|||merge back for rest|26783
+||enp||||end procedure prtvl|26806
+||ejc|||||26807
+|prtvn|prc|25,e|1,0||entry point|26816
+||mov|11,-(xs)|7,xr||stack vrblk pointer|26817
+||add|7,xr|19,*vrsof||point to possible string name|26818
+||bnz|13,sclen(xr)|6,prvn1||jump if not system variable|26819
+||mov|7,xr|13,vrsvo(xr)||point to svblk with name|26820
+|prvn1|jsr|6,prtst|||print string name of variable|26824
+||mov|7,xr|10,(xs)+||restore vrblk pointer|26825
+||exi||||return to prtvn caller|26826
+||enp||||end procedure prtvn|26827
+||ejc|||||26830
+|rcbld|prc|25,e|1,0||entry point|26839
+||mov|7,xr|3,dnamp||load pointer to next available loc|26840
+||add|7,xr|19,*rcsi_||point past new rcblk|26841
+||blo|7,xr|3,dname|6,rcbl1|jump if there is room|26842
+||mov|8,wa|19,*rcsi_||else load rcblk length|26843
+||jsr|6,alloc|||use standard allocator to get block|26844
+||add|7,xr|8,wa||point past block to merge|26845
+|rcbl1|mov|3,dnamp|7,xr||set new pointer|26849
+||sub|7,xr|19,*rcsi_||point back to start of block|26850
+||mov|9,(xr)|22,=b_rcl||store type word|26851
+||str|13,rcval(xr)|||store real value in rcblk|26852
+||exi||||return to rcbld caller|26853
+||enp||||end procedure rcbld|26854
+||ejc|||||26856
+|readr|prc|25,e|1,0||entry point|26870
+||mov|7,xr|3,r_cni||get ptr to next image|26871
+||bnz|7,xr|6,read3||exit if already read|26872
+||bnz|3,cnind|6,reada||if within include file|26874
+||bne|3,stage|18,=stgic|6,read3|exit if not initial compile|26876
+|reada|mov|8,wa|3,cswin||max read length|26877
+||zer|7,xl|||clear any dud value in xl|26878
+||jsr|6,alocs|||allocate buffer|26879
+||jsr|6,sysrd|||read input image|26880
+||ppm|6,read4|||jump if eof or new file name|26881
+||icv|3,rdnln|||increment next line number|26882
+||dcv|3,polct|||test if time to poll interface|26884
+||bnz|3,polct|6,read0||not yet|26885
+||zer|8,wa|||=0 for poll|26886
+||mov|8,wb|3,rdnln||line number|26887
+||jsr|6,syspl|||allow interactive access|26888
+||err|1,320|26,user interrupt|||26889
+||ppm||||single step|26890
+||ppm||||expression evaluation|26891
+||mov|3,polcs|8,wa||new countdown start value|26892
+||mov|3,polct|8,wa||new counter value|26893
+|read0|ble|13,sclen(xr)|3,cswin|6,read1|use smaller of string lnth ...|26895
+||mov|13,sclen(xr)|3,cswin||... and xxx of -inxxx|26896
+|read1|mnz|8,wb|||set trimr to perform trim|26900
+||jsr|6,trimr|||trim trailing blanks|26901
+|read2|mov|3,r_cni|7,xr||store copy of pointer|26905
+|read3|exi||||return to readr caller|26909
+|read4|bze|13,sclen(xr)|6,read5||jump if true end of file|26918
+||zer|8,wb|||new source file name|26919
+||mov|3,rdnln|8,wb||restart line counter for new file|26920
+||jsr|6,trimr|||remove unused space in block|26921
+||jsr|6,newfn|||record new file name|26922
+||brn|6,reada|||now reissue read for record data|26923
+|read5|mov|3,dnamp|7,xr||pop unused scblk|26927
+||bze|3,cnind|6,read6||jump if not within an include file|26929
+||zer|7,xl|||eof within include file|26930
+||jsr|6,sysif|||switch stream back to previous file|26931
+||ppm|||||26932
+||mov|8,wa|3,cnind||restore prev line number, file name|26933
+||add|8,wa|18,=vcvlb||vector offset in words|26934
+||wtb|8,wa|||convert to bytes|26935
+||mov|7,xr|3,r_ifa||file name array|26936
+||add|7,xr|8,wa||ptr to element|26937
+||mov|3,r_sfc|9,(xr)||change source file name|26938
+||mov|9,(xr)|21,=nulls||release scblk|26939
+||mov|7,xr|3,r_ifl||line number array|26940
+||add|7,xr|8,wa||ptr to element|26941
+||mov|7,xl|9,(xr)||icblk containing saved line number|26942
+||ldi|13,icval(xl)|||line number integer|26943
+||mfi|3,rdnln|||change source line number|26944
+||mov|9,(xr)|21,=inton||release icblk|26945
+||dcv|3,cnind|||decrement nesting level|26946
+||mov|8,wb|3,cmpsn||current statement number|26947
+||icv|8,wb|||anticipate end of previous stmt|26948
+||mti|8,wb|||convert to integer|26949
+||jsr|6,icbld|||build icblk for stmt number|26950
+||mov|7,xl|3,r_sfn||file name table|26951
+||mnz|8,wb|||lookup statement number by name|26952
+||jsr|6,tfind|||allocate new teblk|26953
+||ppm||||always possible to allocate block|26954
+||mov|13,teval(xl)|3,r_sfc||record file name as entry value|26955
+||beq|3,stage|18,=stgic|6,reada|if initial compile, reissue read|26956
+||bnz|3,cnind|6,reada||still reading from include file|26957
+||mov|7,xl|3,r_ici||restore code argument string|26962
+||zer|3,r_ici|||release original string|26963
+||mov|8,wa|3,cnsil||get length of string|26964
+||mov|8,wb|3,cnspt||offset of characters left|26965
+||sub|8,wa|8,wb||number of characters left|26966
+||mov|3,scnil|8,wa||set new scan length|26967
+||zer|3,scnpt|||scan from start of substring|26968
+||jsr|6,sbstr|||create substring of remainder|26969
+||mov|3,r_cim|7,xr||set scan image|26970
+||brn|6,read2|||return|26971
+|read6|zer|7,xr|||zero ptr as result|26987
+||brn|6,read2|||merge|26988
+||enp||||end procedure readr|26989
+||ejc|||||26990
+|sbstr|prc|25,e|1,0||entry point|27085
+||bze|8,wa|6,sbst2||jump if null substring|27086
+||jsr|6,alocs|||else allocate scblk|27087
+||mov|8,wa|8,wc||move number of characters|27088
+||mov|8,wc|7,xr||save ptr to new scblk|27089
+||plc|7,xl|8,wb||prepare to load chars from old blk|27090
+||psc|7,xr|||prepare to store chars in new blk|27091
+||mvc||||move characters to new string|27092
+||mov|7,xr|8,wc||then restore scblk pointer|27093
+|sbst1|zer|7,xl|||clear garbage pointer in xl|27097
+||exi||||return to sbstr caller|27098
+|sbst2|mov|7,xr|21,=nulls||set null string as result|27102
+||brn|6,sbst1|||return|27103
+||enp||||end procedure sbstr|27104
+||ejc|||||27105
+|stgcc|prc|25,e|1,0|||27116
+||mov|8,wa|3,polcs||assume no profiling or stcount tracing|27118
+||mov|8,wb|18,=num01||poll each time polcs expires|27119
+||ldi|3,kvstl|||get stmt limit|27123
+||bnz|3,kvpfl|6,stgc1||jump if profiling enabled|27124
+||ilt|6,stgc3|||no stcount tracing if negative|27125
+||bze|3,r_stc|6,stgc2||jump if not stcount tracing|27126
+|stgc1|mov|8,wb|8,wa||count polcs times within stmg|27131
+||mov|8,wa|18,=num01||break out of stmgo on each stmt|27132
+||brn|6,stgc3||||27136
+|stgc2|mti|8,wa|||breakout count start value|27140
+||sbi|3,kvstl|||proposed stmcs minus stmt limit|27141
+||ile|6,stgc3|||jump if stmt count does not limit|27142
+||ldi|3,kvstl|||stlimit limits breakcount count|27143
+||mfi|8,wa|||use it instead|27144
+|stgc3|mov|3,stmcs|8,wa||update breakout count start value|27148
+||mov|3,stmct|8,wa||reset breakout counter|27149
+||mov|3,polct|8,wb|||27151
+||exi|||||27153
+||ejc|||||27154
+|tfind|prc|25,e|1,1||entry point|27173
+||mov|11,-(xs)|8,wb||save name/value indicator|27174
+||mov|11,-(xs)|7,xr||save subscript value|27175
+||mov|11,-(xs)|7,xl||save table pointer|27176
+||mov|8,wa|13,tblen(xl)||load length of tbblk|27177
+||btw|8,wa|||convert to word count|27178
+||sub|8,wa|18,=tbbuk||get number of buckets|27179
+||mti|8,wa|||convert to integer value|27180
+||sti|3,tfnsi|||save for later|27181
+||mov|7,xl|9,(xr)||load first word of subscript|27182
+||lei|7,xl|||load block entry id (bl_xx)|27183
+||bsw|7,xl|2,bl__d|6,tfn00|switch on block type|27184
+||iff|1,0|6,tfn00|||27195
+||iff|1,1|6,tfn00|||27195
+||iff|1,2|6,tfn00|||27195
+||iff|2,bl_ic|6,tfn02||jump if integer|27195
+||iff|2,bl_nm|6,tfn04||jump if name|27195
+||iff|2,bl_p0|6,tfn03||jump if pattern|27195
+||iff|2,bl_p1|6,tfn03||jump if pattern|27195
+||iff|2,bl_p2|6,tfn03||jump if pattern|27195
+||iff|2,bl_rc|6,tfn02||real|27195
+||iff|2,bl_sc|6,tfn05||jump if string|27195
+||iff|1,10|6,tfn00|||27195
+||iff|1,11|6,tfn00|||27195
+||iff|1,12|6,tfn00|||27195
+||iff|1,13|6,tfn00|||27195
+||iff|1,14|6,tfn00|||27195
+||iff|1,15|6,tfn00|||27195
+||iff|1,16|6,tfn00|||27195
+||esw||||end switch on block type|27195
+|tfn00|mov|8,wa|12,1(xr)||load second word|27200
+|tfn01|mti|8,wa|||convert to integer|27204
+||brn|6,tfn06|||jump to merge|27205
+||ejc|||||27206
+|tfn02|ldi|12,1(xr)|||load value as hash source|27216
+||ige|6,tfn06|||ok if positive or zero|27217
+||ngi||||make positive|27218
+||iov|6,tfn06|||clear possible overflow|27219
+||brn|6,tfn06|||merge|27220
+|tfn03|mov|8,wa|9,(xr)||load first word as hash source|27224
+||brn|6,tfn01|||merge back|27225
+|tfn04|mov|8,wa|13,nmofs(xr)||load offset as hash source|27229
+||brn|6,tfn01|||merge back|27230
+|tfn05|jsr|6,hashs|||call routine to compute hash|27234
+|tfn06|rmi|3,tfnsi|||compute hash index by remaindering|27238
+||mfi|8,wc|||get as one word integer|27239
+||wtb|8,wc|||convert to byte offset|27240
+||mov|7,xl|9,(xs)||get table ptr again|27241
+||add|7,xl|8,wc||point to proper bucket|27242
+||mov|7,xr|13,tbbuk(xl)||load first teblk pointer|27243
+||beq|7,xr|9,(xs)|6,tfn10|jump if no teblks on chain|27244
+|tfn07|mov|8,wb|7,xr||save teblk pointer|27248
+||mov|7,xr|13,tesub(xr)||load subscript value|27249
+||mov|7,xl|12,1(xs)||load input argument subscript val|27250
+||jsr|6,ident|||compare them|27251
+||ppm|6,tfn08|||jump if equal (ident)|27252
+||mov|7,xl|8,wb||restore teblk pointer|27256
+||mov|7,xr|13,tenxt(xl)||point to next teblk on chain|27257
+||bne|7,xr|9,(xs)|6,tfn07|jump if there is one|27258
+||mov|8,wc|19,*tenxt||set offset to link field (xl base)|27262
+||brn|6,tfn11|||jump to merge|27263
+||ejc|||||27264
+|tfn08|mov|7,xl|8,wb||restore teblk pointer|27270
+||mov|8,wa|19,*teval||set teblk name offset|27271
+||mov|8,wb|12,2(xs)||restore name/value indicator|27272
+||bnz|8,wb|6,tfn09||jump if called by name|27273
+||jsr|6,acess|||else get value|27274
+||ppm|6,tfn12|||jump if reference fails|27275
+||zer|8,wb|||restore name/value indicator|27276
+|tfn09|add|7,xs|19,*num03||pop stack entries|27280
+||exi||||return to tfind caller|27281
+|tfn10|add|8,wc|19,*tbbuk||get offset to bucket ptr|27285
+||mov|7,xl|9,(xs)||set tbblk ptr as base|27286
+|tfn11|mov|7,xr|9,(xs)||tbblk pointer|27290
+||mov|7,xr|13,tbinv(xr)||load default value in case|27291
+||mov|8,wb|12,2(xs)||load name/value indicator|27292
+||bze|8,wb|6,tfn09||exit with default if value call|27293
+||mov|8,wb|7,xr||copy default value|27294
+||mov|8,wa|19,*tesi_||set size of teblk|27298
+||jsr|6,alloc|||allocate teblk|27299
+||add|7,xl|8,wc||point to hash link|27300
+||mov|9,(xl)|7,xr||link new teblk at end of chain|27301
+||mov|9,(xr)|22,=b_tet||store type word|27302
+||mov|13,teval(xr)|8,wb||set default as initial value|27303
+||mov|13,tenxt(xr)|10,(xs)+||set tbblk ptr to mark end of chain|27304
+||mov|13,tesub(xr)|10,(xs)+||store subscript value|27305
+||mov|8,wb|10,(xs)+||restore name/value indicator|27306
+||mov|7,xl|7,xr||copy teblk pointer (name base)|27307
+||mov|8,wa|19,*teval||set offset|27308
+||exi||||return to caller with new teblk|27309
+|tfn12|exi|1,1|||alternative return|27313
+||enp||||end procedure tfind|27314
+||ejc|||||27315
+|tmake|prc|25,e|1,0|||27325
+||mov|8,wa|8,wc||copy number of headers|27326
+||add|8,wa|18,=tbsi_||adjust for standard fields|27327
+||wtb|8,wa|||convert length to bytes|27328
+||jsr|6,alloc|||allocate space for tbblk|27329
+||mov|8,wb|7,xr||copy pointer to tbblk|27330
+||mov|10,(xr)+|22,=b_tbt||store type word|27331
+||zer|10,(xr)+|||zero id for the moment|27332
+||mov|10,(xr)+|8,wa||store length (tblen)|27333
+||mov|10,(xr)+|7,xl||store initial lookup value|27334
+||lct|8,wc|8,wc||set loop counter (num headers)|27335
+|tma01|mov|10,(xr)+|8,wb||store tbblk ptr in bucket header|27339
+||bct|8,wc|6,tma01||loop till all stored|27340
+||mov|7,xr|8,wb||recall pointer to tbblk|27341
+||exi|||||27342
+||enp|||||27343
+||ejc|||||27344
+|vmake|prc|25,e|1,1||entry point|27356
+||lct|8,wb|8,wa||copy elements for loop later on|27357
+||add|8,wa|18,=vcsi_||add space for standard fields|27358
+||wtb|8,wa|||convert length to bytes|27359
+||bgt|8,wa|3,mxlen|6,vmak2|fail if too large|27360
+||jsr|6,alloc|||allocate space for vcblk|27361
+||mov|9,(xr)|22,=b_vct||store type word|27362
+||zer|13,idval(xr)|||initialize idval|27363
+||mov|13,vclen(xr)|8,wa||set length|27364
+||mov|8,wc|7,xl||copy default value|27365
+||mov|7,xl|7,xr||copy vcblk pointer|27366
+||add|7,xl|19,*vcvls||point to first element value|27367
+|vmak1|mov|10,(xl)+|8,wc||store one value|27371
+||bct|8,wb|6,vmak1||loop till all stored|27372
+||exi||||success return|27373
+|vmak2|exi|1,1|||fail return|27377
+||enp|||||27378
+||ejc|||||27379
+||ejc|||||27427
+||ejc|||||27472
+|scane|prc|25,e|1,0||entry point|27478
+||zer|3,scnbl|||reset blanks flag|27479
+||mov|3,scnsa|8,wa||save wa|27480
+||mov|3,scnsb|8,wb||save wb|27481
+||mov|3,scnsc|8,wc||save wc|27482
+||bze|3,scnrs|6,scn03||jump if no rescan|27483
+||mov|7,xl|3,scntp||set previous returned scan type|27487
+||mov|7,xr|3,r_scp||set previous returned pointer|27488
+||zer|3,scnrs|||reset rescan switch|27489
+||brn|6,scn13|||jump to exit|27490
+|scn01|jsr|6,readr|||read next image|27494
+||mov|8,wb|19,*dvubs||set wb for not reading name|27495
+||bze|7,xr|6,scn30||treat as semi-colon if none|27496
+||plc|7,xr|||else point to first character|27497
+||lch|8,wc|9,(xr)||load first character|27498
+||beq|8,wc|18,=ch_dt|6,scn02|jump if dot for continuation|27499
+||bne|8,wc|18,=ch_pl|6,scn30|else treat as semicolon unless plus|27500
+|scn02|jsr|6,nexts|||acquire next source image|27504
+||mov|3,scnpt|18,=num01||set scan pointer past continuation|27505
+||mnz|3,scnbl|||set blanks flag|27506
+||ejc|||||27507
+|scn03|mov|8,wa|3,scnpt||load current offset|27513
+||beq|8,wa|3,scnil|6,scn01|check continuation if end|27514
+||mov|7,xl|3,r_cim||point to current line|27515
+||plc|7,xl|8,wa||point to current character|27516
+||mov|3,scnse|8,wa||set start of element location|27517
+||mov|8,wc|21,=opdvs||point to operator dv list|27518
+||mov|8,wb|19,*dvubs||set constant for operator circuit|27519
+||brn|6,scn06|||start scanning|27520
+|scn05|bze|8,wb|6,scn10||jump if trailing|27524
+||icv|3,scnse|||increment start of element|27525
+||beq|8,wa|3,scnil|6,scn01|jump if end of image|27526
+||mnz|3,scnbl|||note blanks seen|27527
+|scn06|lch|7,xr|10,(xl)+||get next character|27539
+||icv|8,wa|||bump scan offset|27540
+||mov|3,scnpt|8,wa||store offset past char scanned|27541
+||bsw|7,xr|2,cfp_u|6,scn07|switch on scanned character|27543
+||ejc|||||27570
+||ejc|||||27626
+||iff|1,0|6,scn07|||27659
+||iff|1,1|6,scn07|||27659
+||iff|1,2|6,scn07|||27659
+||iff|1,3|6,scn07|||27659
+||iff|1,4|6,scn07|||27659
+||iff|1,5|6,scn07|||27659
+||iff|1,6|6,scn07|||27659
+||iff|1,7|6,scn07|||27659
+||iff|1,8|6,scn07|||27659
+||iff|2,ch_ht|6,scn05||horizontal tab|27659
+||iff|1,10|6,scn07|||27659
+||iff|1,11|6,scn07|||27659
+||iff|1,12|6,scn07|||27659
+||iff|1,13|6,scn07|||27659
+||iff|1,14|6,scn07|||27659
+||iff|1,15|6,scn07|||27659
+||iff|1,16|6,scn07|||27659
+||iff|1,17|6,scn07|||27659
+||iff|1,18|6,scn07|||27659
+||iff|1,19|6,scn07|||27659
+||iff|1,20|6,scn07|||27659
+||iff|1,21|6,scn07|||27659
+||iff|1,22|6,scn07|||27659
+||iff|1,23|6,scn07|||27659
+||iff|1,24|6,scn07|||27659
+||iff|1,25|6,scn07|||27659
+||iff|1,26|6,scn07|||27659
+||iff|1,27|6,scn07|||27659
+||iff|1,28|6,scn07|||27659
+||iff|1,29|6,scn07|||27659
+||iff|1,30|6,scn07|||27659
+||iff|1,31|6,scn07|||27659
+||iff|2,ch_bl|6,scn05||blank|27659
+||iff|2,ch_ex|6,scn37||exclamation mark|27659
+||iff|2,ch_dq|6,scn17||double quote|27659
+||iff|2,ch_nm|6,scn41||number sign|27659
+||iff|2,ch_dl|6,scn36||dollar|27659
+||iff|2,ch_pc|6,scn38||percent|27659
+||iff|2,ch_am|6,scn44||ampersand|27659
+||iff|2,ch_sq|6,scn16||single quote|27659
+||iff|2,ch_pp|6,scn25||left paren|27659
+||iff|2,ch_rp|6,scn26||right paren|27659
+||iff|2,ch_as|6,scn49||asterisk|27659
+||iff|2,ch_pl|6,scn33||plus|27659
+||iff|2,ch_cm|6,scn31||comma|27659
+||iff|2,ch_mn|6,scn34||minus|27659
+||iff|2,ch_dt|6,scn32||dot|27659
+||iff|2,ch_sl|6,scn40||slash|27659
+||iff|2,ch_d0|6,scn08||digit 0|27659
+||iff|2,ch_d1|6,scn08||digit 1|27659
+||iff|2,ch_d2|6,scn08||digit 2|27659
+||iff|2,ch_d3|6,scn08||digit 3|27659
+||iff|2,ch_d4|6,scn08||digit 4|27659
+||iff|2,ch_d5|6,scn08||digit 5|27659
+||iff|2,ch_d6|6,scn08||digit 6|27659
+||iff|2,ch_d7|6,scn08||digit 7|27659
+||iff|2,ch_d8|6,scn08||digit 8|27659
+||iff|2,ch_d9|6,scn08||digit 9|27659
+||iff|2,ch_cl|6,scn29||colon|27659
+||iff|2,ch_sm|6,scn30||semi-colon|27659
+||iff|2,ch_bb|6,scn28||left bracket|27659
+||iff|2,ch_eq|6,scn46||equal|27659
+||iff|2,ch_rb|6,scn27||right bracket|27659
+||iff|2,ch_qu|6,scn45||question mark|27659
+||iff|2,ch_at|6,scn42||at|27659
+||iff|2,ch_ua|6,scn09||shifted a|27659
+||iff|2,ch_ub|6,scn09||shifted b|27659
+||iff|2,ch_uc|6,scn09||shifted c|27659
+||iff|2,ch_ud|6,scn09||shifted d|27659
+||iff|2,ch_ue|6,scn09||shifted e|27659
+||iff|2,ch_uf|6,scn20||shifted f|27659
+||iff|2,ch_ug|6,scn09||shifted g|27659
+||iff|2,ch_uh|6,scn09||shifted h|27659
+||iff|2,ch_ui|6,scn09||shifted i|27659
+||iff|2,ch_uj|6,scn09||shifted j|27659
+||iff|2,ch_uk|6,scn09||shifted k|27659
+||iff|2,ch_ul|6,scn09||shifted l|27659
+||iff|2,ch_um|6,scn09||shifted m|27659
+||iff|2,ch_un|6,scn09||shifted n|27659
+||iff|2,ch_uo|6,scn09||shifted o|27659
+||iff|2,ch_up|6,scn09||shifted p|27659
+||iff|2,ch_uq|6,scn09||shifted q|27659
+||iff|2,ch_ur|6,scn09||shifted r|27659
+||iff|2,ch_us|6,scn21||shifted s|27659
+||iff|2,ch_ut|6,scn09||shifted t|27659
+||iff|2,ch_uu|6,scn09||shifted u|27659
+||iff|2,ch_uv|6,scn09||shifted v|27659
+||iff|2,ch_uw|6,scn09||shifted w|27659
+||iff|2,ch_ux|6,scn09||shifted x|27659
+||iff|2,ch_uy|6,scn09||shifted y|27659
+||iff|2,ch_uz|6,scn09||shifted z|27659
+||iff|2,ch_ob|6,scn28||left bracket|27659
+||iff|1,92|6,scn07|||27659
+||iff|2,ch_cb|6,scn27||right bracket|27659
+||iff|2,ch_ey|6,scn37||up arrow|27659
+||iff|2,ch_u_|6,scn24||underline|27659
+||iff|1,96|6,scn07|||27659
+||iff|2,ch_la|6,scn09||letter a|27659
+||iff|2,ch_lb|6,scn09||letter b|27659
+||iff|2,ch_lc|6,scn09||letter c|27659
+||iff|2,ch_ld|6,scn09||letter d|27659
+||iff|2,ch_le|6,scn09||letter e|27659
+||iff|2,ch_lf|6,scn20||letter f|27659
+||iff|2,ch_lg|6,scn09||letter g|27659
+||iff|2,ch_lh|6,scn09||letter h|27659
+||iff|2,ch_li|6,scn09||letter i|27659
+||iff|2,ch_lj|6,scn09||letter j|27659
+||iff|2,ch_lk|6,scn09||letter k|27659
+||iff|2,ch_ll|6,scn09||letter l|27659
+||iff|2,ch_lm|6,scn09||letter m|27659
+||iff|2,ch_ln|6,scn09||letter n|27659
+||iff|2,ch_lo|6,scn09||letter o|27659
+||iff|2,ch_lp|6,scn09||letter p|27659
+||iff|2,ch_lq|6,scn09||letter q|27659
+||iff|2,ch_lr|6,scn09||letter r|27659
+||iff|2,ch_ls|6,scn21||letter s|27659
+||iff|2,ch_lt|6,scn09||letter t|27659
+||iff|2,ch_lu|6,scn09||letter u|27659
+||iff|2,ch_lv|6,scn09||letter v|27659
+||iff|2,ch_lw|6,scn09||letter w|27659
+||iff|2,ch_lx|6,scn09||letter x|27659
+||iff|2,ch_ly|6,scn09||letter y|27659
+||iff|2,ch_l_|6,scn09||letter z|27659
+||iff|1,123|6,scn07|||27659
+||iff|2,ch_br|6,scn43||vertical bar|27659
+||iff|1,125|6,scn07|||27659
+||iff|2,ch_nt|6,scn35||not|27659
+||iff|1,127|6,scn07|||27659
+||esw||||end switch on character|27659
+|scn07|bze|8,wb|6,scn10||jump if scanning name or constant|27663
+||erb|1,230|26,syntax error: illegal character|||27664
+||ejc|||||27665
+|scn08|bze|8,wb|6,scn09||keep scanning if name/constant|27671
+||zer|8,wc|||else set flag for scanning constant|27672
+|scn09|beq|8,wa|3,scnil|6,scn11|jump if end of image|27676
+||zer|8,wb|||set flag for scanning name/const|27677
+||brn|6,scn06|||merge back to continue scan|27678
+|scn10|dcv|8,wa|||reset offset to point to delimiter|27682
+|scn11|mov|3,scnpt|8,wa||store updated scan offset|27686
+||mov|8,wb|3,scnse||point to start of element|27687
+||sub|8,wa|8,wb||get number of characters|27688
+||mov|7,xl|3,r_cim||point to line image|27689
+||bnz|8,wc|6,scn15||jump if name|27690
+||jsr|6,sbstr|||get string for constant|27694
+||mov|3,dnamp|7,xr||delete from storage (not needed)|27695
+||jsr|6,gtnum|||convert to numeric|27696
+||ppm|6,scn14|||jump if conversion failure|27697
+|scn12|mov|7,xl|18,=t_con||set result type of constant|27701
+||ejc|||||27702
+|scn13|mov|8,wa|3,scnsa||restore wa|27708
+||mov|8,wb|3,scnsb||restore wb|27709
+||mov|8,wc|3,scnsc||restore wc|27710
+||mov|3,r_scp|7,xr||save xr in case rescan|27711
+||mov|3,scntp|7,xl||save xl in case rescan|27712
+||zer|3,scngo|||reset possible goto flag|27713
+||exi||||return to scane caller|27714
+|scn14|erb|1,231|26,syntax error: invalid numeric item|||27718
+|scn15|jsr|6,sbstr|||build string name of variable|27722
+||bnz|3,scncc|6,scn13||return if cncrd call|27723
+||jsr|6,gtnvr|||locate/build vrblk|27724
+||ppm||||dummy (unused) error return|27725
+||mov|7,xl|18,=t_var||set type as variable|27726
+||brn|6,scn13|||back to exit|27727
+|scn16|bze|8,wb|6,scn10||terminator if scanning name or cnst|27731
+||mov|8,wb|18,=ch_sq||set terminator as single quote|27732
+||brn|6,scn18|||merge|27733
+|scn17|bze|8,wb|6,scn10||terminator if scanning name or cnst|27737
+||mov|8,wb|18,=ch_dq||set double quote terminator, merge|27738
+|scn18|beq|8,wa|3,scnil|6,scn19|error if end of image|27742
+||lch|8,wc|10,(xl)+||else load next character|27743
+||icv|8,wa|||bump offset|27744
+||bne|8,wc|8,wb|6,scn18|loop back if not terminator|27745
+||ejc|||||27746
+||mov|8,wb|3,scnpt||point to first character|27752
+||mov|3,scnpt|8,wa||save offset past final quote|27753
+||dcv|8,wa|||point back past last character|27754
+||sub|8,wa|8,wb||get number of characters|27755
+||mov|7,xl|3,r_cim||point to input image|27756
+||jsr|6,sbstr|||build substring value|27757
+||brn|6,scn12|||back to exit with constant result|27758
+|scn19|mov|3,scnpt|8,wa||set updated scan pointer|27762
+||erb|1,232|26,syntax error: unmatched string quote|||27763
+|scn20|mov|7,xr|18,=t_fgo||set return code for fail goto|27767
+||brn|6,scn22|||jump to merge|27768
+|scn21|mov|7,xr|18,=t_sgo||set success goto as return code|27772
+|scn22|bze|3,scngo|6,scn09||treat as normal letter if not goto|27776
+|scn23|bze|8,wb|6,scn10||jump if end of name/constant|27780
+||mov|7,xl|7,xr||else copy code|27781
+||brn|6,scn13|||and jump to exit|27782
+|scn24|bze|8,wb|6,scn09||part of name if scanning name|27786
+||brn|6,scn07|||else illegal|27787
+||ejc|||||27788
+|scn25|mov|7,xr|18,=t_lpr||set left paren return code|27794
+||bnz|8,wb|6,scn23||return left paren unless name|27795
+||bze|8,wc|6,scn10||delimiter if scanning constant|27796
+||mov|8,wb|3,scnse||point to start of name|27800
+||mov|3,scnpt|8,wa||set pointer past left paren|27801
+||dcv|8,wa|||point back past last char of name|27802
+||sub|8,wa|8,wb||get name length|27803
+||mov|7,xl|3,r_cim||point to input image|27804
+||jsr|6,sbstr|||get string name for function|27805
+||jsr|6,gtnvr|||locate/build vrblk|27806
+||ppm||||dummy (unused) error return|27807
+||mov|7,xl|18,=t_fnc||set code for function call|27808
+||brn|6,scn13|||back to exit|27809
+|scn26|mov|7,xr|18,=t_rpr||right paren, set code|27813
+||brn|6,scn23|||take special character exit|27814
+|scn27|mov|7,xr|18,=t_rbr||right bracket, set code|27816
+||brn|6,scn23|||take special character exit|27817
+|scn28|mov|7,xr|18,=t_lbr||left bracket, set code|27819
+||brn|6,scn23|||take special character exit|27820
+|scn29|mov|7,xr|18,=t_col||colon, set code|27822
+||brn|6,scn23|||take special character exit|27823
+|scn30|mov|7,xr|18,=t_smc||semi-colon, set code|27825
+||brn|6,scn23|||take special character exit|27826
+|scn31|mov|7,xr|18,=t_cma||comma, set code|27828
+||brn|6,scn23|||take special character exit|27829
+||ejc|||||27830
+|scn32|bze|8,wb|6,scn09||dot can be part of name or constant|27842
+||add|8,wc|8,wb||else bump pointer|27843
+|scn33|bze|8,wc|6,scn09||plus can be part of constant|27845
+||bze|8,wb|6,scn48||plus cannot be part of name|27846
+||add|8,wc|8,wb||else bump pointer|27847
+|scn34|bze|8,wc|6,scn09||minus can be part of constant|27849
+||bze|8,wb|6,scn48||minus cannot be part of name|27850
+||add|8,wc|8,wb||else bump pointer|27851
+|scn35|add|8,wc|8,wb||not|27853
+|scn36|add|8,wc|8,wb||dollar|27854
+|scn37|add|8,wc|8,wb||exclamation|27855
+|scn38|add|8,wc|8,wb||percent|27856
+|scn39|add|8,wc|8,wb||asterisk|27857
+|scn40|add|8,wc|8,wb||slash|27858
+|scn41|add|8,wc|8,wb||number sign|27859
+|scn42|add|8,wc|8,wb||at sign|27860
+|scn43|add|8,wc|8,wb||vertical bar|27861
+|scn44|add|8,wc|8,wb||ampersand|27862
+|scn45|add|8,wc|8,wb||question mark|27863
+|scn46|bze|8,wb|6,scn10||operator terminates name/constant|27868
+||mov|7,xr|8,wc||else copy dv pointer|27869
+||lch|8,wc|9,(xl)||load next character|27870
+||mov|7,xl|18,=t_bop||set binary op in case|27871
+||beq|8,wa|3,scnil|6,scn47|should be binary if image end|27872
+||beq|8,wc|18,=ch_bl|6,scn47|should be binary if followed by blk|27873
+||beq|8,wc|18,=ch_ht|6,scn47|jump if horizontal tab|27875
+||beq|8,wc|18,=ch_sm|6,scn47|semicolon can immediately follow =|27880
+||beq|8,wc|18,=ch_cl|6,scn47|colon can immediately follow =|27881
+||beq|8,wc|18,=ch_rp|6,scn47|right paren can immediately follow =|27882
+||beq|8,wc|18,=ch_rb|6,scn47|right bracket can immediately follow =|27883
+||beq|8,wc|18,=ch_cb|6,scn47|right bracket can immediately follow =|27884
+||add|7,xr|19,*dvbs_||point to dv for unary op|27888
+||mov|7,xl|18,=t_uop||set type for unary operator|27889
+||ble|3,scntp|18,=t_uok|6,scn13|ok unary if ok preceding element|27890
+||ejc|||||27891
+|scn47|bnz|3,scnbl|6,scn13||all ok if preceding blanks, exit|27897
+|scn48|erb|1,233|26,syntax error: invalid use of operator|||27901
+|scn49|bze|8,wb|6,scn10||end of name if scanning name|27905
+||beq|8,wa|3,scnil|6,scn39|not ** if * at image end|27906
+||mov|7,xr|8,wa||else save offset past first *|27907
+||mov|3,scnof|8,wa||save another copy|27908
+||lch|8,wa|10,(xl)+||load next character|27909
+||bne|8,wa|18,=ch_as|6,scn50|not ** if next char not *|27910
+||icv|7,xr|||else step offset past second *|27911
+||beq|7,xr|3,scnil|6,scn51|ok exclam if end of image|27912
+||lch|8,wa|9,(xl)||else load next character|27913
+||beq|8,wa|18,=ch_bl|6,scn51|exclamation if blank|27914
+||beq|8,wa|18,=ch_ht|6,scn51|exclamation if horizontal tab|27916
+|scn50|mov|8,wa|3,scnof||recover stored offset|27924
+||mov|7,xl|3,r_cim||point to line again|27925
+||plc|7,xl|8,wa||point to current char|27926
+||brn|6,scn39|||merge with unary *|27927
+|scn51|mov|3,scnpt|7,xr||save scan pointer past 2nd *|27931
+||mov|8,wa|7,xr||copy scan pointer|27932
+||brn|6,scn37|||merge with exclamation|27933
+||enp||||end procedure scane|27934
+||ejc|||||27935
+|scngf|prc|25,e|1,0||entry point|27952
+||jsr|6,scane|||scan initial element|27953
+||beq|7,xl|18,=t_lpr|6,scng1|skip if left paren (normal goto)|27954
+||beq|7,xl|18,=t_lbr|6,scng2|skip if left bracket (direct goto)|27955
+||erb|1,234|26,syntax error: goto field incorrect|||27956
+|scng1|mov|8,wb|18,=num01||set expan flag for normal goto|27960
+||jsr|6,expan|||analyze goto field|27961
+||mov|8,wa|21,=opdvn||point to opdv for complex goto|27962
+||ble|7,xr|3,statb|6,scng3|jump if not in static (sgd15)|27963
+||blo|7,xr|3,state|6,scng4|jump to exit if simple label name|27964
+||brn|6,scng3|||complex goto - merge|27965
+|scng2|mov|8,wb|18,=num02||set expan flag for direct goto|27969
+||jsr|6,expan|||scan goto field|27970
+||mov|8,wa|21,=opdvd||set opdv pointer for direct goto|27971
+||ejc|||||27972
+|scng3|mov|11,-(xs)|8,wa||stack operator dv pointer|27978
+||mov|11,-(xs)|7,xr||stack pointer to expression tree|27979
+||jsr|6,expop|||pop operator off|27980
+||mov|7,xr|10,(xs)+||reload new expression tree pointer|27981
+|scng4|exi||||return to caller|27985
+||enp||||end procedure scngf|27986
+||ejc|||||27987
+|setvr|prc|25,e|1,0||entry point|28002
+||bhi|7,xr|3,state|6,setv1|exit if not natural variable|28003
+||mov|7,xl|7,xr||copy vrblk pointer|28007
+||mov|13,vrget(xr)|22,=b_vrl||store normal get value|28008
+||beq|13,vrsto(xr)|22,=b_vre|6,setv1|skip if protected variable|28009
+||mov|13,vrsto(xr)|22,=b_vrs||store normal store value|28010
+||mov|7,xl|13,vrval(xl)||point to next entry on chain|28011
+||bne|9,(xl)|22,=b_trt|6,setv1|jump if end of trblk chain|28012
+||mov|13,vrget(xr)|22,=b_vra||store trapped routine address|28013
+||mov|13,vrsto(xr)|22,=b_vrv||set trapped routine address|28014
+|setv1|exi||||return to setvr caller|28018
+||enp||||end procedure setvr|28019
+||ejc|||||28022
+||ejc|||||28059
+|sorta|prc|25,n|1,1||entry point|28063
+||mov|3,srtsr|8,wa||sort/rsort indicator|28064
+||mov|3,srtst|19,*num01||default stride of 1|28065
+||zer|3,srtof|||default zero offset to sort key|28066
+||mov|3,srtdf|21,=nulls||clear datatype field name|28067
+||mov|3,r_sxr|10,(xs)+||unstack argument 2|28068
+||mov|7,xr|10,(xs)+||get first argument|28069
+||mnz|8,wa|||use key/values of table entries|28070
+||jsr|6,gtarr|||convert to array|28071
+||ppm|6,srt18|||signal that table is empty|28072
+||ppm|6,srt16|||error if non-convertable|28073
+||mov|11,-(xs)|7,xr||stack ptr to resulting key array|28074
+||mov|11,-(xs)|7,xr||another copy for copyb|28075
+||jsr|6,copyb|||get copy array for sorting into|28076
+||ppm||||cant fail|28077
+||mov|11,-(xs)|7,xr||stack pointer to sort array|28078
+||mov|7,xr|3,r_sxr||get second arg|28079
+||mov|7,xl|13,num01(xs)||get ptr to key array|28080
+||bne|9,(xl)|22,=b_vct|6,srt02|jump if arblk|28081
+||beq|7,xr|21,=nulls|6,srt01|jump if null second arg|28082
+||jsr|6,gtnvr|||get vrblk ptr for it|28083
+||err|1,257|26,erroneous 2nd arg in sort/rsort of vector|||28084
+||mov|3,srtdf|7,xr||store datatype field name vrblk|28085
+|srt01|mov|8,wc|19,*vclen||offset to a(0)|28089
+||mov|8,wb|19,*vcvls||offset to first item|28090
+||mov|8,wa|13,vclen(xl)||get block length|28091
+||sub|8,wa|19,*vcsi_||get no. of entries, n (in bytes)|28092
+||brn|6,srt04|||merge|28093
+|srt02|ldi|13,ardim(xl)|||get possible dimension|28097
+||mfi|8,wa|||convert to short integer|28098
+||wtb|8,wa|||further convert to baus|28099
+||mov|8,wb|19,*arvls||offset to first value if one|28100
+||mov|8,wc|19,*arpro||offset before values if one dim.|28101
+||beq|13,arndm(xl)|18,=num01|6,srt04|jump in fact if one dim.|28102
+||bne|13,arndm(xl)|18,=num02|6,srt16|fail unless two dimens|28103
+||ldi|13,arlb2(xl)|||get lower bound 2 as default|28104
+||beq|7,xr|21,=nulls|6,srt03|jump if default second arg|28105
+||jsr|6,gtint|||convert to integer|28106
+||ppm|6,srt17|||fail|28107
+||ldi|13,icval(xr)|||get actual integer value|28108
+||ejc|||||28109
+|srt03|sbi|13,arlb2(xl)|||subtract low bound|28115
+||iov|6,srt17|||fail if overflow|28116
+||ilt|6,srt17|||fail if below low bound|28117
+||sbi|13,ardm2(xl)|||check against dimension|28118
+||ige|6,srt17|||fail if too large|28119
+||adi|13,ardm2(xl)|||restore value|28120
+||mfi|8,wa|||get as small integer|28121
+||wtb|8,wa|||offset within row to key|28122
+||mov|3,srtof|8,wa||keep offset|28123
+||ldi|13,ardm2(xl)|||second dimension is row length|28124
+||mfi|8,wa|||convert to short integer|28125
+||mov|7,xr|8,wa||copy row length|28126
+||wtb|8,wa|||convert to bytes|28127
+||mov|3,srtst|8,wa||store as stride|28128
+||ldi|13,ardim(xl)|||get number of rows|28129
+||mfi|8,wa|||as a short integer|28130
+||wtb|8,wa|||convert n to baus|28131
+||mov|8,wc|13,arlen(xl)||offset past array end|28132
+||sub|8,wc|8,wa||adjust, giving space for n offsets|28133
+||dca|8,wc|||point to a(0)|28134
+||mov|8,wb|13,arofs(xl)||offset to word before first item|28135
+||ica|8,wb|||offset to first item|28136
+|srt04|ble|8,wa|19,*num01|6,srt15|return if only a single item|28148
+||mov|3,srtsn|8,wa||store number of items (in baus)|28149
+||mov|3,srtso|8,wc||store offset to a(0)|28150
+||mov|8,wc|13,arlen(xl)||length of array or vec (=vclen)|28151
+||add|8,wc|7,xl||point past end of array or vector|28152
+||mov|3,srtsf|8,wb||store offset to first row|28153
+||add|7,xl|8,wb||point to first item in key array|28154
+|srt05|mov|7,xr|9,(xl)||get an entry|28158
+|srt06|bne|9,(xr)|22,=b_trt|6,srt07|jump out if not trblk|28162
+||mov|7,xr|13,trval(xr)||get value field|28163
+||brn|6,srt06|||loop|28164
+||ejc|||||28165
+|srt07|mov|10,(xl)+|7,xr||store as array entry|28171
+||blt|7,xl|8,wc|6,srt05|loop if not done|28172
+||mov|7,xl|9,(xs)||get adrs of sort array|28173
+||mov|7,xr|3,srtsf||initial offset to first key|28174
+||mov|8,wb|3,srtst||get stride|28175
+||add|7,xl|3,srtso||offset to a(0)|28176
+||ica|7,xl|||point to a(1)|28177
+||mov|8,wc|3,srtsn||get n|28178
+||btw|8,wc|||convert from bytes|28179
+||mov|3,srtnr|8,wc||store as row count|28180
+||lct|8,wc|8,wc||loop counter|28181
+|srt08|mov|10,(xl)+|7,xr||store an offset|28185
+||add|7,xr|8,wb||bump offset by stride|28186
+||bct|8,wc|6,srt08||loop through rows|28187
+|srt09|mov|8,wa|3,srtsn||get n|28194
+||mov|8,wc|3,srtnr||get number of rows|28195
+||rsh|8,wc|1,1||i = n / 2 (wc=i, index into array)|28196
+||wtb|8,wc|||convert back to bytes|28197
+|srt10|jsr|6,sorth|||sorth(i,n)|28201
+||dca|8,wc|||i = i - 1|28202
+||bnz|8,wc|6,srt10||loop if i gt 0|28203
+||mov|8,wc|8,wa||i = n|28204
+|srt11|dca|8,wc|||i = i - 1 (n - 1 initially)|28210
+||bze|8,wc|6,srt12||jump if done|28211
+||mov|7,xr|9,(xs)||get sort array address|28212
+||add|7,xr|3,srtso||point to a(0)|28213
+||mov|7,xl|7,xr||a(0) address|28214
+||add|7,xl|8,wc||a(i) address|28215
+||mov|8,wb|13,num01(xl)||copy a(i+1)|28216
+||mov|13,num01(xl)|13,num01(xr)||move a(1) to a(i+1)|28217
+||mov|13,num01(xr)|8,wb||complete exchange of a(1), a(i+1)|28218
+||mov|8,wa|8,wc||n = i for sorth|28219
+||mov|8,wc|19,*num01||i = 1 for sorth|28220
+||jsr|6,sorth|||sorth(1,n)|28221
+||mov|8,wc|8,wa||restore wc|28222
+||brn|6,srt11|||loop|28223
+||ejc|||||28224
+|srt12|mov|7,xr|9,(xs)||base adrs of key array|28231
+||mov|8,wc|7,xr||copy it|28232
+||add|8,wc|3,srtso||offset of a(0)|28233
+||add|7,xr|3,srtsf||adrs of first row of sort array|28234
+||mov|8,wb|3,srtst||get stride|28235
+|srt13|ica|8,wc|||adrs of next of sorted offsets|28240
+||mov|7,xl|8,wc||copy it for access|28241
+||mov|7,xl|9,(xl)||get offset|28242
+||add|7,xl|13,num01(xs)||add key array base adrs|28243
+||mov|8,wa|8,wb||get count of characters in row|28244
+||mvw||||copy a complete row|28245
+||dcv|3,srtnr|||decrement row count|28246
+||bnz|3,srtnr|6,srt13||repeat till all rows done|28247
+|srt15|mov|7,xr|10,(xs)+||pop result array ptr|28251
+||ica|7,xs|||pop key array ptr|28252
+||zer|3,r_sxl|||clear junk|28253
+||zer|3,r_sxr|||clear junk|28254
+||exi||||return|28255
+|srt16|erb|1,256|26,sort/rsort 1st arg not suitable array or table|||28259
+|srt17|erb|1,258|26,sort/rsort 2nd arg out of range or non-integer|||28260
+|srt18|exi|1,1|||return indication of null table|28264
+||enp||||end procudure sorta|28265
+||ejc|||||28266
+|sortc|prc|25,e|1,1||entry point|28287
+||mov|3,srts1|8,wa||save offset 1|28288
+||mov|3,srts2|8,wb||save offset 2|28289
+||mov|3,srtsc|8,wc||save wc|28290
+||add|7,xl|3,srtof||add offset to comparand field|28291
+||mov|7,xr|7,xl||copy base + offset|28292
+||add|7,xl|8,wa||add key1 offset|28293
+||add|7,xr|8,wb||add key2 offset|28294
+||mov|7,xl|9,(xl)||get key1|28295
+||mov|7,xr|9,(xr)||get key2|28296
+||bne|3,srtdf|21,=nulls|6,src12|jump if datatype field name used|28297
+||ejc|||||28298
+|src01|mov|8,wc|9,(xl)||get type code|28304
+||bne|8,wc|9,(xr)|6,src02|skip if not same datatype|28305
+||beq|8,wc|22,=b_scl|6,src09|jump if both strings|28306
+||beq|8,wc|22,=b_icl|6,src14|jump if both integers|28307
+|src02|mov|3,r_sxl|7,xl||keep arg1|28315
+||mov|3,r_sxr|7,xr||keep arg2|28316
+||beq|8,wc|22,=b_scl|6,src11|do not allow conversion to number|28319
+||beq|9,(xr)|22,=b_scl|6,src11|if either arg is a string|28320
+|src14|mov|11,-(xs)|7,xl||stack|28363
+||mov|11,-(xs)|7,xr||args|28364
+||jsr|6,acomp|||compare objects|28365
+||ppm|6,src10|||not numeric|28366
+||ppm|6,src10|||not numeric|28367
+||ppm|6,src03|||key1 less|28368
+||ppm|6,src08|||keys equal|28369
+||ppm|6,src05|||key1 greater|28370
+|src03|bnz|3,srtsr|6,src06||jump if rsort|28374
+|src04|mov|8,wc|3,srtsc||restore wc|28376
+||exi|1,1|||return|28377
+|src05|bnz|3,srtsr|6,src04||jump if rsort|28381
+|src06|mov|8,wc|3,srtsc||restore wc|28383
+||exi||||return|28384
+|src07|blt|7,xl|7,xr|6,src03|item first created is less|28388
+||bgt|7,xl|7,xr|6,src05|addresses rise in order of creation|28389
+|src08|blt|3,srts1|3,srts2|6,src04|test offsets or key addrss instead|28393
+||brn|6,src06|||offset 1 greater|28394
+||ejc|||||28395
+|src09|mov|11,-(xs)|7,xl||stack|28405
+||mov|11,-(xs)|7,xr||args|28406
+||jsr|6,lcomp|||compare objects|28407
+||ppm||||cant|28408
+||ppm||||fail|28409
+||ppm|6,src03|||key1 less|28410
+||ppm|6,src08|||keys equal|28411
+||ppm|6,src05|||key1 greater|28412
+|src10|mov|7,xl|3,r_sxl||get arg1|28416
+||mov|7,xr|3,r_sxr||get arg2|28417
+||mov|8,wc|9,(xl)||get type of key1|28418
+||beq|8,wc|9,(xr)|6,src07|jump if keys of same type|28419
+|src11|mov|7,xl|8,wc||get block type word|28423
+||mov|7,xr|9,(xr)||get block type word|28424
+||lei|7,xl|||entry point id for key1|28425
+||lei|7,xr|||entry point id for key2|28426
+||bgt|7,xl|7,xr|6,src05|jump if key1 gt key2|28427
+||brn|6,src03|||key1 lt key2|28428
+|src12|jsr|6,sortf|||call routine to find field 1|28432
+||mov|11,-(xs)|7,xl||stack item pointer|28433
+||mov|7,xl|7,xr||get key2|28434
+||jsr|6,sortf|||find field 2|28435
+||mov|7,xr|7,xl||place as key2|28436
+||mov|7,xl|10,(xs)+||recover key1|28437
+||brn|6,src01|||merge|28438
+||enp||||procedure sortc|28439
+||ejc|||||28440
+|sortf|prc|25,e|1,0||entry point|28458
+||bne|9,(xl)|22,=b_pdt|6,srtf3|return if not pdblk|28459
+||mov|11,-(xs)|7,xr||keep xr|28460
+||mov|7,xr|3,srtfd||get possible former dfblk ptr|28461
+||bze|7,xr|6,srtf4||jump if not|28462
+||bne|7,xr|13,pddfp(xl)|6,srtf4|jump if not right datatype|28463
+||bne|3,srtdf|3,srtff|6,srtf4|jump if not right field name|28464
+||add|7,xl|3,srtfo||add offset to required field|28465
+|srtf1|mov|7,xl|9,(xl)||get item from field|28469
+|srtf2|mov|7,xr|10,(xs)+||restore xr|28473
+|srtf3|exi||||return|28475
+||ejc|||||28476
+|srtf4|mov|7,xr|7,xl||copy original pointer|28482
+||mov|7,xr|13,pddfp(xr)||point to dfblk|28483
+||mov|3,srtfd|7,xr||keep a copy|28484
+||mov|8,wc|13,fargs(xr)||get number of fields|28485
+||wtb|8,wc|||convert to bytes|28486
+||add|7,xr|13,dflen(xr)||point past last field|28487
+|srtf5|dca|8,wc|||count down|28491
+||dca|7,xr|||point in front|28492
+||beq|9,(xr)|3,srtdf|6,srtf6|skip out if found|28493
+||bnz|8,wc|6,srtf5||loop|28494
+||brn|6,srtf2|||return - not found|28495
+|srtf6|mov|3,srtff|9,(xr)||keep field name ptr|28499
+||add|8,wc|19,*pdfld||add offset to first field|28500
+||mov|3,srtfo|8,wc||store as field offset|28501
+||add|7,xl|8,wc||point to field|28502
+||brn|6,srtf1|||return|28503
+||enp||||procedure sortf|28504
+||ejc|||||28505
+|sorth|prc|25,n|1,0||entry point|28520
+||mov|3,srtsn|8,wa||save n|28521
+||mov|3,srtwc|8,wc||keep wc|28522
+||mov|7,xl|9,(xs)||sort array base adrs|28523
+||add|7,xl|3,srtso||add offset to a(0)|28524
+||add|7,xl|8,wc||point to a(j)|28525
+||mov|3,srtrt|9,(xl)||get offset to root|28526
+||add|8,wc|8,wc||double j - cant exceed n|28527
+|srh01|bgt|8,wc|3,srtsn|6,srh03|done if j gt n|28531
+||beq|8,wc|3,srtsn|6,srh02|skip if j equals n|28532
+||mov|7,xr|9,(xs)||sort array base adrs|28533
+||mov|7,xl|13,num01(xs)||key array base adrs|28534
+||add|7,xr|3,srtso||point to a(0)|28535
+||add|7,xr|8,wc||adrs of a(j)|28536
+||mov|8,wa|13,num01(xr)||get a(j+1)|28537
+||mov|8,wb|9,(xr)||get a(j)|28538
+||jsr|6,sortc|||compare keys - lt(a(j+1),a(j))|28542
+||ppm|6,srh02|||a(j+1) lt a(j)|28543
+||ica|8,wc|||point to greater son, a(j+1)|28544
+||ejc|||||28545
+|srh02|mov|7,xl|13,num01(xs)||key array base adrs|28551
+||mov|7,xr|9,(xs)||get sort array address|28552
+||add|7,xr|3,srtso||adrs of a(0)|28553
+||mov|8,wb|7,xr||copy this adrs|28554
+||add|7,xr|8,wc||adrs of greater son, a(j)|28555
+||mov|8,wa|9,(xr)||get a(j)|28556
+||mov|7,xr|8,wb||point back to a(0)|28557
+||mov|8,wb|3,srtrt||get root|28558
+||jsr|6,sortc|||compare them - lt(a(j),root)|28559
+||ppm|6,srh03|||father exceeds sons - done|28560
+||mov|7,xr|9,(xs)||get sort array adrs|28561
+||add|7,xr|3,srtso||point to a(0)|28562
+||mov|7,xl|7,xr||copy it|28563
+||mov|8,wa|8,wc||copy j|28564
+||btw|8,wc|||convert to words|28565
+||rsh|8,wc|1,1||get j/2|28566
+||wtb|8,wc|||convert back to bytes|28567
+||add|7,xl|8,wa||point to a(j)|28568
+||add|7,xr|8,wc||adrs of a(j/2)|28569
+||mov|9,(xr)|9,(xl)||a(j/2) = a(j)|28570
+||mov|8,wc|8,wa||recover j|28571
+||aov|8,wc|8,wc|6,srh03|j = j*2. done if too big|28572
+||brn|6,srh01|||loop|28573
+|srh03|btw|8,wc|||convert to words|28577
+||rsh|8,wc|1,1||j = j/2|28578
+||wtb|8,wc|||convert back to bytes|28579
+||mov|7,xr|9,(xs)||sort array adrs|28580
+||add|7,xr|3,srtso||adrs of a(0)|28581
+||add|7,xr|8,wc||adrs of a(j/2)|28582
+||mov|9,(xr)|3,srtrt||a(j/2) = root|28583
+||mov|8,wa|3,srtsn||restore wa|28584
+||mov|8,wc|3,srtwc||restore wc|28585
+||exi||||return|28586
+||enp||||end procedure sorth|28587
+||ejc|||||28589
+|trace|prc|25,n|1,2||entry point|28605
+||jsr|6,gtstg|||get trace type string|28606
+||ppm|6,trc15|||jump if not string|28607
+||plc|7,xr|||else point to string|28608
+||lch|8,wa|9,(xr)||load first character|28609
+||flc|8,wa|||fold to upper case|28611
+||mov|7,xr|9,(xs)||load name argument|28613
+||mov|9,(xs)|7,xl||stack trblk ptr or zero|28614
+||mov|8,wc|18,=trtac||set trtyp for access trace|28615
+||beq|8,wa|18,=ch_la|6,trc10|jump if a (access)|28616
+||mov|8,wc|18,=trtvl||set trtyp for value trace|28617
+||beq|8,wa|18,=ch_lv|6,trc10|jump if v (value)|28618
+||beq|8,wa|18,=ch_bl|6,trc10|jump if blank (value)|28619
+||beq|8,wa|18,=ch_lf|6,trc01|jump if f (function)|28623
+||beq|8,wa|18,=ch_lr|6,trc01|jump if r (return)|28624
+||beq|8,wa|18,=ch_ll|6,trc03|jump if l (label)|28625
+||beq|8,wa|18,=ch_lk|6,trc06|jump if k (keyword)|28626
+||bne|8,wa|18,=ch_lc|6,trc15|else error if not c (call)|28627
+|trc01|jsr|6,gtnvr|||point to vrblk for name|28631
+||ppm|6,trc16|||jump if bad name|28632
+||ica|7,xs|||pop stack|28633
+||mov|7,xr|13,vrfnc(xr)||point to function block|28634
+||bne|9,(xr)|22,=b_pfc|6,trc17|error if not program function|28635
+||beq|8,wa|18,=ch_lr|6,trc02|jump if r (return)|28636
+||ejc|||||28637
+||mov|13,pfctr(xr)|7,xl||set/reset call trace|28643
+||beq|8,wa|18,=ch_lc|6,exnul|exit with null if c (call)|28644
+|trc02|mov|13,pfrtr(xr)|7,xl||set/reset return trace|28648
 ||exi||||return|28649
-||ejc|||||28650
-|trc06|jsr|6,gtnvr|||point to vrblk|28656
-||ppm|6,trc16|||error if not natural var|28657
-||bnz|13,vrlen(xr)|6,trc16||error if not system var|28658
-||ica|7,xs|||pop stack|28659
-||bze|7,xl|6,trc07||jump if stoptr case|28660
-||mov|13,trkvr(xl)|7,xr||store vrblk ptr in trblk for ktrex|28661
-|trc07|mov|7,xr|13,vrsvp(xr)||point to svblk|28665
-||beq|7,xr|21,=v_ert|6,trc08|jump if errtype|28666
-||beq|7,xr|21,=v_stc|6,trc09|jump if stcount|28667
-||bne|7,xr|21,=v_fnc|6,trc17|else error if not fnclevel|28668
-||mov|3,r_fnc|7,xl||set/reset fnclevel trace|28672
-||exi||||return|28673
-|trc08|mov|3,r_ert|7,xl||set/reset errtype trace|28677
-||exi||||return|28678
-|trc09|mov|3,r_stc|7,xl||set/reset stcount trace|28682
-||jsr|6,stgcc|||update countdown counters|28683
-||exi||||return|28684
-||ejc|||||28685
-|trc10|jsr|6,gtvar|||locate variable|28691
-||ppm|6,trc16|||error if not appropriate name|28692
-||mov|8,wb|10,(xs)+||get new trblk ptr again|28693
-||add|8,wa|7,xl||point to variable location|28694
-||mov|7,xr|8,wa||copy variable pointer|28695
-|trc11|mov|7,xl|9,(xr)||point to next entry|28699
-||bne|9,(xl)|22,=b_trt|6,trc13|jump if not trblk|28700
-||blt|8,wc|13,trtyp(xl)|6,trc13|jump if too far out on chain|28701
-||beq|8,wc|13,trtyp(xl)|6,trc12|jump if this matches our type|28702
-||add|7,xl|19,*trnxt||else point to link field|28703
-||mov|7,xr|7,xl||copy pointer|28704
-||brn|6,trc11|||and loop back|28705
-|trc12|mov|7,xl|13,trnxt(xl)||get ptr to next block or value|28709
-||mov|9,(xr)|7,xl||store to delete this trblk|28710
-|trc13|bze|8,wb|6,trc14||jump if stoptr case|28714
-||mov|9,(xr)|8,wb||else link new trblk in|28715
-||mov|7,xr|8,wb||copy trblk pointer|28716
-||mov|13,trnxt(xr)|7,xl||store forward pointer|28717
-||mov|13,trtyp(xr)|8,wc||store appropriate trap type code|28718
-|trc14|mov|7,xr|8,wa||recall possible vrblk pointer|28722
-||sub|7,xr|19,*vrval||point back to vrblk|28723
-||jsr|6,setvr|||set fields if vrblk|28724
-||exi||||return|28725
-|trc15|exi|1,2|||take bad trace type error exit|28729
-|trc16|ica|7,xs|||pop stack|28733
-|trc17|exi|1,1|||take bad name error exit|28737
-||enp||||end procedure trace|28738
-||ejc|||||28739
-|trbld|prc|25,e|1,0||entry point|28753
-||mov|11,-(xs)|7,xr||stack trtag (or trfnm)|28754
-||mov|8,wa|19,*trsi_||set size of trblk|28755
-||jsr|6,alloc|||allocate trblk|28756
-||mov|9,(xr)|22,=b_trt||store first word|28757
-||mov|13,trfnc(xr)|7,xl||store trfnc (or trfpt)|28758
-||mov|13,trtag(xr)|10,(xs)+||store trtag (or trfnm)|28759
-||mov|13,trtyp(xr)|8,wb||store type|28760
-||mov|13,trval(xr)|21,=nulls||for now, a null value|28761
-||exi||||return to caller|28762
-||enp||||end procedure trbld|28763
+|trc03|jsr|6,gtnvr|||point to vrblk|28653
+||ppm|6,trc16|||jump if bad name|28654
+||mov|7,xl|13,vrlbl(xr)||load label pointer|28655
+||bne|9,(xl)|22,=b_trt|6,trc04|jump if no old trace|28656
+||mov|7,xl|13,trlbl(xl)||else delete old trace association|28657
+|trc04|beq|7,xl|21,=stndl|6,trc16|error if undefined label|28661
+||mov|8,wb|10,(xs)+||get trblk ptr again|28662
+||bze|8,wb|6,trc05||jump if stoptr case|28663
+||mov|13,vrlbl(xr)|8,wb||else set new trblk pointer|28664
+||mov|13,vrtra(xr)|22,=b_vrt||set label trace routine address|28665
+||mov|7,xr|8,wb||copy trblk pointer|28666
+||mov|13,trlbl(xr)|7,xl||store real label in trblk|28667
+||exi||||return|28668
+|trc05|mov|13,vrlbl(xr)|7,xl||store label ptr back in vrblk|28672
+||mov|13,vrtra(xr)|22,=b_vrg||store normal transfer address|28673
+||exi||||return|28674
+||ejc|||||28675
+|trc06|jsr|6,gtnvr|||point to vrblk|28681
+||ppm|6,trc16|||error if not natural var|28682
+||bnz|13,vrlen(xr)|6,trc16||error if not system var|28683
+||ica|7,xs|||pop stack|28684
+||bze|7,xl|6,trc07||jump if stoptr case|28685
+||mov|13,trkvr(xl)|7,xr||store vrblk ptr in trblk for ktrex|28686
+|trc07|mov|7,xr|13,vrsvp(xr)||point to svblk|28690
+||beq|7,xr|21,=v_ert|6,trc08|jump if errtype|28691
+||beq|7,xr|21,=v_stc|6,trc09|jump if stcount|28692
+||bne|7,xr|21,=v_fnc|6,trc17|else error if not fnclevel|28693
+||mov|3,r_fnc|7,xl||set/reset fnclevel trace|28697
+||exi||||return|28698
+|trc08|mov|3,r_ert|7,xl||set/reset errtype trace|28702
+||exi||||return|28703
+|trc09|mov|3,r_stc|7,xl||set/reset stcount trace|28707
+||jsr|6,stgcc|||update countdown counters|28708
+||exi||||return|28709
+||ejc|||||28710
+|trc10|jsr|6,gtvar|||locate variable|28716
+||ppm|6,trc16|||error if not appropriate name|28717
+||mov|8,wb|10,(xs)+||get new trblk ptr again|28718
+||add|8,wa|7,xl||point to variable location|28719
+||mov|7,xr|8,wa||copy variable pointer|28720
+|trc11|mov|7,xl|9,(xr)||point to next entry|28724
+||bne|9,(xl)|22,=b_trt|6,trc13|jump if not trblk|28725
+||blt|8,wc|13,trtyp(xl)|6,trc13|jump if too far out on chain|28726
+||beq|8,wc|13,trtyp(xl)|6,trc12|jump if this matches our type|28727
+||add|7,xl|19,*trnxt||else point to link field|28728
+||mov|7,xr|7,xl||copy pointer|28729
+||brn|6,trc11|||and loop back|28730
+|trc12|mov|7,xl|13,trnxt(xl)||get ptr to next block or value|28734
+||mov|9,(xr)|7,xl||store to delete this trblk|28735
+|trc13|bze|8,wb|6,trc14||jump if stoptr case|28739
+||mov|9,(xr)|8,wb||else link new trblk in|28740
+||mov|7,xr|8,wb||copy trblk pointer|28741
+||mov|13,trnxt(xr)|7,xl||store forward pointer|28742
+||mov|13,trtyp(xr)|8,wc||store appropriate trap type code|28743
+|trc14|mov|7,xr|8,wa||recall possible vrblk pointer|28747
+||sub|7,xr|19,*vrval||point back to vrblk|28748
+||jsr|6,setvr|||set fields if vrblk|28749
+||exi||||return|28750
+|trc15|exi|1,2|||take bad trace type error exit|28754
+|trc16|ica|7,xs|||pop stack|28758
+|trc17|exi|1,1|||take bad name error exit|28762
+||enp||||end procedure trace|28763
 ||ejc|||||28764
-|trimr|prc|25,e|1,0||entry point|28782
-||mov|7,xl|7,xr||copy string pointer|28783
-||mov|8,wa|13,sclen(xr)||load string length|28784
-||bze|8,wa|6,trim2||jump if null input|28785
-||plc|7,xl|8,wa||else point past last character|28786
-||bze|8,wb|6,trim3||jump if no trim|28787
-||mov|8,wc|18,=ch_bl||load blank character|28788
-|trim0|lch|8,wb|11,-(xl)||load next character|28792
-||beq|8,wb|18,=ch_ht|6,trim1|jump if horizontal tab|28794
-||bne|8,wb|8,wc|6,trim3|jump if non-blank found|28796
-|trim1|dcv|8,wa|||else decrement character count|28797
-||bnz|8,wa|6,trim0||loop back if more to check|28798
-|trim2|mov|3,dnamp|7,xr||wipe out input string block|28802
-||mov|7,xr|21,=nulls||load null result|28803
-||brn|6,trim5|||merge to exit|28804
-||ejc|||||28805
-|trim3|mov|13,sclen(xr)|8,wa||set new length|28811
-||mov|7,xl|7,xr||copy string pointer|28812
-||psc|7,xl|8,wa||ready for storing blanks|28813
-||ctb|8,wa|2,schar||get length of block in bytes|28814
-||add|8,wa|7,xr||point past new block|28815
-||mov|3,dnamp|8,wa||set new top of storage pointer|28816
-||lct|8,wa|18,=cfp_c||get count of chars in word|28817
-||zer|8,wc|||set zero char|28818
-|trim4|sch|8,wc|10,(xl)+||store zero character|28822
-||bct|8,wa|6,trim4||loop back till all stored|28823
-||csc|7,xl|||complete store characters|28824
-|trim5|zer|7,xl|||clear garbage xl pointer|28828
-||exi||||return to caller|28829
-||enp||||end procedure trimr|28830
-||ejc|||||28831
-|trxeq|prc|25,r|1,0||entry point (recursive)|28862
-||mov|8,wc|3,r_cod||load code block pointer|28863
-||scp|8,wb|||get current code pointer|28864
-||sub|8,wb|8,wc||make code pointer into offset|28865
-||mov|11,-(xs)|3,kvtra||stack trace keyword value|28866
-||mov|11,-(xs)|7,xr||stack trblk pointer|28867
-||mov|11,-(xs)|7,xl||stack name base|28868
-||mov|11,-(xs)|8,wa||stack name offset|28869
-||mov|11,-(xs)|8,wc||stack code block pointer|28870
-||mov|11,-(xs)|8,wb||stack code pointer offset|28871
-||mov|11,-(xs)|3,flptr||stack old failure pointer|28872
-||zer|11,-(xs)|||set dummy fail offset|28873
-||mov|3,flptr|7,xs||set new failure pointer|28874
-||zer|3,kvtra|||reset trace keyword to zero|28875
-||mov|8,wc|21,=trxdc||load new (dummy) code blk pointer|28876
-||mov|3,r_cod|8,wc||set as code block pointer|28877
-||lcp|8,wc|||and new code pointer|28878
-||ejc|||||28879
-||mov|8,wb|8,wa||save name offset|28885
-||mov|8,wa|19,*nmsi_||load nmblk size|28886
-||jsr|6,alloc|||allocate space for nmblk|28887
-||mov|9,(xr)|22,=b_nml||set type word|28888
-||mov|13,nmbas(xr)|7,xl||store name base|28889
-||mov|13,nmofs(xr)|8,wb||store name offset|28890
-||mov|7,xl|12,6(xs)||reload pointer to trblk|28891
-||mov|11,-(xs)|7,xr||stack nmblk pointer (1st argument)|28892
-||mov|11,-(xs)|13,trtag(xl)||stack trace tag (2nd argument)|28893
-||mov|7,xl|13,trfnc(xl)||load trace vrblk pointer|28894
-||mov|7,xl|13,vrfnc(xl)||load trace function pointer|28895
-||beq|7,xl|21,=stndf|6,trxq2|jump if not a defined function|28896
-||mov|8,wa|18,=num02||set number of arguments to two|28897
-||brn|6,cfunc|||jump to call function|28898
-|trxq1|mov|7,xs|3,flptr||point back to our stack entries|28902
-||ica|7,xs|||pop off garbage fail offset|28903
-||mov|3,flptr|10,(xs)+||restore old failure pointer|28904
-||mov|8,wb|10,(xs)+||reload code offset|28905
-||mov|8,wc|10,(xs)+||load old code base pointer|28906
-||mov|7,xr|8,wc||copy cdblk pointer|28907
-||mov|3,kvstn|13,cdstm(xr)||restore stmnt no|28908
-||mov|8,wa|10,(xs)+||reload name offset|28909
-||mov|7,xl|10,(xs)+||reload name base|28910
-||mov|7,xr|10,(xs)+||reload trblk pointer|28911
-||mov|3,kvtra|10,(xs)+||restore trace keyword value|28912
-||add|8,wb|8,wc||recompute absolute code pointer|28913
-||lcp|8,wb|||restore code pointer|28914
-||mov|3,r_cod|8,wc||and code block pointer|28915
-||exi||||return to trxeq caller|28916
-|trxq2|erb|1,197|26,trace fourth arg is not function name or null|||28920
-||enp||||end procedure trxeq|28922
-||ejc|||||28923
-||ejc|||||28963
-|xscan|prc|25,e|1,0||entry point|28967
-||mov|3,xscwb|8,wb||preserve wb|28968
-||mov|11,-(xs)|8,wa||record blank skip flag|28969
-||mov|11,-(xs)|8,wa||and second copy|28970
-||mov|7,xr|3,r_xsc||point to argument string|28971
-||mov|8,wa|13,sclen(xr)||load string length|28972
-||mov|8,wb|3,xsofs||load current offset|28973
-||sub|8,wa|8,wb||get number of remaining characters|28974
-||bze|8,wa|6,xscn3||jump if no characters left|28975
-||plc|7,xr|8,wb||point to current character|28976
-|xscn1|lch|8,wb|10,(xr)+||load next character|28980
-||beq|8,wb|8,wc|6,xscn4|jump if delimiter one found|28981
-||beq|8,wb|7,xl|6,xscn5|jump if delimiter two found|28982
-||bze|9,(xs)|6,xscn2||jump if not skipping blanks|28983
-||icv|3,xsofs|||assume blank and delete it|28984
-||beq|8,wb|18,=ch_ht|6,xscn2|jump if horizontal tab|28986
-||beq|8,wb|18,=ch_bl|6,xscn2|jump if blank|28991
-||dcv|3,xsofs|||undelete non-blank character|28992
-||zer|9,(xs)|||and discontinue blank checking|28993
-|xscn2|dcv|8,wa|||decrement count of chars left|28997
-||bnz|8,wa|6,xscn1||loop back if more chars to go|28998
-|xscn3|mov|7,xl|3,r_xsc||point to string block|29002
-||mov|8,wa|13,sclen(xl)||get string length|29003
-||mov|8,wb|3,xsofs||load offset|29004
-||sub|8,wa|8,wb||get substring length|29005
-||zer|3,r_xsc|||clear string ptr for collector|29006
-||zer|3,xscrt|||set zero (runout) return code|29007
-||brn|6,xscn7|||jump to exit|29008
-||ejc|||||29009
-|xscn4|mov|3,xscrt|18,=num01||set return code|29015
-||brn|6,xscn6|||jump to merge|29016
-|xscn5|mov|3,xscrt|18,=num02||set return code|29020
-|xscn6|mov|7,xl|3,r_xsc||reload pointer to string|29024
-||mov|8,wc|13,sclen(xl)||get original length of string|29025
-||sub|8,wc|8,wa||minus chars left = chars scanned|29026
-||mov|8,wa|8,wc||move to reg for sbstr|29027
-||mov|8,wb|3,xsofs||set offset|29028
-||sub|8,wa|8,wb||compute length for sbstr|29029
-||icv|8,wc|||adjust new cursor past delimiter|29030
-||mov|3,xsofs|8,wc||store new offset|29031
-|xscn7|zer|7,xr|||clear garbage character ptr in xr|29035
-||jsr|6,sbstr|||build sub-string|29036
-||ica|7,xs|||remove copy of blank flag|29037
-||mov|8,wb|10,(xs)+||original blank skip/trim flag|29038
-||bze|13,sclen(xr)|6,xscn8||cannot trim the null string|29039
-||jsr|6,trimr|||trim trailing blanks if requested|29040
-|xscn8|mov|8,wa|3,xscrt||load return code|29044
-||mov|8,wb|3,xscwb||restore wb|29045
-||exi||||return to xscan caller|29046
-||enp||||end procedure xscan|29047
-||ejc|||||29048
-|xscni|prc|25,n|1,2||entry point|29065
-||jsr|6,gtstg|||fetch argument as string|29066
-||ppm|6,xsci1|||jump if not convertible|29067
-||mov|3,r_xsc|7,xr||else store scblk ptr for xscan|29068
-||zer|3,xsofs|||set offset to zero|29069
-||bze|8,wa|6,xsci2||jump if null string|29070
-||exi||||return to xscni caller|29071
-|xsci1|exi|1,1|||take not-string error exit|29075
-|xsci2|exi|1,2|||take null-string error exit|29079
-||enp||||end procedure xscni|29080
-||ttl|27,s p i t b o l -- stack overflow section||||29081
-||sec||||start of stack overflow section|29085
-||add|3,errft|18,=num04||force conclusive fatal error|29087
-||mov|7,xs|3,flptr||pop stack to avoid more fails|29088
-||bnz|3,gbcfl|6,stak1||jump if garbage collecting|29089
-||erb|1,246|26,stack overflow|||29090
-|stak1|mov|7,xr|21,=endso||point to message|29094
-||zer|3,kvdmp|||memory is undumpable|29095
-||brn|6,stopr|||give up|29096
-||ttl|27,s p i t b o l -- error section||||29097
-||sec||||start of error section|29127
-|error|beq|3,r_cim|20,=cmlab|6,cmple|jump if error in scanning label|29129
-||mov|3,kvert|8,wa||save error code|29130
-||zer|3,scnrs|||reset rescan switch for scane|29131
-||zer|3,scngo|||reset goto switch for scane|29132
-||mov|3,polcs|18,=num01||reset poll count|29134
-||mov|3,polct|18,=num01||reset poll count|29135
-||mov|7,xr|3,stage||load current stage|29137
-||bsw|7,xr|2,stgno||jump to appropriate error circuit|29138
-||iff|2,stgic|6,err01||initial compile|29146
-||iff|2,stgxc|6,err04||execute time compile|29146
-||iff|2,stgev|6,err04||eval compiling expr.|29146
-||iff|2,stgxt|6,err05||execute time|29146
-||iff|2,stgce|6,err01||compile - after end|29146
-||iff|2,stgxe|6,err04||xeq compile-past end|29146
-||iff|2,stgee|6,err04||eval evaluating expr|29146
-||esw||||end switch on error type|29146
-||ejc|||||29147
-|err01|mov|7,xs|3,cmpxs||reset stack pointer|29163
-||ssl|3,cmpss|||restore s-r stack ptr for cmpil|29164
-||bnz|3,errsp|6,err03||jump if error suppress flag set|29165
-||mov|8,wc|3,cmpsn||current statement|29168
-||jsr|6,filnm|||obtain file name for this statement|29169
-||mov|8,wb|3,scnse||column number|29171
-||mov|8,wc|3,rdcln||line number|29172
-||mov|7,xr|3,stage|||29173
-||jsr|6,sysea|||advise system of error|29174
-||ppm|6,erra3|||if system does not want print|29175
-||mov|11,-(xs)|7,xr||save any provided print message|29176
-||mov|3,erlst|3,erich||set flag for listr|29178
-||jsr|6,listr|||list line|29179
-||jsr|6,prtis|||terminate listing|29180
-||zer|3,erlst|||clear listr flag|29181
-||mov|8,wa|3,scnse||load scan element offset|29182
-||bze|8,wa|6,err02||skip if not set|29183
-||lct|8,wb|8,wa||loop counter|29185
-||icv|8,wa|||increase for ch_ex|29186
-||mov|7,xl|3,r_cim||point to bad statement|29187
-||jsr|6,alocs|||string block for error flag|29188
-||mov|8,wa|7,xr||remember string ptr|29189
-||psc|7,xr|||ready for character storing|29190
-||plc|7,xl|||ready to get chars|29191
-|erra1|lch|8,wc|10,(xl)+||get next char|29195
-||beq|8,wc|18,=ch_ht|6,erra2|skip if tab|29196
-||mov|8,wc|18,=ch_bl||get a blank|29197
-||ejc|||||29198
-|erra2|sch|8,wc|10,(xr)+||store char|29202
-||bct|8,wb|6,erra1||loop|29203
-||mov|7,xl|18,=ch_ex||exclamation mark|29204
-||sch|7,xl|9,(xr)||store at end of error line|29205
-||csc|7,xr|||end of sch loop|29206
-||mov|3,profs|18,=stnpd||allow for statement number|29207
-||mov|7,xr|8,wa||point to error line|29208
-||jsr|6,prtst|||print error line|29209
-|err02|jsr|6,prtis|||print blank line|29223
-||mov|7,xr|10,(xs)+||restore any sysea message|29225
-||bze|7,xr|6,erra0||did sysea provide message to print|29226
-||jsr|6,prtst|||print sysea message|29227
-|erra0|jsr|6,ermsg|||generate flag and error message|29229
-||add|3,lstlc|18,=num03||bump page ctr for blank, error, blk|29230
-|erra3|zer|7,xr|||in case of fatal error|29231
-||bhi|3,errft|18,=num03|6,stopr|pack up if several fatals|29232
-||icv|3,cmerc|||bump error count|29236
-||add|3,noxeq|3,cswer||inhibit xeq if -noerrors|29237
-||bne|3,stage|18,=stgic|6,cmp10|special return if after end line|29238
-||ejc|||||29239
-|err03|mov|7,xr|3,r_cim||point to start of image|29243
-||plc|7,xr|||point to first char|29244
-||lch|7,xr|9,(xr)||get first char|29245
-||beq|7,xr|18,=ch_mn|6,cmpce|jump if error in control card|29246
-||zer|3,scnrs|||clear rescan flag|29247
-||mnz|3,errsp|||set error suppress flag|29248
-||jsr|6,scane|||scan next element|29249
-||bne|7,xl|18,=t_smc|6,err03|loop back if not statement end|29250
-||zer|3,errsp|||clear error suppress flag|29251
-||mov|3,cwcof|19,*cdcod||reset offset in ccblk|29255
-||mov|8,wa|21,=ocer_||load compile error call|29256
-||jsr|6,cdwrd|||generate it|29257
-||mov|13,cmsoc(xs)|3,cwcof||set success fill in offset|29258
-||mnz|13,cmffc(xs)|||set failure fill in flag|29259
-||jsr|6,cdwrd|||generate succ. fill in word|29260
-||brn|6,cmpse|||merge to generate error as cdfal|29261
-|err04|bge|3,errft|18,=num03|6,labo1|abort if too many fatal errors|29271
-||beq|3,kvert|18,=nm320|6,err06|treat user interrupt specially|29273
-||zer|3,r_ccb|||forget garbage code block|29275
-||mov|3,cwcof|19,*cccod||set initial offset (mbe catspaw)|29276
-||ssl|3,iniss|||restore main prog s-r stack ptr|29277
-||jsr|6,ertex|||get fail message text|29278
-||dca|7,xs|||ensure stack ok on loop start|29279
-|erra4|ica|7,xs|||pop stack|29284
-||beq|7,xs|3,flprt|6,errc4|jump if prog defined fn call found|29285
-||bne|7,xs|3,gtcef|6,erra4|loop if not eval or code call yet|29286
-||mov|3,stage|18,=stgxt||re-set stage for execute|29287
-||mov|3,r_cod|3,r_gtc||recover code ptr|29288
-||mov|3,flptr|7,xs||restore fail pointer|29289
-||zer|3,r_cim|||forget possible image|29290
-||zer|3,cnind|||forget possible include|29292
-|errb4|bnz|3,kverl|6,err07||jump if errlimit non-zero|29297
-||brn|6,exfal|||fail|29298
-|errc4|mov|7,xs|3,flptr||restore stack from flptr|29302
-||brn|6,errb4|||merge|29303
-||ejc|||||29304
-|err05|ssl|3,iniss|||restore main prog s-r stack ptr|29322
-||bnz|3,dmvch|6,err08||jump if in mid-dump|29323
-|err06|bze|3,kverl|6,labo1||abort if errlimit is zero|29327
-||jsr|6,ertex|||get fail message text|29328
-|err07|bge|3,errft|18,=num03|6,labo1|abort if too many fatal errors|29332
-||dcv|3,kverl|||decrement errlimit|29333
-||mov|7,xl|3,r_ert||load errtype trace pointer|29334
-||jsr|6,ktrex|||generate errtype trace if required|29335
-||mov|8,wa|3,r_cod||get current code block|29336
-||mov|3,r_cnt|8,wa||set cdblk ptr for continuation|29337
-||scp|8,wb|||current code pointer|29338
-||sub|8,wb|8,wa||offset within code block|29339
-||mov|3,stxoc|8,wb||save code ptr offset for scontinue|29340
-||mov|7,xr|3,flptr||set ptr to failure offset|29341
-||mov|3,stxof|9,(xr)||save failure offset for continue|29342
-||mov|7,xr|3,r_sxc||load setexit cdblk pointer|29343
-||bze|7,xr|6,lcnt1||continue if no setexit trap|29344
-||zer|3,r_sxc|||else reset trap|29345
-||mov|3,stxvr|21,=nulls||reset setexit arg to null|29346
-||mov|7,xl|9,(xr)||load ptr to code block routine|29347
-||bri|7,xl|||execute first trap statement|29348
-|err08|mov|7,xr|3,dmvch||chain head for affected vrblks|29353
-||bze|7,xr|6,err06||done if zero|29354
-||mov|3,dmvch|9,(xr)||set next link as chain head|29355
-||jsr|6,setvr|||restore vrget field|29356
-|s_yyy|brn|6,err08|||loop through chain|29360
-||ttl|27,s p i t b o l -- here endeth the code||||29361
-||end||||end macro-spitbol assembly|29365
+|trbld|prc|25,e|1,0||entry point|28778
+||mov|11,-(xs)|7,xr||stack trtag (or trfnm)|28779
+||mov|8,wa|19,*trsi_||set size of trblk|28780
+||jsr|6,alloc|||allocate trblk|28781
+||mov|9,(xr)|22,=b_trt||store first word|28782
+||mov|13,trfnc(xr)|7,xl||store trfnc (or trfpt)|28783
+||mov|13,trtag(xr)|10,(xs)+||store trtag (or trfnm)|28784
+||mov|13,trtyp(xr)|8,wb||store type|28785
+||mov|13,trval(xr)|21,=nulls||for now, a null value|28786
+||exi||||return to caller|28787
+||enp||||end procedure trbld|28788
+||ejc|||||28789
+|trimr|prc|25,e|1,0||entry point|28807
+||mov|7,xl|7,xr||copy string pointer|28808
+||mov|8,wa|13,sclen(xr)||load string length|28809
+||bze|8,wa|6,trim2||jump if null input|28810
+||plc|7,xl|8,wa||else point past last character|28811
+||bze|8,wb|6,trim3||jump if no trim|28812
+||mov|8,wc|18,=ch_bl||load blank character|28813
+|trim0|lch|8,wb|11,-(xl)||load next character|28817
+||beq|8,wb|18,=ch_ht|6,trim1|jump if horizontal tab|28819
+||bne|8,wb|8,wc|6,trim3|jump if non-blank found|28821
+|trim1|dcv|8,wa|||else decrement character count|28822
+||bnz|8,wa|6,trim0||loop back if more to check|28823
+|trim2|mov|3,dnamp|7,xr||wipe out input string block|28827
+||mov|7,xr|21,=nulls||load null result|28828
+||brn|6,trim5|||merge to exit|28829
+||ejc|||||28830
+|trim3|mov|13,sclen(xr)|8,wa||set new length|28836
+||mov|7,xl|7,xr||copy string pointer|28837
+||psc|7,xl|8,wa||ready for storing blanks|28838
+||ctb|8,wa|2,schar||get length of block in bytes|28839
+||add|8,wa|7,xr||point past new block|28840
+||mov|3,dnamp|8,wa||set new top of storage pointer|28841
+||lct|8,wa|18,=cfp_c||get count of chars in word|28842
+||zer|8,wc|||set zero char|28843
+|trim4|sch|8,wc|10,(xl)+||store zero character|28847
+||bct|8,wa|6,trim4||loop back till all stored|28848
+||csc|7,xl|||complete store characters|28849
+|trim5|zer|7,xl|||clear garbage xl pointer|28853
+||exi||||return to caller|28854
+||enp||||end procedure trimr|28855
+||ejc|||||28856
+|trxeq|prc|25,r|1,0||entry point (recursive)|28887
+||mov|8,wc|3,r_cod||load code block pointer|28888
+||scp|8,wb|||get current code pointer|28889
+||sub|8,wb|8,wc||make code pointer into offset|28890
+||mov|11,-(xs)|3,kvtra||stack trace keyword value|28891
+||mov|11,-(xs)|7,xr||stack trblk pointer|28892
+||mov|11,-(xs)|7,xl||stack name base|28893
+||mov|11,-(xs)|8,wa||stack name offset|28894
+||mov|11,-(xs)|8,wc||stack code block pointer|28895
+||mov|11,-(xs)|8,wb||stack code pointer offset|28896
+||mov|11,-(xs)|3,flptr||stack old failure pointer|28897
+||zer|11,-(xs)|||set dummy fail offset|28898
+||mov|3,flptr|7,xs||set new failure pointer|28899
+||zer|3,kvtra|||reset trace keyword to zero|28900
+||mov|8,wc|21,=trxdc||load new (dummy) code blk pointer|28901
+||mov|3,r_cod|8,wc||set as code block pointer|28902
+||lcp|8,wc|||and new code pointer|28903
+||ejc|||||28904
+||mov|8,wb|8,wa||save name offset|28910
+||mov|8,wa|19,*nmsi_||load nmblk size|28911
+||jsr|6,alloc|||allocate space for nmblk|28912
+||mov|9,(xr)|22,=b_nml||set type word|28913
+||mov|13,nmbas(xr)|7,xl||store name base|28914
+||mov|13,nmofs(xr)|8,wb||store name offset|28915
+||mov|7,xl|12,6(xs)||reload pointer to trblk|28916
+||mov|11,-(xs)|7,xr||stack nmblk pointer (1st argument)|28917
+||mov|11,-(xs)|13,trtag(xl)||stack trace tag (2nd argument)|28918
+||mov|7,xl|13,trfnc(xl)||load trace vrblk pointer|28919
+||mov|7,xl|13,vrfnc(xl)||load trace function pointer|28920
+||beq|7,xl|21,=stndf|6,trxq2|jump if not a defined function|28921
+||mov|8,wa|18,=num02||set number of arguments to two|28922
+||brn|6,cfunc|||jump to call function|28923
+|trxq1|mov|7,xs|3,flptr||point back to our stack entries|28927
+||ica|7,xs|||pop off garbage fail offset|28928
+||mov|3,flptr|10,(xs)+||restore old failure pointer|28929
+||mov|8,wb|10,(xs)+||reload code offset|28930
+||mov|8,wc|10,(xs)+||load old code base pointer|28931
+||mov|7,xr|8,wc||copy cdblk pointer|28932
+||mov|3,kvstn|13,cdstm(xr)||restore stmnt no|28933
+||mov|8,wa|10,(xs)+||reload name offset|28934
+||mov|7,xl|10,(xs)+||reload name base|28935
+||mov|7,xr|10,(xs)+||reload trblk pointer|28936
+||mov|3,kvtra|10,(xs)+||restore trace keyword value|28937
+||add|8,wb|8,wc||recompute absolute code pointer|28938
+||lcp|8,wb|||restore code pointer|28939
+||mov|3,r_cod|8,wc||and code block pointer|28940
+||exi||||return to trxeq caller|28941
+|trxq2|erb|1,197|26,trace fourth arg is not function name or null|||28945
+||enp||||end procedure trxeq|28947
+||ejc|||||28948
+||ejc|||||28988
+|xscan|prc|25,e|1,0||entry point|28992
+||mov|3,xscwb|8,wb||preserve wb|28993
+||mov|11,-(xs)|8,wa||record blank skip flag|28994
+||mov|11,-(xs)|8,wa||and second copy|28995
+||mov|7,xr|3,r_xsc||point to argument string|28996
+||mov|8,wa|13,sclen(xr)||load string length|28997
+||mov|8,wb|3,xsofs||load current offset|28998
+||sub|8,wa|8,wb||get number of remaining characters|28999
+||bze|8,wa|6,xscn3||jump if no characters left|29000
+||plc|7,xr|8,wb||point to current character|29001
+|xscn1|lch|8,wb|10,(xr)+||load next character|29005
+||beq|8,wb|8,wc|6,xscn4|jump if delimiter one found|29006
+||beq|8,wb|7,xl|6,xscn5|jump if delimiter two found|29007
+||bze|9,(xs)|6,xscn2||jump if not skipping blanks|29008
+||icv|3,xsofs|||assume blank and delete it|29009
+||beq|8,wb|18,=ch_ht|6,xscn2|jump if horizontal tab|29011
+||beq|8,wb|18,=ch_bl|6,xscn2|jump if blank|29016
+||dcv|3,xsofs|||undelete non-blank character|29017
+||zer|9,(xs)|||and discontinue blank checking|29018
+|xscn2|dcv|8,wa|||decrement count of chars left|29022
+||bnz|8,wa|6,xscn1||loop back if more chars to go|29023
+|xscn3|mov|7,xl|3,r_xsc||point to string block|29027
+||mov|8,wa|13,sclen(xl)||get string length|29028
+||mov|8,wb|3,xsofs||load offset|29029
+||sub|8,wa|8,wb||get substring length|29030
+||zer|3,r_xsc|||clear string ptr for collector|29031
+||zer|3,xscrt|||set zero (runout) return code|29032
+||brn|6,xscn7|||jump to exit|29033
+||ejc|||||29034
+|xscn4|mov|3,xscrt|18,=num01||set return code|29040
+||brn|6,xscn6|||jump to merge|29041
+|xscn5|mov|3,xscrt|18,=num02||set return code|29045
+|xscn6|mov|7,xl|3,r_xsc||reload pointer to string|29049
+||mov|8,wc|13,sclen(xl)||get original length of string|29050
+||sub|8,wc|8,wa||minus chars left = chars scanned|29051
+||mov|8,wa|8,wc||move to reg for sbstr|29052
+||mov|8,wb|3,xsofs||set offset|29053
+||sub|8,wa|8,wb||compute length for sbstr|29054
+||icv|8,wc|||adjust new cursor past delimiter|29055
+||mov|3,xsofs|8,wc||store new offset|29056
+|xscn7|zer|7,xr|||clear garbage character ptr in xr|29060
+||jsr|6,sbstr|||build sub-string|29061
+||ica|7,xs|||remove copy of blank flag|29062
+||mov|8,wb|10,(xs)+||original blank skip/trim flag|29063
+||bze|13,sclen(xr)|6,xscn8||cannot trim the null string|29064
+||jsr|6,trimr|||trim trailing blanks if requested|29065
+|xscn8|mov|8,wa|3,xscrt||load return code|29069
+||mov|8,wb|3,xscwb||restore wb|29070
+||exi||||return to xscan caller|29071
+||enp||||end procedure xscan|29072
+||ejc|||||29073
+|xscni|prc|25,n|1,2||entry point|29090
+||jsr|6,gtstg|||fetch argument as string|29091
+||ppm|6,xsci1|||jump if not convertible|29092
+||mov|3,r_xsc|7,xr||else store scblk ptr for xscan|29093
+||zer|3,xsofs|||set offset to zero|29094
+||bze|8,wa|6,xsci2||jump if null string|29095
+||exi||||return to xscni caller|29096
+|xsci1|exi|1,1|||take not-string error exit|29100
+|xsci2|exi|1,2|||take null-string error exit|29104
+||enp||||end procedure xscni|29105
+||ttl|27,s p i t b o l -- stack overflow section||||29106
+||sec||||start of stack overflow section|29110
+||add|3,errft|18,=num04||force conclusive fatal error|29112
+||mov|7,xs|3,flptr||pop stack to avoid more fails|29113
+||bnz|3,gbcfl|6,stak1||jump if garbage collecting|29114
+||erb|1,246|26,stack overflow|||29115
+|stak1|mov|7,xr|21,=endso||point to message|29119
+||zer|3,kvdmp|||memory is undumpable|29120
+||brn|6,stopr|||give up|29121
+||ttl|27,s p i t b o l -- error section||||29122
+||sec||||start of error section|29152
+|error|beq|3,r_cim|20,=cmlab|6,cmple|jump if error in scanning label|29154
+||mov|3,kvert|8,wa||save error code|29155
+||zer|3,scnrs|||reset rescan switch for scane|29156
+||zer|3,scngo|||reset goto switch for scane|29157
+||mov|3,polcs|18,=num01||reset poll count|29159
+||mov|3,polct|18,=num01||reset poll count|29160
+||mov|7,xr|3,stage||load current stage|29162
+||bsw|7,xr|2,stgno||jump to appropriate error circuit|29163
+||iff|2,stgic|6,err01||initial compile|29171
+||iff|2,stgxc|6,err04||execute time compile|29171
+||iff|2,stgev|6,err04||eval compiling expr.|29171
+||iff|2,stgxt|6,err05||execute time|29171
+||iff|2,stgce|6,err01||compile - after end|29171
+||iff|2,stgxe|6,err04||xeq compile-past end|29171
+||iff|2,stgee|6,err04||eval evaluating expr|29171
+||esw||||end switch on error type|29171
+||ejc|||||29172
+|err01|mov|7,xs|3,cmpxs||reset stack pointer|29188
+||ssl|3,cmpss|||restore s-r stack ptr for cmpil|29189
+||bnz|3,errsp|6,err03||jump if error suppress flag set|29190
+||mov|8,wc|3,cmpsn||current statement|29193
+||jsr|6,filnm|||obtain file name for this statement|29194
+||mov|8,wb|3,scnse||column number|29196
+||mov|8,wc|3,rdcln||line number|29197
+||mov|7,xr|3,stage|||29198
+||jsr|6,sysea|||advise system of error|29199
+||ppm|6,erra3|||if system does not want print|29200
+||mov|11,-(xs)|7,xr||save any provided print message|29201
+||mov|3,erlst|3,erich||set flag for listr|29203
+||jsr|6,listr|||list line|29204
+||jsr|6,prtis|||terminate listing|29205
+||zer|3,erlst|||clear listr flag|29206
+||mov|8,wa|3,scnse||load scan element offset|29207
+||bze|8,wa|6,err02||skip if not set|29208
+||lct|8,wb|8,wa||loop counter|29210
+||icv|8,wa|||increase for ch_ex|29211
+||mov|7,xl|3,r_cim||point to bad statement|29212
+||jsr|6,alocs|||string block for error flag|29213
+||mov|8,wa|7,xr||remember string ptr|29214
+||psc|7,xr|||ready for character storing|29215
+||plc|7,xl|||ready to get chars|29216
+|erra1|lch|8,wc|10,(xl)+||get next char|29220
+||beq|8,wc|18,=ch_ht|6,erra2|skip if tab|29221
+||mov|8,wc|18,=ch_bl||get a blank|29222
+||ejc|||||29223
+|erra2|sch|8,wc|10,(xr)+||store char|29227
+||bct|8,wb|6,erra1||loop|29228
+||mov|7,xl|18,=ch_ex||exclamation mark|29229
+||sch|7,xl|9,(xr)||store at end of error line|29230
+||csc|7,xr|||end of sch loop|29231
+||mov|3,profs|18,=stnpd||allow for statement number|29232
+||mov|7,xr|8,wa||point to error line|29233
+||jsr|6,prtst|||print error line|29234
+|err02|jsr|6,prtis|||print blank line|29248
+||mov|7,xr|10,(xs)+||restore any sysea message|29250
+||bze|7,xr|6,erra0||did sysea provide message to print|29251
+||jsr|6,prtst|||print sysea message|29252
+|erra0|jsr|6,ermsg|||generate flag and error message|29254
+||add|3,lstlc|18,=num03||bump page ctr for blank, error, blk|29255
+|erra3|zer|7,xr|||in case of fatal error|29256
+||bhi|3,errft|18,=num03|6,stopr|pack up if several fatals|29257
+||icv|3,cmerc|||bump error count|29261
+||add|3,noxeq|3,cswer||inhibit xeq if -noerrors|29262
+||bne|3,stage|18,=stgic|6,cmp10|special return if after end line|29263
+||ejc|||||29264
+|err03|mov|7,xr|3,r_cim||point to start of image|29268
+||plc|7,xr|||point to first char|29269
+||lch|7,xr|9,(xr)||get first char|29270
+||beq|7,xr|18,=ch_mn|6,cmpce|jump if error in control card|29271
+||zer|3,scnrs|||clear rescan flag|29272
+||mnz|3,errsp|||set error suppress flag|29273
+||jsr|6,scane|||scan next element|29274
+||bne|7,xl|18,=t_smc|6,err03|loop back if not statement end|29275
+||zer|3,errsp|||clear error suppress flag|29276
+||mov|3,cwcof|19,*cdcod||reset offset in ccblk|29280
+||mov|8,wa|21,=ocer_||load compile error call|29281
+||jsr|6,cdwrd|||generate it|29282
+||mov|13,cmsoc(xs)|3,cwcof||set success fill in offset|29283
+||mnz|13,cmffc(xs)|||set failure fill in flag|29284
+||jsr|6,cdwrd|||generate succ. fill in word|29285
+||brn|6,cmpse|||merge to generate error as cdfal|29286
+|err04|bge|3,errft|18,=num03|6,labo1|abort if too many fatal errors|29296
+||beq|3,kvert|18,=nm320|6,err06|treat user interrupt specially|29298
+||zer|3,r_ccb|||forget garbage code block|29300
+||mov|3,cwcof|19,*cccod||set initial offset (mbe catspaw)|29301
+||ssl|3,iniss|||restore main prog s-r stack ptr|29302
+||jsr|6,ertex|||get fail message text|29303
+||dca|7,xs|||ensure stack ok on loop start|29304
+|erra4|ica|7,xs|||pop stack|29309
+||beq|7,xs|3,flprt|6,errc4|jump if prog defined fn call found|29310
+||bne|7,xs|3,gtcef|6,erra4|loop if not eval or code call yet|29311
+||mov|3,stage|18,=stgxt||re-set stage for execute|29312
+||mov|3,r_cod|3,r_gtc||recover code ptr|29313
+||mov|3,flptr|7,xs||restore fail pointer|29314
+||zer|3,r_cim|||forget possible image|29315
+||zer|3,cnind|||forget possible include|29317
+|errb4|bnz|3,kverl|6,err07||jump if errlimit non-zero|29322
+||brn|6,exfal|||fail|29323
+|errc4|mov|7,xs|3,flptr||restore stack from flptr|29327
+||brn|6,errb4|||merge|29328
+||ejc|||||29329
+|err05|ssl|3,iniss|||restore main prog s-r stack ptr|29347
+||bnz|3,dmvch|6,err08||jump if in mid-dump|29348
+|err06|bze|3,kverl|6,labo1||abort if errlimit is zero|29352
+||jsr|6,ertex|||get fail message text|29353
+|err07|bge|3,errft|18,=num03|6,labo1|abort if too many fatal errors|29357
+||dcv|3,kverl|||decrement errlimit|29358
+||mov|7,xl|3,r_ert||load errtype trace pointer|29359
+||jsr|6,ktrex|||generate errtype trace if required|29360
+||mov|8,wa|3,r_cod||get current code block|29361
+||mov|3,r_cnt|8,wa||set cdblk ptr for continuation|29362
+||scp|8,wb|||current code pointer|29363
+||sub|8,wb|8,wa||offset within code block|29364
+||mov|3,stxoc|8,wb||save code ptr offset for scontinue|29365
+||mov|7,xr|3,flptr||set ptr to failure offset|29366
+||mov|3,stxof|9,(xr)||save failure offset for continue|29367
+||mov|7,xr|3,r_sxc||load setexit cdblk pointer|29368
+||bze|7,xr|6,lcnt1||continue if no setexit trap|29369
+||zer|3,r_sxc|||else reset trap|29370
+||mov|3,stxvr|21,=nulls||reset setexit arg to null|29371
+||mov|7,xl|9,(xr)||load ptr to code block routine|29372
+||bri|7,xl|||execute first trap statement|29373
+|err08|mov|7,xr|3,dmvch||chain head for affected vrblks|29378
+||bze|7,xr|6,err06||done if zero|29379
+||mov|3,dmvch|9,(xr)||set next link as chain head|29380
+||jsr|6,setvr|||restore vrget field|29381
+|s_yyy|brn|6,err08|||loop through chain|29385
+||ttl|27,s p i t b o l -- here endeth the code||||29386
+||end||||end macro-spitbol assembly|29390

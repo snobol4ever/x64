@@ -10530,6 +10530,11 @@ asg01:
         mov  xr,m_word [xl]                     ; load variable value} mov xr (xl) 
         cmp  m_word [xr],b_trt                  ; jump if trapped} beq (xr) =b_trt asg02
         je   asg02                              ; 
+        push wb                                 ; stack value pointer for sysmv} mov -(xs) wb 
+        mov  xr,xl                              ; xr = vrval field} mov xr xl 
+        sub  xr,cfp_b*vrvlo                     ; xr = vrsto field (vrvlo = vrval - vrsto)} sub xr *vrvlo 
+        call sysmv                              ; emit VALUE record on monitor wire} jsr sysmv  
+        pop  wb                                 ; pop value back} mov wb (xs)+ 
         mov  m_word [xl],wb                     ; else perform assignment} mov (xl) wb 
         xor  xl,xl                              ; clear garbage value in xl} zer xl  
         mov  m_word [_rc_],0                    ; and return to asign caller} exi   
@@ -10752,6 +10757,11 @@ asinp:
         mov  xr,m_word [xl]                     ; load current contents} mov xr (xl) 
         cmp  m_word [xr],b_trt                  ; jump if trapped} beq (xr) =b_trt asnp1
         je   asnp1                              ; 
+        push wb                                 ; stack value pointer for sysmv} mov -(xs) wb 
+        mov  xr,xl                              ; xr = vrval field} mov xr xl 
+        sub  xr,cfp_b*vrvlo                     ; xr = vrsto field (vrvlo = vrval - vrsto)} sub xr *vrvlo 
+        call sysmv                              ; emit VALUE record on monitor wire} jsr sysmv  
+        pop  wb                                 ; pop value back} mov wb (xs)+ 
         mov  m_word [xl],wb                     ; else perform assignment} mov (xl) wb 
         xor  xl,xl                              ; clear garbage value in xl} zer xl  
         mov  m_word [_rc_],0                    ; return to asinp caller} exi   

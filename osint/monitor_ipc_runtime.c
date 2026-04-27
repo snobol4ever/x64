@@ -289,12 +289,28 @@ static uint8_t spl_block_to_wire(const void *v, const void **chars_out,
 static int spl_vrblk_name(const struct vrblk *vr, const char **np, int *nl) {
     if (!vr) { *np = ""; *nl = 0; return 0; }
     word len = vr->vrlen;
-    if (len <= 0) {
+    if (len <= 0 || len > 255) {
         *np = "";
         *nl = 0;
         return 1;
     }
-    *np = vr->vrchs;
+    /* Validate name as printable ASCII identifier bytes (0x20..0x7e).
+     * For asign/asinp fire-points (SN-26-bridge-coverage-b), array-element
+     * and table-slot stores reach this code with a fake vrblk synthesized
+     * from xl - vrsto_offset where xl is mid-arblk/mid-tbblk.  vrlen then
+     * reads whatever the previous slot held; could be a positive integer.
+     * Mirrors CSN's lvalue_name_id() — fall through to caller's <lval>
+     * sentinel on validation failure. */
+    const char *p = vr->vrchs;
+    for (int i = 0; i < (int)len; i++) {
+        unsigned char c = (unsigned char)p[i];
+        if (c < 0x20 || c >= 0x7f) {
+            *np = "";
+            *nl = 0;
+            return 1;
+        }
+    }
+    *np = p;
     *nl = (int)len;
     return 1;
 }
