@@ -856,6 +856,25 @@ sysml:      syscall     zysml,42
 sysmw:     mov   m_word [reg_xs],rsp
       syscall     zysmw,43
 
+;     S-2-bridge-7-byrd-pattern: spl-side PM_CALL/EXIT/REDO/FAIL fire-points.
+;     All four take xr = pattern-node block ptr, wb = cursor.
+;     Gated by SPL_PM_TRACE env var on the C side; silent no-op when off.
+      global pmcll
+      extern      zpmcll
+pmcll:     syscall     zpmcll,44
+
+      global pmext
+      extern      zpmext
+pmext:     syscall     zpmext,45
+
+      global pmred
+      extern      zpmred
+pmred:     syscall     zpmred,46
+
+      global pmfal
+      extern      zpmfal
+pmfal:     syscall     zpmfal,47
+
       %macro      callext     2
       extern      %1
       call  %1

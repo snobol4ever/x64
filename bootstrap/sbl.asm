@@ -385,6 +385,12 @@ sec01:                                          ;
         extern sysmv                            ; define external entry point} exp 0  
         extern sysmc                            ; define external entry point} exp 0  
         extern sysmr                            ; define external entry point} exp 0  
+        extern sysml                            ; define external entry point} exp 0  
+        extern sysmw                            ; define external entry point} exp 0  
+        extern pmcll                            ; define external entry point} exp 0  
+        extern pmext                            ; define external entry point} exp 0  
+        extern pmred                            ; define external entry point} exp 0  
+        extern pmfal                            ; define external entry point} exp 0  
                                                 ; } inr   
                                                 ; } inr   
                                                 ; } inr   
@@ -4738,6 +4744,7 @@ p_abd:                                          ;
         align 2                                 ; p0blk} ent bl_p0  
         db   bl_p0                              ; 
 p_abo:                                          ; 
+        call pmfal                              ; S-2-bridge-7-byrd-pattern: emit PM_FAIL} jsr pmfal  
         jmp  exfal                              ; signal statement failure} brn exfal  
         align 2                                 ; p1blk} ent bl_p1  
         db   bl_p1                              ; 
@@ -5634,8 +5641,11 @@ call_49:                                        ;
 p_una:                                          ; 
         mov  xr,wb                              ; copy initial pattern node pointer} mov xr wb 
         mov  wb,m_word [xs]                     ; get initial cursor} mov wb (xs) 
-        cmp  wb,m_word [pmssl]                  ; match fails if at end of string} beq wb pmssl exfal
-        je   exfal                              ; 
+        cmp  wb,m_word [pmssl]                  ; S-2-bridge-7-byrd-pattern: skip PM_FAIL if not at EOS} bne wb pmssl pun01
+        jne  pun01                              ; 
+        call pmfal                              ; emit PM_FAIL — unanchored match exhausted} jsr pmfal  
+        jmp  exfal                              ; match fails} brn exfal  
+pun01:
         inc  wb                                 ; else increment cursor} icv wb  
         mov  m_word [xs],wb                     ; store incremented cursor} mov (xs) wb 
         push xr                                 ; restack initial node ptr} mov -(xs) xr 
@@ -9557,6 +9567,7 @@ failp:
                                                 ; } rtn   
         pop  xr                                 ; load alternative node pointer} mov xr (xs)+ 
         pop  wb                                 ; restore old cursor} mov wb (xs)+ 
+        call pmred                              ; S-2-bridge-7-byrd-pattern: emit PM_REDO (xr=alt,wb=cursor)} jsr pmred  
         mov  xl,m_word [xr]                     ; load pcode entry pointer} mov xl (xr) 
         jmp  xl                                 ; jump to execute code for node} bri xl  
 indir:
@@ -9846,6 +9857,8 @@ stmgo:
         mov  m_word [kvlst],w0                  ; 
         mov  w0,m_word [(cfp_b*cdstm)+xr]       ; set stno} mov kvstn cdstm(xr) 
         mov  m_word [kvstn],w0                  ; 
+        mov  wa,m_word [kvstn]                  ; load stno into wa for sysml} mov wa kvstn 
+        call sysml                              ; emit LABEL record on monitor wire   SN-26-bridge-coverage-f} jsr sysml  
         mov  w0,m_word [kvlin]                  ; set lastline} mov kvlln kvlin 
         mov  m_word [kvlln],w0                  ; 
         mov  w0,m_word [(cfp_b*cdsln)+xr]       ; set line} mov kvlin cdsln(xr) 
@@ -9867,6 +9880,8 @@ stgo3:
         mov  m_word [kvlst],w0                  ; 
         mov  w0,m_word [(cfp_b*cdstm)+xr]       ; set stno} mov kvstn cdstm(xr) 
         mov  m_word [kvstn],w0                  ; 
+        mov  wa,m_word [kvstn]                  ; load stno into wa for sysml} mov wa kvstn 
+        call sysml                              ; emit LABEL record on monitor wire   SN-26-bridge-coverage-f} jsr sysml  
         mov  w0,m_word [kvlin]                  ; set lastline} mov kvlln kvlin 
         mov  m_word [kvlln],w0                  ; 
         mov  w0,m_word [(cfp_b*cdsln)+xr]       ; set line} mov kvlin cdsln(xr) 
@@ -10033,6 +10048,7 @@ stpr4:
         jmp  stpr3                              ; check if dump or profile needed} brn stpr3  
 succp:
                                                 ; } rtn   
+        call pmext                              ; S-2-bridge-7-byrd-pattern: emit PM_EXIT (xr=node,wb=cursor)} jsr pmext  
         mov  xr,m_word [(cfp_b*pthen)+xr]       ; load successor node} mov xr pthen(xr) 
         mov  xl,m_word [xr]                     ; load node code entry address} mov xl (xr) 
         jmp  xl                                 ; jump to match successor node} bri xl  
@@ -10530,10 +10546,16 @@ asg01:
         mov  xr,m_word [xl]                     ; load variable value} mov xr (xl) 
         cmp  m_word [xr],b_trt                  ; jump if trapped} beq (xr) =b_trt asg02
         je   asg02                              ; 
-        push wb                                 ; stack value pointer for sysmv} mov -(xs) wb 
+        push wb                                 ; stack value pointer for sysmv/sysmw} mov -(xs) wb 
         mov  xr,xl                              ; xr = vrval field} mov xr xl 
-        sub  xr,cfp_b*vrvlo                     ; xr = vrsto field (vrvlo = vrval - vrsto)} sub xr *vrvlo 
-        call sysmv                              ; emit VALUE record on monitor wire} jsr sysmv  
+        sub  xr,cfp_b*vrvlo                     ; xr = putative vrsto field} sub xr *vrvlo 
+        cmp  m_word [xr],b_vrs                  ; jump if real natural variable (vrsto = b_vrs)} beq (xr) =b_vrs asga1
+        je   asga1                              ; 
+        call sysmw                              ; aggregate element store — emit <lval>} jsr sysmw  
+        jmp  asga2                              ; merge} brn asga2  
+asga1:
+        call sysmv                              ; natural variable — emit real name} jsr sysmv  
+asga2:
         pop  wb                                 ; pop value back} mov wb (xs)+ 
         mov  m_word [xl],wb                     ; else perform assignment} mov (xl) wb 
         xor  xl,xl                              ; clear garbage value in xl} zer xl  
@@ -10757,10 +10779,16 @@ asinp:
         mov  xr,m_word [xl]                     ; load current contents} mov xr (xl) 
         cmp  m_word [xr],b_trt                  ; jump if trapped} beq (xr) =b_trt asnp1
         je   asnp1                              ; 
-        push wb                                 ; stack value pointer for sysmv} mov -(xs) wb 
+        push wb                                 ; stack value pointer for sysmv/sysmw} mov -(xs) wb 
         mov  xr,xl                              ; xr = vrval field} mov xr xl 
-        sub  xr,cfp_b*vrvlo                     ; xr = vrsto field (vrvlo = vrval - vrsto)} sub xr *vrvlo 
-        call sysmv                              ; emit VALUE record on monitor wire} jsr sysmv  
+        sub  xr,cfp_b*vrvlo                     ; xr = putative vrsto field} sub xr *vrvlo 
+        cmp  m_word [xr],b_vrs                  ; jump if real natural variable} beq (xr) =b_vrs asnpa
+        je   asnpa                              ; 
+        call sysmw                              ; aggregate element — emit <lval>} jsr sysmw  
+        jmp  asnpb                              ; merge} brn asnpb  
+asnpa:
+        call sysmv                              ; natural variable — emit real name} jsr sysmv  
+asnpb:
         pop  wb                                 ; pop value back} mov wb (xs)+ 
         mov  m_word [xl],wb                     ; else perform assignment} mov (xl) wb 
         xor  xl,xl                              ; clear garbage value in xl} zer xl  

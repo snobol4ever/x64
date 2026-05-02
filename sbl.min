@@ -2954,6 +2954,20 @@ sysmw  exp  0                define external entry point
 *      (xs)+1                value being stored (same contract as sysmv)
 *      jsr  sysmw            emit VALUE <lval> record on monitor wire
 *      (xs,xl,xr,wa,wb,wc,ia) preserved over call
+
+pmcll  exp  0                define external entry point
+pmext  exp  0                define external entry point
+pmred  exp  0                define external entry point
+pmfal  exp  0                define external entry point
+
+*      S-2-bridge-7-byrd-pattern: per-pattern-node match events.
+*      All four take xr = pattern-node block ptr (first word = code addr),
+*      wb = current pattern-match cursor.  Gated on SPL_PM_TRACE env var.
+*      pmcll — PM_CALL: entering Match() for a pattern node (reserved).
+*      pmext — PM_EXIT: node Scan returned SUCCESS (call at succp).
+*      pmred — PM_REDO: alt-stack pop restored this node (call at failp).
+*      pmfal — PM_FAIL: control reached p_abo (no live alternates left).
+*      (xs,xl,xr,wa,wb,wc,ia) preserved over each call.
        ejc
 
 *      introduce the internal procedures.
@@ -11663,6 +11677,7 @@ p_abd  ent                   entry point
 *      no parameters
 
 p_abo  ent  bl_p0            p0blk
+       jsr  pmfal           S-2-bridge-7-byrd-pattern: emit PM_FAIL
        brn  exfal            signal statement failure
        ejc
 
@@ -12671,8 +12686,10 @@ p_tbd  ent  bl_p1            p1blk
 p_una  ent                   entry point
        mov  xr,wb            copy initial pattern node pointer
        mov  wb,(xs)          get initial cursor
-       beq  wb,pmssl,exfal   match fails if at end of string
-       icv  wb               else increment cursor
+       bne  wb,pmssl,pun01  S-2-bridge-7-byrd-pattern: skip PM_FAIL if not at EOS
+       jsr  pmfal            emit PM_FAIL — unanchored match exhausted
+       brn  exfal            match fails
+pun01  icv  wb               else increment cursor
        mov  (xs),wb          store incremented cursor
        mov  -(xs),xr         restack initial node ptr
        mov  -(xs),=nduna     restack unanchored node
@@ -16256,6 +16273,7 @@ flpop  rtn
 failp  rtn
        mov  xr,(xs)+         load alternative node pointer
        mov  wb,(xs)+         restore old cursor
+       jsr  pmred           S-2-bridge-7-byrd-pattern: emit PM_REDO (xr=alt,wb=cursor)
        mov  xl,(xr)          load pcode entry pointer
        bri  xl               jump to execute code for node
        ejc
@@ -16815,6 +16833,7 @@ stpr4  rtn
 *      succp continues by matching the successor node
 
 succp  rtn
+       jsr  pmext           S-2-bridge-7-byrd-pattern: emit PM_EXIT (xr=node,wb=cursor)
        mov  xr,pthen(xr)     load successor node
        mov  xl,(xr)          load node code entry address
        bri  xl               jump to match successor node

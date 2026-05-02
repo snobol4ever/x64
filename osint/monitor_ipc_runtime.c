@@ -55,6 +55,11 @@
 #define MWK_END         4u
 #define MWK_LABEL       5u
 #define MWK_NAME_DEF    6u   /* SN-26-bridge-coverage-e: streaming-intern name binding */
+/* S-2-bridge-7-byrd-pattern: per-AST-node pattern-match traversal events. */
+#define MWK_PM_CALL     7u   /* enter Match() for AST node          */
+#define MWK_PM_EXIT     8u   /* node Scan returned SUCCESS          */
+#define MWK_PM_REDO     9u   /* RestoreAlternate popped this node   */
+#define MWK_PM_FAIL    10u   /* node FAILED, no alternate restored  */
 
 #define MWT_NULL        0
 #define MWT_STRING      1
@@ -552,6 +557,129 @@ int zysmw(void) {
     }
 
     emit_record_raw(MWK_VALUE, name_id, type, vp, vlen);
+    return -1;
+}
+
+/*============================================================================
+ * S-2-bridge-7-byrd-pattern: PM_CALL/PM_EXIT/PM_REDO/PM_FAIL fire-points.
+ *
+ * Wire encoding (matches dot-side MonitorIpc.cs and monitor_wire.h):
+ *   kind     = MWK_PM_CALL / MWK_PM_EXIT / MWK_PM_REDO / MWK_PM_FAIL
+ *   name_id  = interned "<spl-pm>" sentinel (controller wildcards PM names)
+ *   type     = MWT_INTEGER
+ *   value    = 8-byte LE node-code address (xr's first word at fire-point)
+ *
+ * Gating: SPL_PM_TRACE env var must be set non-empty to enable; otherwise
+ * the calls are silent no-ops with negligible overhead.  Per session #75
+ * spec: keep PM emits opt-in so existing harness invocations are unaffected.
+ *
+ * Why "<spl-pm>" sentinel name (not the real node tag):
+ *   The dot side emits per-pattern-class tags ("*snoString", "BREAK",
+ *   "LITERAL", ...).  SPITBOL's SIL pattern nodes are dispatched via
+ *   p_xxx code addresses and have no string-tag table.  Rather than
+ *   build a brittle address->name reverse map from a linker dump, we
+ *   use a stable sentinel and let the controller wildcard PM names.
+ *   The cursor value (wb) and node-code address (in payload) still
+ *   give enough discriminator for divergence localisation when the
+ *   user's C# trace runs between adjacent agreed/disagreed events.
+ *==========================================================================*/
+
+static int g_pm_enabled = -1;   /* -1 = unchecked, 0 = off, 1 = on */
+
+static int pm_check_enabled(void) {
+    if (g_pm_enabled >= 0) return g_pm_enabled;
+    const char *e = getenv("SPL_PM_TRACE");
+    g_pm_enabled = (e && *e) ? 1 : 0;
+    return g_pm_enabled;
+}
+
+/* Emit a PM_* record.  kind = one of MWK_PM_CALL/EXIT/REDO/FAIL.
+ * node_addr = code-entry address of the pattern node (or 0 if unknown).
+ * cursor    = current pattern-match cursor (from wb).
+ *
+ * Both values are packed as 8-byte LE in the payload; the cursor is in
+ * the low 4 bytes and the node_addr (truncated to 32 bits) in the high
+ * 4 bytes — keeps wire size at 8 bytes (MWT_INTEGER convention) while
+ * preserving both pieces of state for human-readable forensics.  If
+ * the address overflows 32 bits, the truncation loses high bits but
+ * the cursor portion (which the controller-side compares) is unaffected.
+ */
+static void emit_pm(uint32_t kind, uint64_t node_addr, int64_t cursor) {
+    if (!pm_check_enabled()) return;
+    if (!monitor_init()) return;
+
+    static const char pm_name[] = "<spl-pm>";
+    uint32_t name_id = intern_name(pm_name, (int)(sizeof pm_name - 1));
+    if (name_id == MW_NAME_ID_NONE) return;
+
+    uint64_t packed = ((uint64_t)cursor & 0xffffffffULL)
+                    | ((node_addr & 0xffffffffULL) << 32);
+    unsigned char buf[8];
+    for (int k = 0; k < 8; k++) buf[k] = (unsigned char)((packed >> (k*8)) & 0xff);
+
+    emit_record_raw(kind, name_id, MWT_INTEGER, buf, 8);
+}
+
+/*  zpmcll — PM_CALL: entering a pattern node Match.
+ *
+ *  Call site (sbl.min): jsr pmcll placed at common p_xxx node entries
+ *  (or a shared dispatch hook).  In the current minimum-surgery patch
+ *  we do NOT instrument every p_xxx; PM_CALL coverage is reserved for a
+ *  future rung.  This entry is provided for completeness so the four
+ *  syscall thunks line up with int.asm without dangling externs.
+ *
+ *  Register contract (mirrors sysmv):
+ *    xr = pattern-node block pointer (first word = code address)
+ *    wb = current pattern-match cursor
+ */
+int zpmcll(void) {
+    uint64_t xrp = (uint64_t)XR(unsigned long);
+    uint64_t node_addr = xrp ? *((uint64_t *)xrp) : 0;
+    int64_t  cursor    = WB(long);
+    emit_pm(MWK_PM_CALL, node_addr, cursor);
+    return -1;
+}
+
+/*  zpmext — PM_EXIT: pattern node Scan returned SUCCESS.
+ *
+ *  Call site (sbl.min): jsr pmext at the entry of `succp` (line 16817)
+ *  BEFORE the pthen advance.  At that point xr still points to the
+ *  current node and wb is the post-scan cursor.
+ */
+int zpmext(void) {
+    uint64_t xrp = (uint64_t)XR(unsigned long);
+    uint64_t node_addr = xrp ? *((uint64_t *)xrp) : 0;
+    int64_t  cursor    = WB(long);
+    emit_pm(MWK_PM_EXIT, node_addr, cursor);
+    return -1;
+}
+
+/*  zpmred — PM_REDO: backtrack via failp's alt-stack pop.
+ *
+ *  Call site (sbl.min): jsr pmred at `failp` (line 16256) AFTER the
+ *  alt has been popped into xr and the saved cursor into wb, but
+ *  BEFORE the bri xl dispatch — so the wire records "we are about to
+ *  retry this alternate node at this cursor."
+ */
+int zpmred(void) {
+    uint64_t xrp = (uint64_t)XR(unsigned long);
+    uint64_t node_addr = xrp ? *((uint64_t *)xrp) : 0;
+    int64_t  cursor    = WB(long);
+    emit_pm(MWK_PM_REDO, node_addr, cursor);
+    return -1;
+}
+
+/*  zpmfal — PM_FAIL: control reached p_abo (no live alternates left).
+ *
+ *  Call site (sbl.min): jsr pmfal at `p_abo` entry (line 11665) BEFORE
+ *  the brn exfal — so the wire records the failure-out-of-pattern
+ *  before the SNOBOL4-level statement-fail propagates.
+ */
+int zpmfal(void) {
+    uint64_t xrp = (uint64_t)XR(unsigned long);
+    uint64_t node_addr = xrp ? *((uint64_t *)xrp) : 0;
+    int64_t  cursor    = WB(long);
+    emit_pm(MWK_PM_FAIL, node_addr, cursor);
     return -1;
 }
 
