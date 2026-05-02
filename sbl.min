@@ -16836,6 +16836,7 @@ succp  rtn
        jsr  pmext           S-2-bridge-7-byrd-pattern: emit PM_EXIT (xr=node,wb=cursor)
        mov  xr,pthen(xr)     load successor node
        mov  xl,(xr)          load node code entry address
+       jsr  pmcll            S-2-bridge-7-byrd-pattern: emit PM_CALL (xr=node,xl=code)
        bri  xl               jump to match successor node
        ejc
 

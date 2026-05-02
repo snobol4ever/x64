@@ -10051,6 +10051,7 @@ succp:
         call pmext                              ; S-2-bridge-7-byrd-pattern: emit PM_EXIT (xr=node,wb=cursor)} jsr pmext  
         mov  xr,m_word [(cfp_b*pthen)+xr]       ; load successor node} mov xr pthen(xr) 
         mov  xl,m_word [xr]                     ; load node code entry address} mov xl (xr) 
+        call pmcll                              ; S-2-bridge-7-byrd-pattern: emit PM_CALL (xr=node,xl=code)} jsr pmcll  
         jmp  xl                                 ; jump to match successor node} bri xl  
 sysab:
                                                 ; } rtn   
