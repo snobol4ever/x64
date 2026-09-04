@@ -33,6 +33,7 @@ typedef mword (*PFN)(); /* pointer to function */
 
 static union block *scanp;          /* used by scanef/nextef */
 static pXFNode xnfree = (pXFNode)0; /* list of freed blocks */
+static int ef_loaded = 0;              /* count of LOAD()ed functions this run; the exit scan in nextef is skipped while it is 0 */
 
 extern long f_2_i(double ra);
 extern double i_2_f(long ia);
@@ -315,6 +316,7 @@ loadef(mword fd, char *filename)
     pnode->xnu.xndta[0] = (mword)(uintptr_t)handle; /* xndta[0] = DLL handle */
     pnode->xnu.xndta[1] = (mword)(uintptr_t)pfn;    /* xndta[1] = function entry point */
     pnode->xnu.ef.xn1st = 2;       /* flag first call to function */
+    ef_loaded++;                   /* a function block now exists for nextef to find at exit */
     pnode->xnu.ef.xnsave = 0;      /* not reload from save file */
     pnode->xnu.ef.xncbp = (void far (*)())0; /* no callback  declared */
     return (void *)pnode; /* Return node to store in EFBLK */
@@ -369,6 +371,10 @@ nextef(unsigned char **bufp, int io)
     pXFNode pnode;
 
     MINSAVE();
+    if(io == 1 && ef_loaded == 0) { /* nothing was ever LOAD()ed: no callback can exist, and an error exit leaves the heap */
+        MINRESTORE();                /* with no well-formed block run to walk -- the 2026-09-04 SIGSEGV-on-exit class */
+        return 0;
+    }
     for(dnamp = GET_MIN_VALUE(dnamp, union block *); scanp < dnamp;
         scanp = ((union block *)(MP_OFF(scanp, muword) + blksize))) {
         type = scanp->scb.sctyp; /* any block type lets us access type word */
@@ -376,8 +382,9 @@ nextef(unsigned char **bufp, int io)
         SET_XR(scanp);
         MINIMAL(MINIMAL_BLKLN); /* get length of block in bytes */
         blksize = WA(mword);
-        if(blksize == 0)         /* safety: unknown block type → skip one word */
-            blksize = sizeof(mword);
+        if(blksize == 0 || (blksize & (sizeof(mword) - 1)) != 0 ||
+           (MP_OFF(scanp, muword) + blksize) > MP_OFF(dnamp, muword))
+            break;               /* not a well-formed block run: stop the scan, never stride through junk */
         if(type != ef_type) /* keep searching if not EFBLK */
             continue;
         pnode =
