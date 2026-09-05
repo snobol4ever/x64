@@ -19573,7 +19573,7 @@ cnc01  bge  scnpt,scnil,cnc09 return if end of image
 .if    .culc
        flc  wa               fold to upper case
 .fi
-       beq  wa,=ch_li,cnc07  special case of -inxxx
+       beq  wa,=ch_ui,cnc07  special case of -inxxx
 cnc0a  mnz  scncc            set flag for scane
        jsr  scane            scan card name
        zer  scncc            clear scane flag
@@ -19680,7 +19680,7 @@ cnc07  lch  wa,(xr)+         get next char
 .if    .culc
        flc  wa               fold to upper case
 .fi
-       bne  wa,=ch_ln,cnc0a  if not letter n
+       bne  wa,=ch_un,cnc0a  if not letter n
        lch  wa,(xr)          get third char
        blt  wa,=ch_d0,cnc0a  if not digit
        bgt  wa,=ch_d9,cnc0a  if not digit
@@ -28663,18 +28663,18 @@ trace  prc  n,2              entry point
        mov  xr,(xs)          load name argument
        mov  (xs),xl          stack trblk ptr or zero
        mov  wc,=trtac        set trtyp for access trace
-       beq  wa,=ch_la,trc10  jump if a (access)
+       beq  wa,=ch_ua,trc10  jump if a (access)
        mov  wc,=trtvl        set trtyp for value trace
-       beq  wa,=ch_lv,trc10  jump if v (value)
+       beq  wa,=ch_uv,trc10  jump if v (value)
        beq  wa,=ch_bl,trc10  jump if blank (value)
 
 *      here for l,k,f,c,r
 
-       beq  wa,=ch_lf,trc01  jump if f (function)
-       beq  wa,=ch_lr,trc01  jump if r (return)
-       beq  wa,=ch_ll,trc03  jump if l (label)
-       beq  wa,=ch_lk,trc06  jump if k (keyword)
-       bne  wa,=ch_lc,trc15  else error if not c (call)
+       beq  wa,=ch_uf,trc01  jump if f (function)
+       beq  wa,=ch_ur,trc01  jump if r (return)
+       beq  wa,=ch_ul,trc03  jump if l (label)
+       beq  wa,=ch_uk,trc06  jump if k (keyword)
+       bne  wa,=ch_uc,trc15  else error if not c (call)
 
 *      here for f,c,r
 
@@ -28683,7 +28683,7 @@ trc01  jsr  gtnvr            point to vrblk for name
        ica  xs               pop stack
        mov  xr,vrfnc(xr)     point to function block
        bne  (xr),=b_pfc,trc17 error if not program function
-       beq  wa,=ch_lr,trc02  jump if r (return)
+       beq  wa,=ch_ur,trc02  jump if r (return)
        ejc
 
 *      trace (continued)
@@ -28691,7 +28691,7 @@ trc01  jsr  gtnvr            point to vrblk for name
 *      here for f,c to set/reset call trace
 
        mov  pfctr(xr),xl     set/reset call trace
-       beq  wa,=ch_lc,exnul  exit with null if c (call)
+       beq  wa,=ch_uc,exnul  exit with null if c (call)
 
 *      here for f,r to set/reset return trace
 
