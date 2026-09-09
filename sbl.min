@@ -16667,6 +16667,7 @@ stgo4  ldi  kvstc            get stmt count
        adi  kvstc            stmt count minus counter
        sti  kvstc            replace it
        ile  stcov            fail if stlimit reached
+       mov  stmct,stmcs      reset counter before a trace reads it
        bze  r_stc,stgo5      jump if no statement trace
        zer  xr               clear garbage value in xr
        mov  xl,r_stc         load pointer to stcount trblk
@@ -28755,7 +28756,15 @@ trc08  mov  r_ert,xl         set/reset errtype trace
 *      stcount
 
 trc09  mov  r_stc,xl         set/reset stcount trace
-       jsr  stgcc            update countdown counters
+       ldi  kvstl            check if counting suppressed
+       ilt  trc9a            do not refine if so
+       mov  wa,stmcs         refine with counter breakout
+       sub  wa,stmct         values
+       mti  wa               convert to integer
+       ngi                   current-start value
+       adi  kvstc            add in course counter value
+       sti  kvstc            save refined value
+trc9a  jsr  stgcc            update countdown counters
        exi                   return
        ejc
 
