@@ -1681,7 +1681,7 @@
 .def   .cuej                 define to suppress needless ejects
 .def   .culc                 define to include &case (lc names)
 .def   .culk                 define to include &lcase, &ucase keywords
-*      .cust                 define to include set() code
+.def   .cust                 define to include set() code
 *      .cusr                 define to have set() use real values
 *                             (must also #define setreal 1 in systype.h)
 *
@@ -2742,7 +2742,7 @@ sysrw  exp  3                define external entry point
 
 *      sysst -- set file pointer
 
-sysst  exp  0                define external entry point
+sysst  exp  5                define external entry point
 
 *      sysst is called to change the position of a file
 *      pointer. this is accomplished in a system dependent
@@ -6892,9 +6892,9 @@ v_rem  dbc  svkvc            rem
        dac  ndrem
 .if    .cust
 
-v_set  dbc  svfnn            set (renamed to zet for setl4)
+v_set  dbc  svfnn            set
        dac  3
-       dtc  /ZET/
+       dtc  /SET/
        dac  s_set
        dac  3
 .fi
