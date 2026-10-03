@@ -27292,7 +27292,14 @@ tfn01  mti  wa               convert to integer
 tfn02  ldi  1(xr)            load value as hash source
        ige  tfn06            ok if positive or zero
        ngi                   make positive
-       iov  tfn06            clear possible overflow
+       iov  tfn0a            most negative integer has no positive twin
+       brn  tfn06            merge
+*      here for the most negative integer: hash it as zero rather
+*      than remainder a negative value into a bucket index
+*      (lon 2026-10-03, ceo: a table keyed by the smallest integer
+*      read or wrote through a negative bucket offset and died)
+tfn0a  zer  wa               zero hash source
+       mti  wa               as integer
        brn  tfn06            merge
 
 *      for pattern, use first word (pcode) as source
