@@ -22,7 +22,7 @@ getshell(void)
 {
     char *p;
 
-    if((p = findenv(SHELL_ENV_NAME, sizeof(SHELL_ENV_NAME))) == (char *)0)
+    if((p = findenv(SHELL_ENV_NAME, sizeof(SHELL_ENV_NAME) - 1)) == (char *)0)
         p = SHELL_PATH; /* failure -- use default */
     return p;           /* value (with a null terminator) */
 }

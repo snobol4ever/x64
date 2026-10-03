@@ -6879,6 +6879,12 @@ v_lne  dbc  svfpr            lne
        dac  s_lne
        dac  2
 
+v_ord  dbc  svfnn            ord
+       dac  3
+       dtc  /ORD/
+       dac  s_ord
+       dac  1
+
 v_pos  dbc  svfnp            pos
        dac  3
        dtc  /POS/
@@ -15085,6 +15091,19 @@ s_oup  ent                   entry point
        err  161,output file cannot be written to
        err  290,output channel currently in use
        brn  exnul            return null string
+       ejc
+
+*      ord
+
+s_ord  ent                   entry point
+       jsr  gtstg            load string argument
+       err  333,ord argument is not a string
+       bze  wa,exfal         fail if null string
+       plc  xr               point to first character
+       lch  wa,(xr)          load first character
+       zer  xr               clear character pointer
+       mti  wa               load character code as integer
+       brn  exint            exit with integer result
        ejc
 
 *      pos
