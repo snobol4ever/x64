@@ -211,6 +211,15 @@ mxcsr       dd      0       ; used to test mxcsr exceptions
 do_dvi:
     test    r10,r10         ; check for divide by zero
     jz      do_dvi_over     ; set overflow
+    cmp     r10,-1          ; idiv traps on the smallest integer over -1
+    jne     do_dvi_idiv
+    mov     w0,ia
+    neg     w0              ; the quotient is the negation, OF set when ia is the smallest integer
+    jo      do_dvi_over     ; set overflow
+    mov     ia,w0
+    xor     w0,w0
+    ret
+do_dvi_idiv:
     mov     w0,ia
     cdq
     idiv    r10
@@ -228,6 +237,12 @@ do_dvi_over:
 do_rmi:
     test    r10,r10         ; check for divide by zero
     jz      do_rmi_over     ; set overflow
+    cmp     r10,-1          ; idiv traps on the smallest integer over -1
+    jne     do_rmi_idiv
+    xor     ia,ia           ; every integer over -1 leaves remainder 0
+    xor     w0,w0
+    ret
+do_rmi_idiv:
     mov     w0,ia
     cdq
     idiv    r10

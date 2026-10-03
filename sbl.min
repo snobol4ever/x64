@@ -6825,6 +6825,11 @@ v_end  dbc  svlbl            end
        dac  3
        dtc  /END/
        dac  l_end
+
+v_enl  dbc  svlbl            end in lower case (lon 2026-10-03: end and END are both the end statement)
+       dac  3
+       dtc  /end/
+       dac  l_end
 .if    .cmth
 
 v_exp  dbc  svfnp            exp
@@ -19290,11 +19295,12 @@ cmp07  mov  scnpt,wa         save updated scan offset
        ppm                   dummy (impossible) error return
        mov  cmlbl(xs),xr     store label pointer
        bnz  vrlen(xr),cmp11  jump if not system label
-       bne  vrsvp(xr),=v_end,cmp11 jump if not end label
+       beq  vrsvp(xr),=v_end,cmp7e jump if end label
+       bne  vrsvp(xr),=v_enl,cmp11 jump if not end label in lower case
 
 *      here for end label scanned out
 
-       add  stage,=stgnd     adjust stage appropriately
+cmp7e  add  stage,=stgnd     adjust stage appropriately
        jsr  scane            scan out next element
        beq  xl,=t_smc,cmp10  jump if end of image
        bne  xl,=t_var,cmp08  else error if not variable
