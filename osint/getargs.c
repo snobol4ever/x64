@@ -126,6 +126,12 @@ getargs(int argc, char *argv[])
                 /* round up to machine word boundary */
                 databts = (databts + sizeof(int) - 1) & ~(sizeof(int) - 1);
                 break;
+            case 'D': { /* n  set &DUMP to n before the program's first statement */
+                uword dmp = 0;
+                cp = optnum(cp, &dmp);
+                SET_MIN_VALUE(kvdmp, dmp, word);
+                break;
+            }
             case 'e':   /* don't send errors to terminal */
                 spitflag &= ~ERRORS;
                 break;

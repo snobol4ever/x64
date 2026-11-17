@@ -32,6 +32,7 @@ prompt(void)
            "megabytes.");
     wrterr("spitbol v4.0f");
     wrterr("options:");
+    wrterr("-D# set &DUMP to # before the first statement");
     wrterr("-d# #bytes max heap            -i# #bytes initial heap size & "
            "enlarge amount");
     wrterr("-m# #bytes max object size     -s# #bytes stack size");
